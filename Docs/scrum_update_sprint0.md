@@ -15,10 +15,6 @@
 | Evaluation Plan | [E] | 100% | 90 | Metrics defined; golden set methodology pending Sprint 1 |
 | **Overall Sprint 0** | — | **100%** | **90.83%** | Adjust to reflect where you actually are right now |
 
-
-## GitHub Links
-- Repo: https://github.com/bottyash/cartly.git
-
 ---
 
 ## Blockers Faced
