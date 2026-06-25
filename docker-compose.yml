@@ -1,0 +1,75 @@
+services:
+
+  # ─────────────────────────────────────────────
+  # PostgreSQL — Mock Order Database
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: cartly_postgres
+    environment:
+      POSTGRES_DB:       ${POSTGRES_DB:-cartly}
+      POSTGRES_USER:     ${POSTGRES_USER:-cartly}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-cartly_secret}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./data/seed_orders.sql:/docker-entrypoint-initdb.d/seed_orders.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cartly}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # API — FastAPI ingress (OpenRouter for LLM)
+  # ─────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: cartly_api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      - POSTGRES_DSN=postgresql://${POSTGRES_USER:-cartly}:${POSTGRES_PASSWORD:-cartly_secret}@postgres:${POSTGRES_PORT:-5432}/${POSTGRES_DB:-cartly}
+      - LOG_DIR=/app/observability/logs
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-cartly-admin-2026}
+      - THRESHOLD_AMOUNT=${THRESHOLD_AMOUNT:-500}
+      - FAITHFULNESS_FLOOR=${FAITHFULNESS_FLOOR:-0.70}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-meta-llama/llama-3.2-3b-instruct}
+      - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      - OPENROUTER_SITE_URL=${OPENROUTER_SITE_URL:-http://localhost:3000}
+      - OPENROUTER_SITE_NAME=${OPENROUTER_SITE_NAME:-Cartly}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./observability/logs:/app/observability/logs
+    command: >
+      sh -c "
+        python /app/scripts/seed_demo_logs.py &&
+        uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # Dashboard — Static web UI (nginx)
+  # ─────────────────────────────────────────────
+  dashboard:
+    image: nginx:alpine
+    container_name: cartly_dashboard
+    ports:
+      - "3000:80"
+    volumes:
+      - ./dashboard:/usr/share/nginx/html:ro
+      - ./dashboard/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
