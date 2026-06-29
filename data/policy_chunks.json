@@ -1,0 +1,42 @@
+[
+  {
+    "id": "POL-001",
+    "category": "damaged_goods",
+    "keywords": ["damaged", "broken", "defective", "faulty", "cracked", "not working", "arrived broken"],
+    "title": "Damaged Goods Refund Policy",
+    "text": "If an item arrives damaged or defective, the buyer is eligible for a full refund or replacement within 7 days of delivery. The buyer must provide photo evidence of the damage. Refunds are processed within 3-5 business days after verification. This policy applies to all product categories except digital goods and perishables.",
+    "clause": "\u00a73.2 \u2014 Damaged or Defective Items"
+  },
+  {
+    "id": "POL-002",
+    "category": "non_delivery",
+    "keywords": ["not arrived", "never received", "lost", "missing", "not delivered", "where is my order", "wismo", "not delivered", "never arrived"],
+    "title": "Non-Delivery Refund Policy",
+    "text": "If an order is confirmed as lost or undelivered by the courier within the expected delivery window, the buyer is eligible for a full refund. The claim must be raised within 15 days of the expected delivery date. The platform will initiate a courier investigation before issuing the refund. Refunds are processed within 5-7 business days after investigation completion.",
+    "clause": "\u00a74.1 \u2014 Non-Delivery Claims"
+  },
+  {
+    "id": "POL-003",
+    "category": "electronics_return",
+    "keywords": ["electronics", "laptop", "phone", "mobile", "tablet", "television", "tv", "earbuds", "headphones", "speaker", "gadget", "30-day", "30 day", "return policy"],
+    "title": "Electronics Return Policy \u2014 Non-Returnable",
+    "text": "Electronics and gadgets are NON-RETURNABLE once opened and used, unless the item is defective on arrival (Dead on Arrival). The general 30-day return window does NOT apply to electronics, laptops, mobile phones, tablets, audio equipment, or any electronic accessories. Defective electronics may be exchanged or refunded within 7 days of delivery with clear proof of manufacturing defect. Change of mind, incompatibility, or buyer preference are not valid grounds for return of electronics.",
+    "clause": "\u00a75.4 \u2014 Electronics \u2014 Non-Returnable Category"
+  },
+  {
+    "id": "POL-004",
+    "category": "general_return",
+    "keywords": ["return", "change of mind", "wrong size", "wrong colour", "not as described", "different from listing"],
+    "title": "General Return Policy",
+    "text": "Most non-electronic items are eligible for return within 30 days of delivery, provided they are unused, undamaged, and in original packaging with all tags intact. Refunds are processed within 5-7 business days after the returned item is received and passes inspection. Items that show signs of use, damage, or missing accessories are not eligible for return under this policy.",
+    "clause": "\u00a73.1 \u2014 General 30-Day Return Window"
+  },
+  {
+    "id": "POL-005",
+    "category": "fraud_escalation",
+    "keywords": ["fraud", "legal", "lawyer", "court", "sue", "lawsuit", "police", "report", "crime", "chargeback", "dispute bank", "consumer court"],
+    "title": "Legal Threat and Fraud Escalation Policy",
+    "text": "Any ticket containing legal threats, allegations of fraud or criminal conduct, or references to law enforcement, courts, or legal proceedings must be immediately escalated to a senior human compliance agent. Automated resolution is strictly prohibited for such cases. A unique case reference number is issued within 15 minutes and the case is reviewed by the compliance team within 24 hours.",
+    "clause": "\u00a78.1 \u2014 Legal Threat Kill-Switch"
+  }
+]
