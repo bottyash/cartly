@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartly Admin — Operations Dashboard</title>
+  <meta name="description" content="Cartly admin observability dashboard — tickets, charts, traces and system metrics." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body class="admin-body">
+
+  <!-- Admin Header -->
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <div class="logo">
+        <span class="logo-icon">🛒</span>
+        <span class="logo-text">Cartly</span>
+        <span class="logo-badge admin-badge">Admin</span>
+      </div>
+      <div class="admin-header-right">
+        <div class="api-status" id="api-status">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="status-label">Connecting…</span>
+        </div>
+        <button class="admin-refresh-btn" onclick="loadDashboard()" title="Refresh">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+        </button>
+        <a href="index.html" class="header-logout-btn">← Exit</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main">
+
+    <!-- ── Stats Cards Row ─────────────────────────────────────────── -->
+    <section class="stats-row" id="stats-row">
+      <div class="stat-card" id="stat-total">
+        <div class="stat-label">Total Tickets</div>
+        <div class="stat-value" id="val-total">—</div>
+        <div class="stat-sub">all time</div>
+      </div>
+      <div class="stat-card stat-green" id="stat-resolved">
+        <div class="stat-label">Resolution Rate</div>
+        <div class="stat-value" id="val-resolved">—</div>
+        <div class="stat-sub" id="sub-resolved">— resolved</div>
+      </div>
+      <div class="stat-card stat-amber" id="stat-escalated">
+        <div class="stat-label">Escalated</div>
+        <div class="stat-value" id="val-escalated">—</div>
+        <div class="stat-sub" id="sub-escalated">of total</div>
+      </div>
+      <div class="stat-card stat-cyan" id="stat-latency">
+        <div class="stat-label">Avg Latency</div>
+        <div class="stat-value" id="val-latency">—</div>
+        <div class="stat-sub">per ticket</div>
+      </div>
+      <div class="stat-card stat-purple" id="stat-tokens">
+        <div class="stat-label">Total Tokens</div>
+        <div class="stat-value" id="val-tokens">—</div>
+        <div class="stat-sub">LLM consumption</div>
+      </div>
+    </section>
+
+    <!-- ── Charts Row ──────────────────────────────────────────────── -->
+    <section class="charts-row">
+
+      <div class="chart-card chart-donut">
+        <div class="chart-title">Resolution Rate</div>
+        <div class="chart-body">
+          <canvas id="chart-resolution" width="200" height="200"></canvas>
+        </div>
+        <div class="donut-legend" id="donut-legend"></div>
+      </div>
+
+      <div class="chart-card chart-bar">
+        <div class="chart-title">Daily Ticket Volume</div>
+        <div class="chart-body">
+          <canvas id="chart-volume"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-line">
+        <div class="chart-title">Avg Latency Trend (ms)</div>
+        <div class="chart-body">
+          <canvas id="chart-latency"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card chart-hbar">
+        <div class="chart-title">Escalation Triggers</div>
+        <div class="chart-body">
+          <canvas id="chart-triggers"></canvas>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── FR Coverage ─────────────────────────────────────────────── -->
+    <section class="fr-section">
+      <div class="section-title">FR1–FR8 Coverage</div>
+      <div class="fr-coverage-row" id="fr-coverage-row">
+        <!-- filled by JS -->
+      </div>
+    </section>
+
+    <!-- ── Ticket Table ─────────────────────────────────────────────── -->
+    <section class="ticket-table-section">
+      <div class="table-header-row">
+        <div class="section-title">All Tickets</div>
+        <div class="table-controls">
+          <input type="text" class="table-search" id="table-search"
+            placeholder="Search ticket ID, order…" oninput="filterTable()" />
+          <select class="table-filter" id="status-filter" onchange="filterTable()">
+            <option value="">All status</option>
+            <option value="resolved">Resolved</option>
+            <option value="escalated">Escalated</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="ticket-table" id="ticket-table">
+          <thead>
+            <tr>
+              <th>Ticket ID</th>
+              <th>Status</th>
+              <th>Order</th>
+              <th>Amount</th>
+              <th>Trigger</th>
+              <th>Latency</th>
+              <th>Tokens</th>
+              <th>Created</th>
+              <th>Trace</th>
+            </tr>
+          </thead>
+          <tbody id="ticket-tbody">
+            <tr><td colspan="9" class="table-loading">Loading tickets…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Trace Detail Modal ─────────────────────────────────────────── -->
+  <div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal()">
+    <div class="modal" id="trace-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modal-title">Ticket Trace</div>
+          <div class="modal-subtitle" id="modal-subtitle"></div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body">
+        <!-- trace events rendered here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

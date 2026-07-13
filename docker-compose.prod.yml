@@ -1,0 +1,38 @@
+# docker-compose.prod.yml — Production overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Differences from dev:
+#   - No --reload (uvicorn production mode)
+#   - Memory limits on api container
+#   - Postgres not exposed on host (only internal network)
+
+services:
+
+  postgres:
+    ports: []   # Remove host port exposure in prod
+    networks:
+      - cartly-internal
+
+  api:
+    command: >
+      sh -c "
+        python /app/scripts/seed_demo_logs.py &&
+        uvicorn api.main:app --host 0.0.0.0 --port 8000 --workers 2
+      "
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    networks:
+      - cartly-internal
+      - cartly-public
+
+  dashboard:
+    networks:
+      - cartly-public
+
+networks:
+  cartly-internal:
+    driver: bridge
+  cartly-public:
+    driver: bridge

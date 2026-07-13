@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartly — My Orders</title>
+  <meta name="description" content="Cartly customer portal — track your orders and request refunds via AI chat." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="user-body">
+
+  <!-- Header -->
+  <header class="user-header">
+    <div class="user-header-inner">
+      <div class="logo">
+        <span class="logo-icon">🛒</span>
+        <span class="logo-text">Cartly</span>
+      </div>
+      <div class="user-header-right">
+        <div class="user-order-badge hidden" id="order-badge"></div>
+        <a href="index.html" class="header-logout-btn">← Back</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="user-main">
+
+    <!-- ── STEP 1: Order lookup ───────────────────────────────────── -->
+    <div class="user-screen" id="screen-lookup">
+      <div class="lookup-wrap">
+        <div class="lookup-icon">📦</div>
+        <h1 class="lookup-title">Find Your Order</h1>
+        <p class="lookup-sub">Enter your Order ID to get started with your refund request</p>
+        <div class="lookup-form">
+          <input
+            id="lookup-input"
+            type="text"
+            class="lookup-input"
+            placeholder="e.g. 1042"
+            onkeydown="if(event.key==='Enter') lookupOrder()"
+            autofocus
+          />
+          <button class="lookup-btn" id="lookup-btn" onclick="lookupOrder()">
+            <span id="lookup-text">Find Order</span>
+            <span id="lookup-spinner" class="spinner hidden"></span>
+          </button>
+        </div>
+        <p class="lookup-error hidden" id="lookup-error"></p>
+        <div class="lookup-demo-hint">
+          <span class="hint-label">Demo orders:</span>
+          <button class="hint-chip" onclick="fillAndLookup('1042')">1042</button>
+          <button class="hint-chip" onclick="fillAndLookup('1077')">1077</button>
+          <button class="hint-chip" onclick="fillAndLookup('1090')">1090</button>
+          <button class="hint-chip" onclick="fillAndLookup('1099')">1099</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STEP 2 + 3: Order found + Chat ────────────────────────── -->
+    <div class="user-screen hidden" id="screen-chat">
+
+      <!-- Order card -->
+      <div class="order-card-strip" id="order-card-strip">
+        <div class="order-card" id="order-card">
+          <!-- filled by JS -->
+        </div>
+      </div>
+
+      <!-- Chat window -->
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chat-messages">
+          <!-- messages filled by JS -->
+        </div>
+
+        <!-- Input area -->
+        <div class="chat-input-area" id="chat-input-area">
+          <textarea
+            id="chat-input"
+            class="chat-textarea"
+            placeholder="Describe your refund request…"
+            rows="2"
+            onkeydown="handleChatKey(event)"
+          ></textarea>
+          <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="user.js"></script>
+</body>
+</html>
