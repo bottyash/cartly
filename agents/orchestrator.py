@@ -18,6 +18,8 @@ from typing import Any
 
 from agents.llm_gateway import call_llm, LLMGatewayError
 from agents.refund_agent import RefundAgent
+from agents.delivery_agent import DeliveryAgent
+from agents.complaint_agent import ComplaintAgent
 from agents.safety_critic import SafetyCritic
 from api.schemas import (
     ActionTaken,
@@ -41,18 +43,25 @@ class Orchestrator:
     """
 
     TRIAGE_SYSTEM_PROMPT = """You are a triage classifier for an e-commerce customer support system.
-Classify the customer's refund ticket.
+Classify the customer's support ticket.
 
 Respond ONLY with valid JSON in this exact format:
 {
-  "intent": "<refund_request | exchange_request | status_inquiry | other>",
-  "category": "<damaged_goods | non_delivery | electronics_return | general_return | other>",
+  "intent": "<refund_request | exchange_request | delivery_inquiry | complaint | other>",
+  "category": "<damaged_goods | non_delivery | electronics_return | general_return | quality_issue | delivery_status | exchange | complaint | other>",
   "risk_tier": "<low | medium | high>",
   "confidence": <float 0.0-1.0>
 }
 
+Intent guide:
+- refund_request: customer explicitly wants money back
+- exchange_request: customer wants replacement or exchange of item
+- delivery_inquiry: customer asking about delivery status, tracking, ETA
+- complaint: dissatisfaction, quality issue, bad experience (no specific refund ask)
+- other: general question, not covered above
+
 Risk tier guide:
-- low: clear-cut case, straightforward refund claim
+- low: clear-cut case, straightforward
 - medium: ambiguous eligibility or missing info
 - high: large amount, legal language, or complex situation"""
 
@@ -111,7 +120,22 @@ Risk tier guide:
                 triage=triage,
             )
 
-        # ── Step 4: Dispatch to Refund Agent ─────────────────────────────
+        # ── Step 4: Intent-based routing ──────────────────────────────────
+        intent = triage.intent if triage else "refund_request"
+
+        # ─── 4a. Delivery / status inquiry ───────────────────────────────
+        if intent in ("delivery_inquiry", "status_inquiry"):
+            return self._handle_delivery(request, triage, t_start)
+
+        # ─── 4b. Exchange request ────────────────────────────────────────
+        if intent == "exchange_request":
+            return self._handle_complaint(request, triage, t_start, intent)
+
+        # ─── 4c. Complaint / other ────────────────────────────────────────
+        if intent in ("complaint", "other"):
+            return self._handle_complaint(request, triage, t_start, intent)
+
+        # ─── 4d. Refund request (default) ────────────────────────────────
         refund_agent = RefundAgent()
         agent_result = refund_agent.resolve(
             ticket_id=self.ticket_id,
@@ -188,6 +212,82 @@ Risk tier guide:
                 source_refs=agent_result.source_refs,
                 transaction_ref=agent_result.transaction_ref,
                 faithfulness_score=critic_result.faithfulness_score,
+            ),
+            trace=trace,
+            total_latency_ms=total_latency,
+            total_cost_tokens=sum(e["cost_tokens"] for e in events),
+        )
+
+    # ── Delivery handler ──────────────────────────────────────────────────
+
+    def _handle_delivery(self, request: TicketRequest, triage, t_start: float) -> ResolutionResponse:
+        agent = DeliveryAgent()
+        result = agent.resolve(
+            ticket_id=self.ticket_id,
+            order_id=request.order_id,
+            customer_query=request.raw_ticket,
+        )
+        total_latency = (time.monotonic() - t_start) * 1000
+        log_event(
+            self.ticket_id,
+            step="orchestrator_verdict",
+            latency_ms=total_latency,
+            cost_tokens=0,
+            decision=f"RESOLVED — {result.action_taken} (delivery_inquiry)",
+            metadata={"delivery_status": result.delivery_status},
+        )
+        events = read_events(self.ticket_id)
+        trace = [ObsStep(step=e["step"], latency_ms=e["latency_ms"], cost_tokens=e["cost_tokens"],
+                         decision=e.get("decision"), metadata=e.get("metadata", {})) for e in events]
+        return ResolutionResponse(
+            ticket_id=self.ticket_id,
+            status=ResolutionStatus.resolved,
+            resolution=ResolutionDetail(
+                eligible=False,
+                action_taken=ActionTaken(result.action_taken),
+                reason=result.draft_response,
+                source_refs=[],
+                transaction_ref=None,
+                faithfulness_score=1.0,  # DB facts — fully faithful
+            ),
+            trace=trace,
+            total_latency_ms=total_latency,
+            total_cost_tokens=sum(e["cost_tokens"] for e in events),
+        )
+
+    # ── Complaint / exchange handler ──────────────────────────────────────
+
+    def _handle_complaint(self, request: TicketRequest, triage, t_start: float, intent: str) -> ResolutionResponse:
+        agent = ComplaintAgent()
+        result = agent.resolve(
+            ticket_id=self.ticket_id,
+            order_id=request.order_id,
+            intent=intent,
+            category=triage.category if triage else "other",
+            raw_ticket=request.raw_ticket,
+        )
+        total_latency = (time.monotonic() - t_start) * 1000
+        log_event(
+            self.ticket_id,
+            step="orchestrator_verdict",
+            latency_ms=total_latency,
+            cost_tokens=0,
+            decision=f"RESOLVED — {result.action_taken} ({intent})",
+            metadata={"intent": intent},
+        )
+        events = read_events(self.ticket_id)
+        trace = [ObsStep(step=e["step"], latency_ms=e["latency_ms"], cost_tokens=e["cost_tokens"],
+                         decision=e.get("decision"), metadata=e.get("metadata", {})) for e in events]
+        return ResolutionResponse(
+            ticket_id=self.ticket_id,
+            status=ResolutionStatus.resolved,
+            resolution=ResolutionDetail(
+                eligible=False,
+                action_taken=ActionTaken(result.action_taken),
+                reason=result.draft_response,
+                source_refs=[],
+                transaction_ref=None,
+                faithfulness_score=None,
             ),
             trace=trace,
             total_latency_ms=total_latency,

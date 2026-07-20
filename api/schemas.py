@@ -27,11 +27,14 @@ class ResolutionStatus(str, Enum):
 
 
 class ActionTaken(str, Enum):
-    refund_issued = "refund_issued"
-    replacement_offered = "replacement_offered"
-    denied = "denied"
-    escalated = "escalated"
-    abstained = "abstained"
+    refund_issued        = "refund_issued"
+    replacement_offered  = "replacement_offered"
+    denied               = "denied"
+    escalated            = "escalated"
+    abstained            = "abstained"
+    info_provided        = "info_provided"     # delivery / status queries
+    complaint_logged     = "complaint_logged"  # complaint acknowledgement
+    exchange_initiated   = "exchange_initiated" # exchange requests
 
 
 # ──────────────────────────────────────────────
