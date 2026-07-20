@@ -1,362 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Cartly — Customer Support</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>My Account — Cartly</title>
+<meta name="description" content="Manage your Cartly orders, get AI-powered support, and track deliveries."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#0f172a;min-height:100vh;-webkit-font-smoothing:antialiased}
+:root{--blue:#1d4ed8;--blue-dark:#1e40af;--blue-light:#eff6ff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;--gray-900:#0f172a;--green:#16a34a;--red:#dc2626;--orange:#f97316}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--gray-50);color:var(--gray-900);min-height:100vh;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .hidden{display:none!important}
 
-/* NAV */
-.topnav{position:sticky;top:0;z-index:99;background:#fff;border-bottom:1px solid #e2e8f0;height:62px;display:flex;align-items:center;padding:0 32px;gap:12px}
-.tn-icon{width:34px;height:34px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
-.tn-name{font-size:19px;font-weight:800;letter-spacing:-.5px}
-.tn-sp{flex:1}
-.tn-user-pill{display:flex;align-items:center;gap:7px;background:#f1f5f9;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600;color:#1e293b}
-.tn-user-ico{width:26px;height:26px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-.tn-logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:2px 6px;border-radius:4px}
-.tn-logout:hover{background:#e2e8f0;color:#475569}
-.nav-link{font-size:13px;font-weight:500;color:#64748b;padding:6px 12px;border-radius:7px;transition:all .15s}
-.nav-link:hover{background:#f1f5f9;color:#1e293b}
+/* ═══ NAVBAR ═══ */
+.navbar{background:#fff;border-bottom:1px solid var(--gray-200);position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 20px;height:62px;display:flex;align-items:center;gap:16px}
+.nav-logo{display:flex;align-items:center;gap:9px;cursor:pointer}
+.nav-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--blue),#7c3aed);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px}
+.nav-logo-name{font-size:20px;font-weight:900;letter-spacing:-1px}
+.nav-sp{flex:1}
+.nav-link{font-size:13px;font-weight:600;color:var(--gray-500);padding:7px 12px;border-radius:7px;transition:all .15s;cursor:pointer}
+.nav-link:hover{background:var(--gray-100);color:var(--gray-900)}
+.nav-link.active{color:var(--blue);background:var(--blue-light)}
+.nav-user-pill{display:flex;align-items:center;gap:8px;padding:6px 14px 6px 8px;border:1.5px solid var(--gray-200);border-radius:22px;cursor:pointer;background:#fff;transition:all .15s;position:relative}
+.nav-user-pill:hover{border-color:var(--blue);background:var(--blue-light)}
+.nav-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7c3aed);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-uname{font-size:13px;font-weight:600;color:var(--gray-700)}
+.nav-pill-dd{font-size:10px;color:var(--gray-400)}
 
-/* ═══════════════════════════════════════════
-   SCREEN 0: LOGIN
-════════════════════════════════════════════ */
-#screen-login{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(150deg,#0f172a 0%,#1e3a8a 100%)}
-.login-card{background:#fff;border-radius:18px;padding:42px 38px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
-.login-icon{width:60px;height:60px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px}
-.login-t{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
-.login-s{font-size:14px;color:#64748b;text-align:center;margin-bottom:28px;line-height:1.6}
-.login-lbl{font-size:13px;font-weight:600;color:#374151;margin-bottom:7px}
-.login-inp{width:100%;padding:12px 15px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;font-family:inherit;transition:all .15s;margin-bottom:16px}
-.login-inp:focus{outline:none;border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1)}
-.login-btn{width:100%;padding:13px;background:#1d4ed8;color:#fff;border-radius:9px;font-size:15px;font-weight:700;transition:background .15s;margin-bottom:12px}
-.login-btn:hover{background:#1e40af}
-.login-err{font-size:13px;color:#dc2626;text-align:center;margin-bottom:10px}
-.login-div{display:flex;align-items:center;gap:10px;margin:14px 0;color:#94a3b8;font-size:12px}
-.login-div::before,.login-div::after{content:'';flex:1;height:1px;background:#e2e8f0}
-.login-skip{width:100%;padding:11px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:14px;font-weight:600;color:#475569;background:#fff;transition:all .15s}
-.login-skip:hover{border-color:#1d4ed8;color:#1d4ed8}
-.login-hint{text-align:center;font-size:12px;color:#94a3b8;margin-top:12px}
-.demo-names{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
-.demo-name{font-size:12px;padding:4px 10px;border-radius:14px;background:#eff6ff;color:#1d4ed8;cursor:pointer;font-weight:600;border:1px solid #bfdbfe}
-.demo-name:hover{background:#dbeafe}
+/* Account dropdown */
+.acc-dd{position:absolute;right:0;top:calc(100%+8px);background:#fff;border:1px solid var(--gray-200);border-radius:12px;min-width:200px;box-shadow:0 8px 30px rgba(0,0,0,.12);z-index:200;overflow:hidden;opacity:0;transform:translateY(-8px);pointer-events:none;transition:all .18s}
+.acc-dd.open{opacity:1;transform:translateY(0);pointer-events:auto}
+.acc-dd-header{padding:14px 16px;border-bottom:1px solid var(--gray-100)}
+.acc-dd-name{font-size:14px;font-weight:700}
+.acc-dd-sub{font-size:12px;color:var(--gray-400);margin-top:2px}
+.acc-dd-item{display:flex;align-items:center;gap:9px;padding:11px 16px;font-size:14px;color:var(--gray-700);cursor:pointer;transition:background .12s}
+.acc-dd-item:hover{background:var(--gray-50)}
+.acc-dd-item.danger{color:var(--red)}
+.acc-dd-item.danger:hover{background:#fef2f2}
+.acc-dd-divider{height:1px;background:var(--gray-100);margin:4px 0}
 
-/* ═══════════════════════════════════════════
-   SCREEN 1: HOME (after login)
-════════════════════════════════════════════ */
-#screen-home{min-height:calc(100vh - 62px);padding:32px 20px;max-width:900px;margin:0 auto}
-.home-greeting{font-size:22px;font-weight:800;margin-bottom:4px}
-.home-sub{font-size:15px;color:#64748b;margin-bottom:28px}
-.home-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px}
-@media(max-width:700px){.home-cards{grid-template-columns:1fr}}
-.home-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:22px 20px;cursor:pointer;transition:all .2s}
-.home-card:hover{border-color:#1d4ed8;transform:translateY(-2px);box-shadow:0 6px 20px rgba(29,78,216,.1)}
-.home-card-ico{font-size:28px;margin-bottom:12px}
-.home-card-t{font-size:15px;font-weight:700;margin-bottom:5px}
-.home-card-s{font-size:13px;color:#64748b;line-height:1.6}
+/* ═══ PAGE LAYOUT ═══ */
+.page-wrap{max-width:1200px;margin:0 auto;padding:28px 20px}
+.page-sidebar{width:240px;flex-shrink:0}
+.page-main{flex:1;min-width:0}
+.flex-layout{display:flex;gap:22px;align-items:flex-start}
+@media(max-width:880px){.flex-layout{flex-direction:column}.page-sidebar{width:100%}}
 
-/* Order history */
-.orders-sec-t{font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.orders-list{display:flex;flex-direction:column;gap:10px}
-.order-item{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s}
-.order-item:hover{border-color:#1d4ed8;background:#eff6ff}
-.order-item-ico{width:42px;height:42px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
-.order-item-info{flex:1;min-width:0}
-.order-item-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.order-item-meta{font-size:12px;color:#64748b;margin-top:2px}
-.order-item-right{text-align:right;flex-shrink:0}
-.order-item-amt{font-size:15px;font-weight:800;color:#1d4ed8}
-.pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:14px}
-.pill-g{background:#ecfdf5;color:#059669}
-.pill-a{background:#fffbeb;color:#d97706}
-.pill-r{background:#fef2f2;color:#dc2626}
+/* Sidebar nav */
+.sidebar-card{background:#fff;border:1px solid var(--gray-200);border-radius:14px;overflow:hidden}
+.sidebar-profile{padding:18px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:12px}
+.sidebar-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7c3aed);color:#fff;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sidebar-name{font-size:15px;font-weight:700}
+.sidebar-sub{font-size:12px;color:var(--gray-400);margin-top:2px}
+.sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:12px 18px;font-size:14px;color:var(--gray-600);cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.sidebar-nav-item:hover{background:var(--gray-50);color:var(--gray-900)}
+.sidebar-nav-item.active{background:var(--blue-light);color:var(--blue);border-left-color:var(--blue);font-weight:600}
+.sidebar-nav-item.danger{color:var(--red)}
+.sidebar-nav-item.danger:hover{background:#fef2f2}
 
-/* ═══════════════════════════════════════════
-   SCREEN 2: ORDER LOOKUP (skip login path)
-════════════════════════════════════════════ */
-#screen-lookup{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
-.lk-wrap{width:100%;max-width:460px}
-.lk-bc{font-size:13px;color:#64748b;margin-bottom:20px;display:flex;align-items:center;gap:5px}
-.lk-bc a{color:#1d4ed8;font-weight:500}
-.lk-bc a:hover{text-decoration:underline}
-.lk-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:36px 32px;box-shadow:0 4px 20px rgba(0,0,0,.07)}
-.lk-head{display:flex;align-items:center;gap:14px;margin-bottom:26px}
-.lk-head-ic{width:50px;height:50px;background:#eff6ff;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.lk-head-t{font-size:20px;font-weight:700}
-.lk-head-s{font-size:13px;color:#64748b;margin-top:2px}
-.lk-lbl{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px}
-.lk-row{display:flex;gap:10px}
-.lk-inp{flex:1;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;color:#0f172a;transition:all .15s}
-.lk-inp:focus{outline:none;border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1)}
-.lk-btn{padding:11px 20px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:600;border-radius:9px;transition:background .15s;min-width:100px;display:flex;align-items:center;justify-content:center;gap:6px}
-.lk-btn:hover:not(:disabled){background:#1e40af}
-.lk-btn:disabled{opacity:.55;cursor:not-allowed}
-.lk-err{margin-top:10px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;color:#dc2626}
-.lk-div{display:flex;align-items:center;gap:10px;margin:20px 0;color:#94a3b8;font-size:12px;font-weight:500}
-.lk-div::before,.lk-div::after{content:'';flex:1;height:1px;background:#e2e8f0}
-.lk-hints{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
-.lk-hl{font-size:13px;color:#64748b}
-.lk-chip{padding:5px 13px;border-radius:18px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:600;color:#1d4ed8;transition:all .15s}
-.lk-chip:hover{background:#eff6ff;border-color:#1d4ed8}
+/* ═══ PANELS ═══ */
+.panel{background:#fff;border:1px solid var(--gray-200);border-radius:14px;overflow:hidden}
+.panel-hd{padding:18px 22px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:16px;font-weight:700}
+.panel-sub{font-size:13px;color:var(--gray-400);margin-top:2px}
+.panel-body{padding:22px}
 
-/* ═══════════════════════════════════════════
-   SCREEN 3: GENERIC QUERY (no order)
-════════════════════════════════════════════ */
-#screen-generic{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
-.gen-wrap{width:100%;max-width:580px}
-.gen-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:36px 32px;box-shadow:0 4px 20px rgba(0,0,0,.07)}
-.gen-head{display:flex;align-items:center;gap:14px;margin-bottom:24px}
-.gen-ico{width:50px;height:50px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
-.gen-t{font-size:20px;font-weight:700}
-.gen-s{font-size:13px;color:#64748b;margin-top:2px}
-.gen-examples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
-.gen-ex{padding:5px 13px;border-radius:18px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:13px;color:#475569;cursor:pointer;transition:all .15s}
-.gen-ex:hover{background:#eff6ff;border-color:#1d4ed8;color:#1d4ed8}
-.gen-ta-wrap{position:relative;margin-bottom:14px}
-.gen-ta{width:100%;padding:13px 15px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;font-family:inherit;resize:vertical;min-height:88px;transition:all .15s;color:#0f172a}
-.gen-ta:focus{outline:none;border-color:#1d4ed8}
-.gen-btn{width:100%;padding:13px;background:#1d4ed8;color:#fff;border-radius:9px;font-size:15px;font-weight:700;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
-.gen-btn:hover:not(:disabled){background:#1e40af}
-.gen-btn:disabled{opacity:.55;cursor:not-allowed}
-.gen-result{margin-top:18px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px;font-size:14px;line-height:1.7;color:#0f172a}
-.gen-result-hd{font-size:11px;font-weight:700;color:#0369a1;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
-.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:_s .7s linear infinite}
-@keyframes _s{to{transform:rotate(360deg)}}
-
-/* ═══════════════════════════════════════════
-   SCREEN 4: CHAT
-════════════════════════════════════════════ */
-#screen-chat{min-height:calc(100vh - 62px)}
-.chat-layout{display:flex;max-width:1080px;margin:0 auto;padding:20px;gap:18px}
-.order-sb{width:260px;flex-shrink:0}
-.order-sb-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);position:sticky;top:78px}
-.order-sb-hd{padding:11px 14px;background:#1d4ed8;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase}
-.order-sb-body{padding:14px}
-.order-pname{font-size:14px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f1f5f9}
-.order-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+/* Order list */
+.order-row{display:flex;align-items:center;gap:14px;padding:16px;border-bottom:1px solid var(--gray-100);cursor:pointer;transition:background .12s}
 .order-row:last-child{border:none}
-.order-key{color:#64748b}
-.order-val{font-weight:600;color:#1e293b}
-.order-amt{font-size:20px;font-weight:800;color:#1d4ed8}
-.pdot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.order-sb-ft{padding:10px 14px;border-top:1px solid #f1f5f9}
-.change-btn{width:100%;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:13px;font-weight:600;color:#475569;transition:all .15s}
-.change-btn:hover{background:#f1f5f9;color:#1e293b}
-.how-box{margin-top:12px;background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:14px;font-size:13px;color:#475569}
-.how-title{font-weight:700;color:#0f172a;margin-bottom:7px}
-.how-box ol{padding-left:16px;line-height:2.1}
+.order-row:hover{background:var(--gray-50)}
+.order-row-ico{width:48px;height:48px;background:var(--gray-100);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.order-row-info{flex:1;min-width:0}
+.order-row-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-row-meta{font-size:12px;color:var(--gray-400);margin-top:3px}
+.order-row-right{text-align:right;flex-shrink:0}
+.order-row-amt{font-size:15px;font-weight:800;color:var(--gray-900)}
+.status-pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:14px;margin-top:5px}
+.s-delivered{background:#ecfdf5;color:var(--green)}
+.s-transit{background:#eff6ff;color:var(--blue)}
+.s-pending{background:#fffbeb;color:var(--orange)}
+.s-cancelled{background:#fef2f2;color:var(--red)}
+.s-other{background:var(--gray-100);color:var(--gray-600)}
+.order-row-action{font-size:12px;font-weight:600;color:var(--blue);margin-top:5px;display:flex;align-items:center;gap:3px}
+.order-empty{text-align:center;padding:60px 20px}
+.order-empty-ico{font-size:52px;margin-bottom:14px}
+.order-empty-t{font-size:17px;font-weight:700;margin-bottom:6px}
+.order-empty-s{font-size:14px;color:var(--gray-400);margin-bottom:18px}
 
-.chat-main{flex:1;min-width:0;display:flex;flex-direction:column}
-.chat-win{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:460px}
-.chat-hd{padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px}
-.chat-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
-.chat-aname{font-size:14px;font-weight:700;color:#0f172a}
-.chat-asta{font-size:12px;color:#22c55e;display:flex;align-items:center;gap:4px;margin-top:1px}
+/* Support card */
+.support-opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.support-opts{grid-template-columns:1fr}}
+.support-opt{border:1.5px solid var(--gray-200);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s}
+.support-opt:hover{border-color:var(--blue);background:var(--blue-light);transform:translateY(-2px)}
+.support-opt-ico{font-size:28px;margin-bottom:10px}
+.support-opt-t{font-size:14px;font-weight:700;margin-bottom:4px}
+.support-opt-s{font-size:13px;color:var(--gray-400);line-height:1.55}
+
+/* Generic query */
+.q-examples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.q-ex{padding:6px 14px;border-radius:18px;border:1.5px solid var(--gray-200);background:var(--gray-50);font-size:13px;color:var(--gray-600);cursor:pointer;transition:all .15s}
+.q-ex:hover{background:var(--blue-light);border-color:var(--blue);color:var(--blue)}
+.q-ta{width:100%;padding:13px 15px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:15px;font-family:inherit;resize:vertical;min-height:80px;transition:border-color .15s;color:var(--gray-900);margin-bottom:12px}
+.q-ta:focus{outline:none;border-color:var(--blue)}
+.q-result{margin-top:16px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px;font-size:14px;line-height:1.7}
+.q-result-hd{font-size:11px;font-weight:700;color:#0369a1;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Chat */
+.chat-wrap{display:flex;gap:18px;padding:20px;max-width:1200px;margin:0 auto}
+@media(max-width:760px){.chat-wrap{flex-direction:column;padding:12px}}
+.chat-sidebar{width:240px;flex-shrink:0}
+@media(max-width:760px){.chat-sidebar{width:100%}}
+.chat-order-card{background:#fff;border:1px solid var(--gray-200);border-radius:14px;overflow:hidden;position:sticky;top:78px}
+.chat-order-hd{background:var(--blue);padding:11px 14px;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase}
+.chat-order-body{padding:14px}
+.chat-order-product{font-size:14px;font-weight:700;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--gray-100);line-height:1.4}
+.chat-order-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.chat-order-row:last-child{border:none}
+.chat-order-key{color:var(--gray-400)}
+.chat-order-val{font-weight:600;color:var(--gray-700)}
+.chat-order-ft{padding:10px 14px;border-top:1px solid var(--gray-100)}
+.change-order-btn{width:100%;padding:8px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:7px;font-size:13px;font-weight:600;color:var(--gray-600);transition:all .15s}
+.change-order-btn:hover{background:var(--gray-100)}
+.chat-main-area{flex:1;min-width:0}
+.chat-window{background:#fff;border:1px solid var(--gray-200);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:500px;max-height:calc(100vh - 140px)}
+.chat-hd{padding:13px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px}
+.chat-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:17px}
+.chat-aname{font-size:14px;font-weight:700}
+.chat-asta{font-size:12px;color:#22c55e;display:flex;align-items:center;gap:4px}
 .chat-asta::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
-.chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;min-height:200px}
+.chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
 .chat-messages::-webkit-scrollbar{width:4px}
-.chat-messages::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--gray-200)}
 .chat-bubble{max-width:78%;display:flex;flex-direction:column}
 .bubble-user{align-self:flex-end;align-items:flex-end}
-.bubble-system{align-self:flex-start;align-items:flex-start}
-.bubble-body{padding:11px 15px;border-radius:18px;font-size:14px;line-height:1.6}
-.bubble-user .bubble-body{background:#1d4ed8;color:#fff;border-bottom-right-radius:4px}
-.bubble-system .bubble-body{background:#f1f5f9;color:#1e293b;border:1px solid #e2e8f0;border-bottom-left-radius:4px}
-.bubble-resolved .bubble-body{background:#ecfdf5;border:1px solid #a7f3d0;color:#1e293b}
-.bubble-escalated .bubble-body{background:#fffbeb;border:1px solid #fde68a;color:#1e293b}
-.bubble-time{font-size:11px;color:#94a3b8;margin-top:3px;padding:0 3px}
-.typing-dots{display:flex;gap:4px;align-items:center;padding:3px 2px}
-.typing-dots span{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:_tb 1.4s infinite}
+.bubble-bot{align-self:flex-start;align-items:flex-start}
+.bubble-body{padding:11px 15px;border-radius:18px;font-size:14px;line-height:1.65}
+.bubble-user .bubble-body{background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.bubble-bot .bubble-body{background:var(--gray-100);color:var(--gray-900);border-bottom-left-radius:4px}
+.bubble-resolved .bubble-body{background:#ecfdf5;border:1px solid #a7f3d0;color:var(--gray-900)}
+.bubble-escalated .bubble-body{background:#fffbeb;border:1px solid #fde68a;color:var(--gray-900)}
+.bubble-time{font-size:11px;color:var(--gray-400);margin-top:3px;padding:0 3px}
+.typing-dots{display:flex;gap:4px;align-items:center;padding:3px 0}
+.typing-dots span{width:7px;height:7px;background:var(--gray-400);border-radius:50%;animation:bounce 1.4s infinite}
 .typing-dots span:nth-child(2){animation-delay:.2s}
 .typing-dots span:nth-child(3){animation-delay:.4s}
-@keyframes _tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-.trace-toggle{margin-top:8px;font-size:12px;font-weight:600;color:#1d4ed8;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:#eff6ff}
-.trace-toggle:hover{background:#dbeafe}
-.trace-box{margin-top:8px;background:#0f172a;border-radius:8px;overflow:hidden;border:1px solid #1e293b;font-size:11.5px}
-.trace-row{display:flex;align-items:center;gap:7px;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+.trace-toggle{margin-top:7px;font-size:12px;font-weight:600;color:var(--blue);cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:var(--blue-light)}
+.trace-box{margin-top:8px;background:var(--gray-900);border-radius:8px;overflow:hidden;font-size:11.5px}
+.trace-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
 .trace-row:last-child{border:none}
-.tr-step{color:#7dd3fc;font-weight:600;min-width:190px;font-family:monospace}
+.tr-step{color:#7dd3fc;font-weight:600;min-width:180px;font-family:monospace}
 .tr-dec{color:#e2e8f0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tr-lat{color:#475569;min-width:50px;text-align:right;font-family:monospace}
-.chat-inp-area{padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;gap:9px;align-items:flex-end}
-.chat-ta{flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:22px;font-size:14px;font-family:inherit;resize:none;min-height:40px;max-height:100px;transition:all .15s;line-height:1.5}
-.chat-ta:focus{outline:none;border-color:#1d4ed8}
-.chat-ta::placeholder{color:#94a3b8}
-.chat-send{width:40px;height:40px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-.chat-send:hover:not(:disabled){background:#1e40af;transform:scale(1.05)}
-.chat-send:disabled{opacity:.5;cursor:not-allowed}
+.tr-lat{color:var(--gray-500);font-family:monospace;min-width:50px;text-align:right}
+.chat-inp-wrap{padding:12px 14px;border-top:1px solid var(--gray-100);display:flex;gap:9px;align-items:flex-end}
+.chat-ta{flex:1;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:22px;font-size:14px;font-family:inherit;resize:none;min-height:40px;max-height:100px;transition:border-color .15s;line-height:1.5}
+.chat-ta:focus{outline:none;border-color:var(--blue)}
+.chat-ta::placeholder{color:var(--gray-400)}
+.send-btn{width:40px;height:40px;border-radius:50%;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.send-btn:hover:not(:disabled){background:var(--blue-dark);transform:scale(1.05)}
+.send-btn:disabled{opacity:.45;cursor:not-allowed}
 
-@media(max-width:760px){.chat-layout{flex-direction:column}.order-sb{width:100%}.order-sb-card{position:static}.chat-bubble{max-width:88%}}
+/* Buttons */
+.btn{padding:10px 20px;border-radius:9px;font-size:14px;font-weight:700;transition:all .15s;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-dark)}
+.btn-outline{background:#fff;border:1.5px solid var(--gray-200);color:var(--gray-700)}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue)}
+
+/* Login page (full screen, no sidebar) */
+.login-page{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(150deg,var(--gray-900) 0%,#1e3a8a 100%)}
+.login-box{background:#fff;border-radius:18px;padding:42px 38px;max-width:420px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.2)}
+.login-ico{font-size:36px;margin-bottom:16px;text-align:center}
+.login-t{font-size:24px;font-weight:800;text-align:center;margin-bottom:6px}
+.login-s{font-size:14px;color:var(--gray-400);text-align:center;margin-bottom:26px;line-height:1.65}
+.form-lbl{font-size:13px;font-weight:600;color:var(--gray-700);margin-bottom:7px}
+.form-inp{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:9px;font-size:15px;font-family:inherit;transition:all .15s;color:var(--gray-900);margin-bottom:14px}
+.form-inp:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+.form-btn{width:100%;padding:13px;background:var(--blue);color:#fff;border-radius:9px;font-size:15px;font-weight:700;transition:background .15s;margin-bottom:14px}
+.form-btn:hover:not(:disabled){background:var(--blue-dark)}
+.form-btn:disabled{opacity:.55;cursor:not-allowed}
+.form-err{font-size:13px;color:var(--red);padding:9px 12px;background:#fef2f2;border:1px solid #fecaca;border-radius:7px;margin:-6px 0 12px}
+.divider{display:flex;align-items:center;gap:10px;color:var(--gray-400);font-size:12px;margin:10px 0}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.demo-btn{padding:8px;border:1.5px solid var(--gray-200);border-radius:8px;font-size:13px;font-weight:600;color:var(--gray-700);background:#fff;transition:all .15s}
+.demo-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-light)}
+
+/* Spin */
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:_sp .7s linear infinite;display:inline-block}
+@keyframes _sp{to{transform:rotate(360deg)}}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:600;background:var(--gray-900);color:#fff;padding:13px 18px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(60px);opacity:0;transition:all .25s;max-width:320px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--green)}
+.toast.err{background:var(--red)}
+
+/* How it works in chat sidebar */
+.how-box{background:#fff;border:1px solid var(--gray-200);border-radius:13px;padding:14px;font-size:13px;color:var(--gray-500);margin-top:12px}
+.how-title{font-weight:700;color:var(--gray-900);margin-bottom:7px}
+.how-box ol{padding-left:16px;line-height:2.1}
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<nav class="topnav">
-  <div class="tn-icon">🛒</div>
-  <span class="tn-name">Cartly</span>
-  <div class="tn-sp"></div>
-  <div id="nav-user-pill" class="hidden tn-user-pill">
-    <div class="tn-user-ico" id="nav-user-ico">?</div>
-    <span id="nav-user-name">Guest</span>
-    <span class="tn-logout" onclick="logout()" title="Sign out">✕</span>
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="goHome()">
+      <div class="nav-logo-icon">🛒</div>
+      <span class="nav-logo-name">Cartly</span>
+    </div>
+    <div class="nav-sp"></div>
+
+    <!-- Nav links — shown when logged in -->
+    <div id="nav-auth-links" class="hidden" style="display:flex;gap:4px">
+      <div class="nav-link" id="nav-orders-btn" onclick="switchView('orders')">My Orders</div>
+      <div class="nav-link" id="nav-support-btn" onclick="switchView('support-hub')">Support</div>
+    </div>
+
+    <!-- Guest -->
+    <div id="nav-guest">
+      <button class="btn btn-primary" onclick="switchView('login')" style="padding:9px 18px;font-size:14px">Sign In</button>
+    </div>
+
+    <!-- Logged in user pill -->
+    <div id="nav-user" class="hidden" style="position:relative">
+      <div class="nav-user-pill" onclick="toggleNavDD()">
+        <div class="nav-avatar" id="nav-avatar">?</div>
+        <span class="nav-uname" id="nav-uname">Account</span>
+        <span class="nav-pill-dd">▾</span>
+      </div>
+      <div class="acc-dd" id="nav-dd">
+        <div class="acc-dd-header">
+          <div class="acc-dd-name" id="dd-name"></div>
+          <div class="acc-dd-sub">Cartly Customer</div>
+        </div>
+        <div class="acc-dd-item" onclick="switchView('orders')"><span>📦</span> My Orders</div>
+        <div class="acc-dd-item" onclick="switchView('support-hub')"><span>💬</span> Get Support</div>
+        <div class="acc-dd-item" onclick="window.location.href='catalog.html'"><span>🛍️</span> Browse Catalog</div>
+        <div class="acc-dd-divider"></div>
+        <div class="acc-dd-item danger" onclick="logoutUser()"><span>🚪</span> Sign Out</div>
+      </div>
+    </div>
   </div>
-  <a href="catalog.html" class="nav-link">Catalog</a>
-  <a href="index.html" class="nav-link">← Home</a>
 </nav>
 
-<main id="main-content">
+<main id="main">
 
-<!-- ═══ SCREEN 0: LOGIN ═══════════════════════════════════════════ -->
-<div id="screen-login">
-  <div class="login-card">
-    <div class="login-icon">🛒</div>
-    <div class="login-t">Welcome to Cartly Support</div>
-    <p class="login-s">Sign in to see your orders and get instant support, or continue as a guest.</p>
-
-    <p class="login-lbl">Your Name</p>
-    <input type="text" id="login-name-inp" class="login-inp" placeholder="e.g. Rahul" onkeydown="if(event.key==='Enter')loginUser()"/>
-    <p class="login-err hidden" id="login-err"></p>
-    <button class="login-btn" onclick="loginUser()">Sign In & View My Orders</button>
-
-    <div class="login-div">Try a demo account</div>
-    <div class="demo-names">
-      <span class="demo-name" onclick="fillLogin('Rahul')">Rahul</span>
-      <span class="demo-name" onclick="fillLogin('Ananya')">Ananya</span>
-      <span class="demo-name" onclick="fillLogin('Priya')">Priya</span>
-      <span class="demo-name" onclick="fillLogin('Arjun')">Arjun</span>
+<!-- ═══ VIEW: LOGIN ════════════════════════════════════════ -->
+<div id="view-login" class="login-page">
+  <div class="login-box">
+    <div class="login-ico">🛒</div>
+    <div class="login-t">Sign in to Cartly</div>
+    <p class="login-s">Enter your name to view your orders and get instant support.</p>
+    <p class="form-lbl">Your Name</p>
+    <input id="login-inp" type="text" class="form-inp" placeholder="e.g. Rahul, Ananya, Priya…" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div id="login-err" class="form-err hidden"></div>
+    <button class="form-btn" id="login-submit-btn" onclick="doLogin()">Sign In</button>
+    <div class="divider">Try a demo account</div>
+    <div class="demo-grid">
+      <button class="demo-btn" onclick="quickLogin('Rahul')">Rahul</button>
+      <button class="demo-btn" onclick="quickLogin('Ananya')">Ananya</button>
+      <button class="demo-btn" onclick="quickLogin('Priya')">Priya</button>
+      <button class="demo-btn" onclick="quickLogin('Arjun')">Arjun</button>
     </div>
-
-    <div class="login-div" style="margin-top:18px">or</div>
-    <button class="login-skip" onclick="skipToLookup()">Continue without signing in →</button>
-    <p class="login-hint">Cartly uses your name to find your orders. No password required.</p>
-  </div>
-</div>
-
-<!-- ═══ SCREEN 1: HOME (logged in) ══════════════════════════════ -->
-<div id="screen-home" class="hidden">
-  <p class="home-greeting">Hello, <span id="home-user-name">there</span>! 👋</p>
-  <p class="home-sub">What would you like help with today?</p>
-
-  <div class="home-cards">
-    <div class="home-card" onclick="showScreen('screen-chat-from-home')">
-      <div class="home-card-ico">📦</div>
-      <div class="home-card-t">My Orders</div>
-      <div class="home-card-s">View your order history and get support for a specific order</div>
-    </div>
-    <div class="home-card" onclick="showScreen('screen-generic')">
-      <div class="home-card-ico">💬</div>
-      <div class="home-card-t">Ask a Question</div>
-      <div class="home-card-s">Ask about return policy, shipping, warranty — no order ID needed</div>
-    </div>
-    <div class="home-card" onclick="window.location.href='catalog.html'">
-      <div class="home-card-ico">🛍️</div>
-      <div class="home-card-t">Browse Catalog</div>
-      <div class="home-card-s">Explore products and check return eligibility before buying</div>
-    </div>
-  </div>
-
-  <div class="orders-sec-t">📦 Your Recent Orders <span style="font-size:12px;font-weight:500;color:#94a3b8" id="orders-count"></span></div>
-  <div class="orders-list" id="orders-list">
-    <div style="text-align:center;padding:24px;color:#94a3b8">Loading your orders…</div>
-  </div>
-</div>
-
-<!-- ═══ SCREEN 2: ORDER LOOKUP (guest path) ══════════════════════ -->
-<div id="screen-lookup" class="hidden">
-  <div class="lk-wrap">
-    <p class="lk-bc"><a href="#" onclick="showScreen('screen-login')">Home</a> <span>›</span> Order Lookup</p>
-    <div class="lk-card">
-      <div class="lk-head">
-        <div class="lk-head-ic">📦</div>
-        <div><div class="lk-head-t">Find Your Order</div><div class="lk-head-s">Enter your Order ID to get started</div></div>
-      </div>
-      <p class="lk-lbl">Order ID</p>
-      <div class="lk-row">
-        <input id="lookup-input" type="text" class="lk-inp" placeholder="e.g. 1042" onkeydown="if(event.key==='Enter')lookupOrder()"/>
-        <button class="lk-btn" id="lookup-btn" onclick="lookupOrder()">
-          <span id="lookup-text">Search</span>
-          <span id="lookup-spinner" class="spin hidden"></span>
-        </button>
-      </div>
-      <p class="lk-err hidden" id="lookup-error"></p>
-      <div class="lk-div">or try a demo order</div>
-      <div class="lk-hints">
-        <span class="lk-hl">Quick fill:</span>
-        <button class="lk-chip" onclick="fillAndLookup('1042')">#1042</button>
-        <button class="lk-chip" onclick="fillAndLookup('1077')">#1077</button>
-        <button class="lk-chip" onclick="fillAndLookup('1090')">#1090</button>
-        <button class="lk-chip" onclick="fillAndLookup('1099')">#1099</button>
-      </div>
-    </div>
-    <div style="margin-top:14px;text-align:center">
-      <button class="nav-link" onclick="showScreen('screen-generic')" style="padding:8px 16px;font-size:13px;color:#1d4ed8;font-weight:600">💬 Ask a generic question instead →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ SCREEN 3: GENERIC QUERY ═══════════════════════════════════ -->
-<div id="screen-generic" class="hidden">
-  <div class="gen-wrap">
-    <p class="lk-bc" style="margin-bottom:16px">
-      <a href="#" onclick="goBack()">← Back</a>
+    <p style="text-align:center;margin-top:16px;font-size:13px;color:var(--gray-400)">
+      <a href="index.html" style="color:var(--blue);font-weight:600">← Back to Cartly Home</a>
     </p>
-    <div class="gen-card">
-      <div class="gen-head">
-        <div class="gen-ico">💬</div>
-        <div><div class="gen-t">Ask Anything</div><div class="gen-s">No order ID needed — ask about products, policies, shipping</div></div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: ORDERS LIST ══════════════════════════════════ -->
+<div id="view-orders" class="page-wrap hidden">
+  <div class="flex-layout">
+    <aside class="page-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-profile">
+          <div class="sidebar-avatar" id="sb-avatar">?</div>
+          <div><div class="sidebar-name" id="sb-name">User</div><div class="sidebar-sub">Cartly Member</div></div>
+        </div>
+        <div class="sidebar-nav-item active" onclick="switchView('orders')"><span>📦</span>&nbsp; My Orders</div>
+        <div class="sidebar-nav-item" onclick="switchView('support-hub')"><span>💬</span>&nbsp; Get Support</div>
+        <div class="sidebar-nav-item" onclick="window.location.href='catalog.html'"><span>🛍️</span>&nbsp; Browse Catalog</div>
+        <div class="sidebar-nav-item" onclick="window.location.href='index.html'"><span>🏠</span>&nbsp; Home</div>
+        <div class="sidebar-nav-item danger" onclick="logoutUser()"><span>🚪</span>&nbsp; Sign Out</div>
       </div>
-      <div class="gen-examples">
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">Which smartphone should I buy under ₹3000?</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">Compare the SoundMax Pro vs SoundBuds Lite</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">How long does shipping take?</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">Can I exchange a kurta for a different size?</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">What is the warranty on the TimeFit X1?</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">How do I cancel an order?</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">Is the Yoga Mat returnable?</span>
-        <span class="gen-ex" onclick="fillGeneric(this.textContent)">What payment methods does Cartly accept?</span>
-      </div>
-      <div class="gen-ta-wrap">
-        <textarea id="gen-query" class="gen-ta" placeholder="Type your question — e.g. Is the SoundBuds Lite returnable?"></textarea>
-      </div>
-      <button class="gen-btn" id="gen-btn" onclick="submitGeneric()">
-        <span id="gen-btn-text">Ask Cartly AI</span>
-        <span id="gen-spinner" class="spin hidden"></span>
-      </button>
-      <div class="gen-result hidden" id="gen-result">
-        <div class="gen-result-hd">🤖 Cartly AI Answer</div>
-        <div id="gen-result-text"></div>
+    </aside>
+    <div class="page-main">
+      <div class="panel">
+        <div class="panel-hd">
+          <div>
+            <div class="panel-title">My Orders</div>
+            <div class="panel-sub" id="orders-count-sub">Loading…</div>
+          </div>
+        </div>
+        <div id="orders-list-body">
+          <div style="padding:40px;text-align:center;color:var(--gray-400)">Loading your orders…</div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══ SCREEN 4: CHAT ════════════════════════════════════════════ -->
-<div class="hidden" id="screen-chat">
-  <div class="chat-layout">
-    <aside class="order-sb">
-      <div class="order-sb-card">
-        <div class="order-sb-hd">Your Order</div>
-        <div class="order-sb-body" id="order-card"></div>
-        <div class="order-sb-ft">
-          <button class="change-btn" onclick="changeOrder()">← Search a different order</button>
+<!-- ═══ VIEW: SUPPORT HUB ══════════════════════════════════ -->
+<div id="view-support-hub" class="page-wrap hidden">
+  <div class="flex-layout">
+    <aside class="page-sidebar">
+      <div class="sidebar-card">
+        <div class="sidebar-profile">
+          <div class="sidebar-avatar" id="sb2-avatar">?</div>
+          <div><div class="sidebar-name" id="sb2-name">User</div><div class="sidebar-sub">Cartly Member</div></div>
+        </div>
+        <div class="sidebar-nav-item" onclick="switchView('orders')"><span>📦</span>&nbsp; My Orders</div>
+        <div class="sidebar-nav-item active" onclick="switchView('support-hub')"><span>💬</span>&nbsp; Get Support</div>
+        <div class="sidebar-nav-item" onclick="window.location.href='catalog.html'"><span>🛍️</span>&nbsp; Browse Catalog</div>
+        <div class="sidebar-nav-item" onclick="window.location.href='index.html'"><span>🏠</span>&nbsp; Home</div>
+        <div class="sidebar-nav-item danger" onclick="logoutUser()"><span>🚪</span>&nbsp; Sign Out</div>
+      </div>
+    </aside>
+    <div class="page-main">
+      <div class="panel">
+        <div class="panel-hd"><div class="panel-title">How can we help?</div></div>
+        <div class="panel-body">
+          <div class="support-opts">
+            <div class="support-opt" onclick="switchView('generic-query')">
+              <div class="support-opt-ico">💬</div>
+              <div class="support-opt-t">Ask a Question</div>
+              <p class="support-opt-s">Policy questions, product info, shipping — no order needed</p>
+            </div>
+            <div class="support-opt" onclick="switchView('order-lookup')">
+              <div class="support-opt-ico">📦</div>
+              <div class="support-opt-t">Order Support</div>
+              <p class="support-opt-s">Refund, exchange, delivery issue for a specific order</p>
+            </div>
+          </div>
+          <div style="margin-top:18px;padding-top:18px;border-top:1px solid var(--gray-100)">
+            <p style="font-size:14px;font-weight:700;margin-bottom:12px">Your recent orders — click to get support:</p>
+            <div id="support-orders-quick"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: ORDER LOOKUP (enter order ID) ═══════════════ -->
+<div id="view-order-lookup" class="page-wrap hidden">
+  <div style="max-width:500px;margin:0 auto">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <button class="btn btn-outline" onclick="switchView('support-hub')" style="padding:7px 14px;font-size:13px">← Back</button>
+      <span style="font-size:16px;font-weight:700">Order Support</span>
+    </div>
+    <div class="panel">
+      <div class="panel-hd"><div class="panel-title">Enter Order ID</div><div class="panel-sub">We'll find your order and connect you with our AI agent</div></div>
+      <div class="panel-body">
+        <p class="form-lbl">Order ID</p>
+        <div style="display:flex;gap:10px;margin-bottom:10px">
+          <input id="lookup-inp" type="text" class="form-inp" style="margin:0;flex:1" placeholder="e.g. 1042" onkeydown="if(event.key==='Enter')doLookup()"/>
+          <button class="btn btn-primary" id="lookup-btn" onclick="doLookup()" style="white-space:nowrap">Find Order</button>
+        </div>
+        <div id="lookup-err" class="form-err hidden"></div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;align-items:center">
+          <span style="font-size:13px;color:var(--gray-400)">Quick fill:</span>
+          <button class="demo-btn" onclick="fillLookup('1042')" style="padding:5px 12px">#1042</button>
+          <button class="demo-btn" onclick="fillLookup('1077')" style="padding:5px 12px">#1077</button>
+          <button class="demo-btn" onclick="fillLookup('1090')" style="padding:5px 12px">#1090</button>
+          <button class="demo-btn" onclick="fillLookup('1099')" style="padding:5px 12px">#1099</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: GENERIC QUERY ════════════════════════════════ -->
+<div id="view-generic-query" class="page-wrap hidden">
+  <div style="max-width:600px;margin:0 auto">
+    <div style="margin-bottom:16px;display:flex;align-items:center;gap:10px">
+      <button class="btn btn-outline" onclick="switchView('support-hub')" style="padding:7px 14px;font-size:13px">← Back</button>
+      <span style="font-size:16px;font-weight:700">Ask Anything</span>
+    </div>
+    <div class="panel">
+      <div class="panel-hd">
+        <div>
+          <div class="panel-title">AI Shopping Assistant</div>
+          <div class="panel-sub">Product recommendations, policies, shipping — no order ID needed</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="q-examples">
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">Which smartphone should I buy?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">How long does delivery take?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">Is the Yoga Mat returnable?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">Can I exchange a kurta for a different size?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">What is the warranty on the TimeFit X1?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">How do I cancel my order?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">What payment methods does Cartly accept?</span>
+          <span class="q-ex" onclick="fillGeneric(this.textContent)">Compare SoundMax Pro vs SoundBuds Lite</span>
+        </div>
+        <textarea id="gen-ta" class="q-ta" placeholder="Ask about products, return policy, shipping, payments…"></textarea>
+        <button class="btn btn-primary" id="gen-btn" onclick="submitGeneric()" style="width:100%;justify-content:center;padding:13px">
+          <span id="gen-btn-t">Ask Cartly AI</span>
+          <span id="gen-spin" class="spin hidden"></span>
+        </button>
+        <div id="gen-result" class="q-result hidden">
+          <div class="q-result-hd">🤖 Cartly AI Answer</div>
+          <div id="gen-result-body"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: CHAT ══════════════════════════════════════════ -->
+<div id="view-chat" class="hidden">
+  <div class="chat-wrap">
+    <aside class="chat-sidebar">
+      <div class="chat-order-card">
+        <div class="chat-order-hd">Your Order</div>
+        <div class="chat-order-body" id="chat-order-body"></div>
+        <div class="chat-order-ft">
+          <button class="change-order-btn" onclick="switchView('support-hub')">← Choose a different order</button>
         </div>
       </div>
       <div class="how-box">
         <div class="how-title">💡 How it works</div>
         <ol>
-          <li>Describe your issue in chat</li>
+          <li>Describe your issue</li>
           <li>AI reviews order + policy</li>
-          <li>Get an instant decision</li>
+          <li>Get instant resolution</li>
         </ol>
       </div>
     </aside>
-    <div class="chat-main">
-      <div class="chat-win">
+    <div class="chat-main-area">
+      <div class="chat-window">
         <div class="chat-hd">
           <div class="chat-av">🤖</div>
           <div>
@@ -365,12 +444,12 @@ a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;b
           </div>
         </div>
         <div class="chat-messages" id="chat-messages"></div>
-        <div class="chat-inp-area" id="chat-input-area">
-          <textarea id="chat-input" class="chat-ta" rows="1"
+        <div class="chat-inp-wrap" id="chat-inp-area">
+          <textarea id="chat-inp" class="chat-ta" rows="1"
             placeholder="Describe your issue — refund, delivery, exchange, complaint…"
             onkeydown="handleChatKey(event)"></textarea>
-          <button class="chat-send" id="chat-send-btn" onclick="sendMessage()">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>
           </button>
@@ -382,167 +461,315 @@ a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;b
 
 </main>
 
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
 <script src="user.js"></script>
 <script>
+'use strict';
 const API = 'http://localhost:8000';
+const STATUS_CLASS = {delivered:'s-delivered',in_transit:'s-transit',shipped:'s-transit',processing:'s-pending',pending:'s-pending',not_delivered:'s-pending',cancelled:'s-cancelled'};
+const STATUS_ICO = {delivered:'✅',in_transit:'🚚',shipped:'📬',processing:'⚙️',pending:'🕐',not_delivered:'⚠️',cancelled:'❌'};
+const CAT_ICO = {electronics:'⚡',clothing:'👕',home:'🏠',books:'📚',sports:'🏃',beauty:'✨',default:'📦'};
+
 let currentUser = null;
-let userOrders  = [];
-let prevScreen  = 'screen-login';
+let userOrders = [];
+let historyStack = [];
 
-/* ── Helpers ─────────────────────────────────────────────── */
-function showScreen(id) {
-  ['screen-login','screen-home','screen-lookup','screen-generic','screen-chat']
-    .forEach(s => document.getElementById(s).classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+/* ═══ TOAST ═════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast${type?' '+type:''}`;
+  setTimeout(()=>t.classList.add('show'), 10);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 3200);
 }
 
-function goBack() {
-  const dest = currentUser ? 'screen-home' : 'screen-login';
-  showScreen(dest);
+/* ═══ VIEW SYSTEM ════════════════════════════════════════ */
+const VIEWS = ['login','orders','support-hub','order-lookup','generic-query','chat'];
+
+function switchView(name, pushHistory = true) {
+  const prev = VIEWS.find(v => !document.getElementById('view-'+v).classList.contains('hidden'));
+  if (pushHistory && prev && prev !== name) historyStack.push(prev);
+
+  VIEWS.forEach(v => document.getElementById('view-'+v).classList.add('hidden'));
+  document.getElementById('view-'+name).classList.remove('hidden');
+
+  // Update sidebar active state
+  ['nav-orders-btn','nav-support-btn'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  if (name === 'orders') document.getElementById('nav-orders-btn')?.classList.add('active');
+  if (name === 'support-hub' || name === 'generic-query' || name === 'order-lookup')
+    document.getElementById('nav-support-btn')?.classList.add('active');
 }
 
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+/* ═══ AUTH ═══════════════════════════════════════════════ */
+function initAuth() {
+  const saved = sessionStorage.getItem('cartly_user');
+  if (saved) {
+    try {
+      const u = JSON.parse(saved);
+      currentUser = u.name;
+      userOrders = u.orders || [];
+      setLoggedInUI(u.name);
 
-/* ── Login ───────────────────────────────────────────────── */
-function fillLogin(name) { document.getElementById('login-name-inp').value = name; }
+      // Handle URL params
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('view') === 'orders') { renderOrders(); switchView('orders', false); }
+      else if (params.get('mode') === 'generic') {
+        const q = params.get('query') || '';
+        if (q) document.getElementById('gen-ta').value = decodeURIComponent(q);
+        switchView('generic-query', false);
+      } else { switchView('orders', false); }
+    } catch { sessionStorage.removeItem('cartly_user'); showLoginPage(); }
+  } else { showLoginPage(); }
+}
 
-async function loginUser() {
-  const name = document.getElementById('login-name-inp').value.trim();
+function showLoginPage() {
+  // Check URL for mode even as guest
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mode') === 'generic') {
+    const q = params.get('query') || '';
+    if (q) document.getElementById('gen-ta').value = decodeURIComponent(q);
+    // Can do generic without login
+    switchView('generic-query', false);
+    // Hide sidebar stuff that requires auth
+    return;
+  }
+  switchView('login', false);
+}
+
+function setLoggedInUI(name) {
+  document.getElementById('nav-guest').classList.add('hidden');
+  document.getElementById('nav-user').classList.remove('hidden');
+  document.getElementById('nav-auth-links').classList.remove('hidden');
+  document.getElementById('nav-avatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('nav-uname').textContent = name;
+  document.getElementById('dd-name').textContent = name;
+  // sidebar
+  ['sb-avatar','sb2-avatar'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = name.charAt(0).toUpperCase();
+  });
+  ['sb-name','sb2-name'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = name;
+  });
+}
+
+function toggleNavDD() {
+  document.getElementById('nav-dd').classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  const u = document.getElementById('nav-user');
+  if (u && !u.contains(e.target)) document.getElementById('nav-dd').classList.remove('open');
+});
+
+async function doLogin() {
+  const name = document.getElementById('login-inp').value.trim();
   const errEl = document.getElementById('login-err');
+  const btn = document.getElementById('login-submit-btn');
   errEl.classList.add('hidden');
   if (!name) { errEl.textContent='Please enter your name.'; errEl.classList.remove('hidden'); return; }
 
+  btn.disabled = true; btn.textContent = 'Signing in…';
   try {
     const r = await fetch(`${API}/orders/buyer/${encodeURIComponent(name)}`);
-    if (!r.ok) { errEl.textContent=`No orders found for "${name}". Try: Rahul, Ananya, Priya, Arjun.`; errEl.classList.remove('hidden'); return; }
+    if (!r.ok) {
+      errEl.textContent = `No account found for "${name}". Try: Rahul, Ananya, Priya or Arjun.`;
+      errEl.classList.remove('hidden'); return;
+    }
     const d = await r.json();
     currentUser = name;
-    userOrders  = d.orders || [];
-    setNavUser(name);
-    renderOrderList();
-    document.getElementById('home-user-name').textContent = name;
-    document.getElementById('orders-count').textContent = `(${userOrders.length})`;
-    showScreen('screen-home');
-  } catch { errEl.textContent='Could not connect to server.'; errEl.classList.remove('hidden'); }
+    userOrders = d.orders || [];
+    sessionStorage.setItem('cartly_user', JSON.stringify({name, orders: userOrders}));
+    setLoggedInUI(name);
+    renderOrders();
+    switchView('orders', false);
+    showToast(`Welcome back, ${name}! 👋`, 'success');
+  } catch {
+    errEl.textContent = 'Could not connect to server. Please try again.';
+    errEl.classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Sign In'; }
 }
 
-function setNavUser(name) {
-  const pill = document.getElementById('nav-user-pill');
-  pill.classList.remove('hidden');
-  document.getElementById('nav-user-name').textContent = name;
-  document.getElementById('nav-user-ico').textContent = name.charAt(0).toUpperCase();
+function quickLogin(name) {
+  document.getElementById('login-inp').value = name;
+  doLogin();
 }
 
-function logout() {
+function logoutUser() {
+  sessionStorage.removeItem('cartly_user');
   currentUser = null; userOrders = [];
-  document.getElementById('nav-user-pill').classList.add('hidden');
-  document.getElementById('login-name-inp').value = '';
-  showScreen('screen-login');
+  document.getElementById('nav-user').classList.add('hidden');
+  document.getElementById('nav-guest').classList.remove('hidden');
+  document.getElementById('nav-auth-links').classList.add('hidden');
+  document.getElementById('nav-dd').classList.remove('open');
+  historyStack = [];
+  switchView('login', false);
+  showToast('Signed out successfully.');
 }
 
-function skipToLookup() { showScreen('screen-lookup'); }
+function goHome() { window.location.href = 'index.html'; }
 
-/* ── Order list ──────────────────────────────────────────── */
-const DELIVERY_ICONS = {delivered:'✅',not_delivered:'⚠️',in_transit:'🚚',shipped:'📬',processing:'⚙️',pending:'🕐',cancelled:'❌'};
-const STATUS_PILLS = {delivered:'pill-g',not_delivered:'pill-a',in_transit:'pill-g',shipped:'pill-g',processing:'pill-a',pending:'pill-a',cancelled:'pill-r'};
-
-function renderOrderList() {
-  const el = document.getElementById('orders-list');
-  if (!userOrders.length) { el.innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8">No orders found.</div>'; return; }
-  el.innerHTML = userOrders.map(o => {
-    const ico  = DELIVERY_ICONS[o.delivery_status] || '📦';
-    const pc   = STATUS_PILLS[o.delivery_status]  || 'pill-a';
+/* ═══ ORDERS LIST ════════════════════════════════════════ */
+function renderOrders() {
+  const body = document.getElementById('orders-list-body');
+  const countEl = document.getElementById('orders-count-sub');
+  if (!userOrders.length) {
+    body.innerHTML = `<div class="order-empty"><div class="order-empty-ico">📦</div><div class="order-empty-t">No orders yet</div><div class="order-empty-s">Your orders will appear here once you make a purchase.</div><button class="btn btn-primary" onclick="window.location.href='index.html'">Start Shopping</button></div>`;
+    countEl.textContent = '0 orders'; return;
+  }
+  countEl.textContent = `${userOrders.length} order${userOrders.length>1?'s':''}`;
+  body.innerHTML = userOrders.map(o => {
+    const sc = STATUS_CLASS[o.delivery_status] || 's-other';
+    const ico = STATUS_ICO[o.delivery_status] || '📦';
+    const catIco = CAT_ICO[o.product_category] || '📦';
     return `
-    <div class="order-item" onclick="openOrderChat('${o.order_id}')">
-      <div class="order-item-ico">${ico}</div>
-      <div class="order-item-info">
-        <div class="order-item-name">${esc(o.product_name)}</div>
-        <div class="order-item-meta">#${esc(o.order_id)} · ${esc(o.product_category)} · ${esc(o.order_date||'')}</div>
+    <div class="order-row" onclick="openOrderChat('${o.order_id}')">
+      <div class="order-row-ico">${catIco}</div>
+      <div class="order-row-info">
+        <div class="order-row-name">${esc(o.product_name)}</div>
+        <div class="order-row-meta">Order #${esc(o.order_id)} · ${esc(o.order_date||'')} · ${esc(o.courier||'')}</div>
       </div>
-      <div class="order-item-right">
-        <div class="order-item-amt">₹${Number(o.order_amount).toFixed(0)}</div>
-        <div class="pill ${pc}" style="margin-top:4px"><span class="pdot"></span>${esc(o.delivery_status)}</div>
+      <div class="order-row-right">
+        <div class="order-row-amt">₹${Number(o.order_amount).toLocaleString('en-IN')}</div>
+        <div class="status-pill ${sc}">${ico} ${esc(o.delivery_status).replace('_',' ')}</div>
+        <div class="order-row-action">Get Support →</div>
       </div>
+    </div>`;
+  }).join('');
+
+  // Also populate support hub quick list
+  renderSupportQuickOrders();
+}
+
+function renderSupportQuickOrders() {
+  const el = document.getElementById('support-orders-quick');
+  if (!el || !userOrders.length) return;
+  el.innerHTML = userOrders.slice(0,3).map(o => {
+    const sc = STATUS_CLASS[o.delivery_status] || 's-other';
+    const ico = STATUS_ICO[o.delivery_status] || '📦';
+    return `
+    <div class="order-row" style="border:1.5px solid var(--gray-200);border-radius:10px;margin-bottom:8px" onclick="openOrderChat('${o.order_id}')">
+      <div class="order-row-ico" style="font-size:18px;width:38px;height:38px">${ico}</div>
+      <div class="order-row-info">
+        <div class="order-row-name" style="font-size:13px">${esc(o.product_name)}</div>
+        <div class="order-row-meta">#${esc(o.order_id)} · ₹${Number(o.order_amount).toLocaleString('en-IN')}</div>
+      </div>
+      <div><div class="status-pill ${sc}">${esc(o.delivery_status).replace('_',' ')}</div></div>
     </div>`;
   }).join('');
 }
 
 async function openOrderChat(orderId) {
-  document.getElementById('lookup-input') && (document.getElementById('lookup-input').value = orderId);
-  // Directly load the order and go to chat
-  const r = await fetch(`${API}/orders/${orderId}`);
-  if (!r.ok) return;
-  const order = await r.json();
-  window._currentOrder = order;
-  renderOrderCard(order);
-  document.getElementById('chat-messages').innerHTML = '';
-  showScreen('screen-chat');
-  // Trigger welcome message
-  if (typeof addWelcomeMessage === 'function') addWelcomeMessage(order);
-  else appendBotMessage(`Hi ${order.buyer_name}! 👋 I found your order for **${order.product_name}** (₹${order.order_amount}). How can I help you today?`);
+  const local = userOrders.find(o => o.order_id === orderId);
+  if (local) { window._currentOrder = local; setupChat(local); return; }
+  try {
+    const r = await fetch(`${API}/orders/${orderId}`);
+    if (!r.ok) { showToast('Order not found.', 'err'); return; }
+    window._currentOrder = await r.json();
+    setupChat(window._currentOrder);
+  } catch { showToast('Could not load order.', 'err'); }
 }
 
-function showScreen_fromHome(id) { prevScreen = 'screen-home'; showScreen(id); }
+function setupChat(order) {
+  // Render order card in chat sidebar
+  const body = document.getElementById('chat-order-body');
+  const sc = STATUS_CLASS[order.delivery_status] || 's-other';
+  body.innerHTML = `
+    <div class="chat-order-product">${esc(order.product_name)}</div>
+    <div class="chat-order-row"><span class="chat-order-key">Order ID</span><span class="chat-order-val">#${esc(order.order_id)}</span></div>
+    <div class="chat-order-row"><span class="chat-order-key">Amount</span><span class="chat-order-val">₹${Number(order.order_amount).toLocaleString('en-IN')}</span></div>
+    <div class="chat-order-row"><span class="chat-order-key">Category</span><span class="chat-order-val">${esc(order.product_category)}</span></div>
+    <div class="chat-order-row"><span class="chat-order-key">Status</span><span class="status-pill ${sc}">${esc(order.delivery_status).replace('_',' ')}</span></div>
+    <div class="chat-order-row"><span class="chat-order-key">Courier</span><span class="chat-order-val">${esc(order.courier||'N/A')}</span></div>`;
 
-/* ── Generic query ──────────────────────────────────────── */
-function fillGeneric(q) { document.getElementById('gen-query').value = q; }
+  // Clear and init chat
+  document.getElementById('chat-messages').innerHTML = '';
+  switchView('chat');
+  const buyer = (order.buyer_name || 'there').split(' ')[0];
+  addBubble('bot', `Hi ${buyer}! 👋 I found your order for **${order.product_name}** (₹${Number(order.order_amount).toLocaleString('en-IN')}). I'm Cartly's AI support agent.\n\nHow can I help you today? I can assist with refunds, delivery tracking, exchanges, complaints, or any other issue.`);
+  setTimeout(()=>document.getElementById('chat-inp').focus(), 300);
+}
+
+/* ═══ ORDER LOOKUP (guest/manual) ═══════════════════════ */
+function fillLookup(id) { document.getElementById('lookup-inp').value = id; }
+
+async function doLookup() {
+  const id = document.getElementById('lookup-inp').value.trim();
+  const errEl = document.getElementById('lookup-err');
+  const btn = document.getElementById('lookup-btn');
+  errEl.classList.add('hidden');
+  if (!id) return;
+  btn.disabled = true; btn.textContent = 'Searching…';
+  try {
+    const r = await fetch(`${API}/orders/${id}`);
+    if (!r.ok) {
+      errEl.textContent = `Order #${id} not found. Try: 1042, 1077, 1090, 1099`;
+      errEl.classList.remove('hidden'); return;
+    }
+    window._currentOrder = await r.json();
+    setupChat(window._currentOrder);
+  } catch {
+    errEl.textContent = 'Could not connect to server.';
+    errEl.classList.remove('hidden');
+  } finally { btn.disabled = false; btn.textContent = 'Find Order'; }
+}
+
+/* ═══ GENERIC QUERY ══════════════════════════════════════ */
+function fillGeneric(q) { document.getElementById('gen-ta').value = q; }
 
 async function submitGeneric() {
-  const q   = document.getElementById('gen-query').value.trim();
+  const q = document.getElementById('gen-ta').value.trim();
   const btn = document.getElementById('gen-btn');
-  const txt = document.getElementById('gen-btn-text');
-  const sp  = document.getElementById('gen-spinner');
+  const btnT = document.getElementById('gen-btn-t');
+  const spin = document.getElementById('gen-spin');
   const res = document.getElementById('gen-result');
-  const rtxt= document.getElementById('gen-result-text');
+  const body = document.getElementById('gen-result-body');
   if (!q) return;
-
-  btn.disabled = true; txt.textContent = 'Thinking…'; sp.classList.remove('hidden');
+  btn.disabled = true; btnT.textContent = 'Thinking…'; spin.classList.remove('hidden');
   res.classList.add('hidden');
-
   try {
     const r = await fetch(`${API}/tickets/generic`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ query: q })
+      body: JSON.stringify({query: q})
     });
     const d = await r.json();
-    const answer = d.resolution?.reason || d.handoff_brief?.reason || 'I could not find a specific answer. Please contact support@cartly.in';
-    // Render markdown-ish bold
-    rtxt.innerHTML = answer.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    const ans = d.resolution?.reason || d.handoff_brief?.reason || 'I couldn\'t find a specific answer. Please contact support@cartly.in.';
+    body.innerHTML = ans.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
     res.classList.remove('hidden');
   } catch {
-    rtxt.textContent = 'Could not connect to server. Please try again.';
+    body.textContent = 'Could not connect to server. Please try again.';
     res.classList.remove('hidden');
-  } finally {
-    btn.disabled = false; txt.textContent = 'Ask Cartly AI'; sp.classList.add('hidden');
-  }
+  } finally { btn.disabled=false; btnT.textContent='Ask Cartly AI'; spin.classList.add('hidden'); }
 }
 
-/* ── Chat helpers (used by user.js) ─────────────────────── */
-function changeOrder() {
-  document.getElementById('screen-chat').classList.add('hidden');
-  document.getElementById('chat-messages').innerHTML = '';
-  if (currentUser) showScreen('screen-home');
-  else showScreen('screen-lookup');
-}
-
-function appendBotMessage(text) {
+/* ═══ CHAT (bubble rendering, uses user.js for sending) ══ */
+function addBubble(role, text, type='') {
   const msgs = document.getElementById('chat-messages');
-  const div  = document.createElement('div');
-  div.className = 'chat-bubble bubble-system';
-  div.innerHTML = `<div class="bubble-body">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>`;
+  const div = document.createElement('div');
+  div.className = `chat-bubble bubble-${role} ${type}`;
+  const html = text
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\n/g,'<br>');
+  const now = new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  div.innerHTML = `<div class="bubble-body">${html}</div><div class="bubble-time">${now}</div>`;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+  return div;
 }
 
-/* ── Init: check URL params ──────────────────────────────── */
-document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('mode') === 'generic') {
-    const q = params.get('query') || '';
-    showScreen('screen-generic');
-    if (q) document.getElementById('gen-query').value = decodeURIComponent(q);
-  }
-});
+// compatibility with user.js
+function addWelcomeMessage(order) {} // handled in setupChat above
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+/* ═══ INIT ═══════════════════════════════════════════════ */
+initAuth();
 </script>
 </body>
 </html>

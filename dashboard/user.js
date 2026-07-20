@@ -1,102 +1,16 @@
-/* ──────────────────────────────────────────────────────────────
-   Cartly — User Chat Interface (user.js)
-   Handles: order lookup → chat flow → ticket submission → result
-────────────────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────
+   Cartly — Chat Engine (user.js)
+   Handles: sendMessage → ticket API → render result
+   All view/auth/nav logic lives in user.html inline script.
+────────────────────────────────────────────────────────── */
 'use strict';
 
 const API_BASE = 'http://localhost:8000';
+let chatLocked = false;
+let bubbleCounter = 0;
+let typingIdCounter = 0;
 
-let currentOrder = null;
-let chatLocked   = false;
-
-// ── Step 1: Order Lookup ──────────────────────────────────────────────────
-
-function fillAndLookup(orderId) {
-  document.getElementById('lookup-input').value = orderId;
-  lookupOrder();
-}
-
-async function lookupOrder() {
-  const input = document.getElementById('lookup-input');
-  const btn   = document.getElementById('lookup-btn');
-  const txtEl = document.getElementById('lookup-text');
-  const spn   = document.getElementById('lookup-spinner');
-  const errEl = document.getElementById('lookup-error');
-  const orderId = input.value.trim();
-
-  if (!orderId) return;
-
-  btn.disabled = true;
-  txtEl.classList.add('hidden');
-  spn.classList.remove('hidden');
-  errEl.classList.add('hidden');
-
-  try {
-    const r = await fetch(`${API_BASE}/orders/${encodeURIComponent(orderId)}`);
-    if (!r.ok) {
-      const data = await r.json().catch(() => ({}));
-      errEl.textContent = data.detail || `Order '${orderId}' not found. Try: 1042, 1077, 1090, 1099`;
-      errEl.classList.remove('hidden');
-      return;
-    }
-    currentOrder = await r.json();
-    enterChatMode();
-  } catch (err) {
-    errEl.textContent = `Cannot reach API. Make sure docker compose is running.`;
-    errEl.classList.remove('hidden');
-  } finally {
-    btn.disabled = false;
-    txtEl.classList.remove('hidden');
-    spn.classList.add('hidden');
-  }
-}
-
-// ── Step 2: Enter Chat Mode ───────────────────────────────────────────────
-
-function enterChatMode() {
-  // Use showScreen if available (new multi-screen user.html)
-  if (typeof showScreen === 'function') {
-    showScreen('screen-chat');
-  } else {
-    document.getElementById('screen-lookup').classList.add('hidden');
-    document.getElementById('screen-chat').classList.remove('hidden');
-  }
-
-  // Order badge in header
-  const badge = document.getElementById('order-badge');
-  if (badge) { badge.textContent = `Order #${currentOrder.order_id}`; badge.classList.remove('hidden'); }
-
-  // Render order card
-  renderOrderCard(currentOrder);
-  addWelcomeMessage(currentOrder);
-  setTimeout(() => document.getElementById('chat-input').focus(), 300);
-}
-
-function addWelcomeMessage(order) {
-  // Clear any existing messages first if this is a fresh start
-  const buyer   = (order.buyer_name || 'there').split(' ')[0];
-  const product = order.product_name || 'your item';
-  const amount  = order.order_amount ? `₹${Number(order.order_amount).toFixed(0)}` : '';
-  addBubble('system',
-    `Hi ${buyer}! 👋 I found your order for **${product}** (${amount}). I'm Cartly's AI support agent.\n\nHow can I help you today? I can assist with refunds, delivery status, exchanges, complaints, or any other issue.`);
-}
-
-function renderOrderCard(order) {
-  const card = document.getElementById('order-card');
-  const isDelivered = order.delivery_status === 'delivered';
-  const pillCls = isDelivered ? 'pill pill-g' : 'pill pill-a';
-  card.innerHTML = `
-    <div class="order-pname">${esc(order.product_name)}</div>
-    <div class="order-row"><span class="order-key">Order ID</span><span class="order-val">#${esc(order.order_id)}</span></div>
-    <div class="order-row"><span class="order-key">Category</span><span class="order-val">${esc(order.product_category)}</span></div>
-    <div class="order-row"><span class="order-key">Status</span><span class="${pillCls}"><span class="pdot"></span>${esc(order.delivery_status)}</span></div>
-    ${order.courier ? `<div class="order-row"><span class="order-key">Courier</span><span class="order-val">${esc(order.courier)}</span></div>` : ''}
-    <div class="order-row" style="padding-top:14px;border:none"><span class="order-key">Order Value</span><span class="order-amt">₹${Number(order.order_amount).toFixed(2)}</span></div>
-  `;
-}
-
-
-// ── Step 3: Chat ──────────────────────────────────────────────────────────
+// ── Input helpers ──────────────────────────────────────────
 
 function handleChatKey(event) {
   if (event.key === 'Enter' && !event.shiftKey) {
@@ -105,88 +19,101 @@ function handleChatKey(event) {
   }
 }
 
+function resizeTextarea(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('chat-inp');
+  if (inp) inp.addEventListener('input', function () { resizeTextarea(this); });
+});
+
+// ── Send message → API ─────────────────────────────────────
+
 async function sendMessage() {
   if (chatLocked) return;
-  const inputEl = document.getElementById('chat-input');
-  const text    = inputEl.value.trim();
+  const inputEl = document.getElementById('chat-inp');
+  const text = inputEl?.value.trim();
   if (!text) return;
 
-  // Render user bubble
   addBubble('user', text);
   inputEl.value = '';
   resizeTextarea(inputEl);
 
-  // Show typing indicator
   const typingId = addTypingIndicator();
   chatLocked = true;
-  document.getElementById('chat-send-btn').disabled = true;
+  const sendBtn = document.getElementById('send-btn');
+  if (sendBtn) sendBtn.disabled = true;
 
   try {
-    const amount = currentOrder.order_amount || 0;
+    const order = window._currentOrder;
+    if (!order) { removeTypingIndicator(typingId); addBubble('bot', '⚠️ No order loaded. Please go back and select an order.'); return; }
+
     const payload = {
       raw_ticket:     text,
-      order_id:       currentOrder.order_id,
-      buyer_id:       currentOrder.order_id,
-      claimed_amount: parseFloat(amount),
+      order_id:       order.order_id,
+      buyer_id:       order.order_id,
+      claimed_amount: parseFloat(order.order_amount || 0),
       channel:        'web',
     };
 
     const r = await fetch(`${API_BASE}/tickets`, {
-      method: 'POST',
+      method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body:    JSON.stringify(payload),
     });
 
     removeTypingIndicator(typingId);
 
     if (!r.ok) {
       const err = await r.text();
-      addBubble('system', `⚠️ Something went wrong: ${err}`);
+      addBubble('bot', `⚠️ Something went wrong: ${err}`);
       return;
     }
 
-    const data = await r.json();
-    renderResult(data);
+    renderResult(await r.json());
   } catch (err) {
     removeTypingIndicator(typingId);
-    addBubble('system', `❌ Cannot reach the API. Check that docker compose is running.\n\n${err.message}`);
+    addBubble('bot', `❌ Cannot reach the API. Make sure the server is running.\n\n${err.message}`);
   } finally {
     chatLocked = false;
-    document.getElementById('chat-send-btn').disabled = false;
-    setTimeout(() => document.getElementById('chat-input').focus(), 100);
+    if (sendBtn) sendBtn.disabled = false;
+    setTimeout(() => inputEl?.focus(), 100);
   }
 }
 
-// ── Step 4: Render result ─────────────────────────────────────────────────
+// ── Render API response ────────────────────────────────────
 
 function renderResult(data) {
   if (data.status === 'resolved') {
     const r = data.resolution;
     const fa = r.faithfulness_score != null ? ` · Faithfulness: ${r.faithfulness_score.toFixed(2)}` : '';
     const refs = (r.source_refs || []).join(', ');
-    const msg  = `✅ **Good news!** Your request has been **${r.action_taken.replace('_', ' ')}**.\n\n${r.reason}\n\n📋 Policy refs: ${refs || 'N/A'}${r.transaction_ref ? `\n🔖 Ref: \`${r.transaction_ref}\`` : ''}${fa}`;
-    addBubble('system', msg, 'resolved', data.trace);
+    const actionLabel = (r.action_taken || '').replace(/_/g, ' ');
+    const msg = `✅ **Your request has been ${actionLabel}.**\n\n${r.reason}\n\n📋 Policy refs: ${refs || 'N/A'}${r.transaction_ref ? `\n🔖 Ref: \`${r.transaction_ref}\`` : ''}${fa}`;
+    addBubble('bot', msg, 'bubble-resolved', data.trace);
   } else {
-    const hb = data.handoff_brief;
-    const triggerMsg = {
-      threshold:        `⚖️ Your claimed amount exceeds our automated refund limit. A human agent will review this.`,
-      critic_rejection: `🛡️ Our safety review found an issue with this decision. A human agent will verify.`,
-      hard_trigger:     `🚨 Your message has been flagged for priority human review.`,
-    }[hb.escalation_trigger] || `Your ticket has been escalated for human review.`;
-    const msg = `⚠️ **This ticket needs human review.**\n\n${triggerMsg}\n\n${hb.reason}\n\n_Our team will contact you within 24 hours._`;
-    addBubble('system', msg, 'escalated', data.trace);
+    const hb = data.handoff_brief || {};
+    const triggerMsg = ({
+      threshold:        `⚖️ Your claimed amount exceeds our automated limit. A human agent will review this shortly.`,
+      critic_rejection: `🛡️ Our safety review flagged this decision for manual verification.`,
+      hard_trigger:     `🚨 Your message has been escalated for priority review.`,
+    })[hb.escalation_trigger] || `Your request has been escalated for human review.`;
+    const msg = `⚠️ **This ticket needs human review.**\n\n${triggerMsg}\n\n${hb.reason || ''}\n\n_Our team will contact you within 24 hours._`;
+    addBubble('bot', msg, 'bubble-escalated', data.trace);
   }
 }
 
-// ── Bubble helpers ────────────────────────────────────────────────────────
+// ── Bubble system ──────────────────────────────────────────
 
-let bubbleCounter = 0;
-
-function addBubble(role, text, variant = '', trace = null) {
+function addBubble(role, text, extraClass = '', trace = null) {
   const container = document.getElementById('chat-messages');
+  if (!container) return;
   const id = `bubble-${++bubbleCounter}`;
   const div = document.createElement('div');
-  div.className = `chat-bubble bubble-${role}${variant ? ` bubble-${variant}` : ''}`;
+  // role: 'user' | 'bot'
+  div.className = `chat-bubble bubble-${role}${extraClass ? ' ' + extraClass : ''}`;
   div.id = id;
 
   const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
@@ -199,6 +126,8 @@ function addBubble(role, text, variant = '', trace = null) {
       hard_trigger_check: '🔴', triage: '🔍', threshold_gate: '⚖️',
       refund_agent_order_lookup: '📦', refund_agent_policy_retrieval: '📋',
       refund_agent_llm: '🤖', safety_critic: '🛡️', orchestrator_verdict: '📊',
+      delivery_agent: '🚚', complaint_agent: '💬', product_agent_retrieval: '🛍️',
+      product_agent_llm: '🤖',
     };
     const stepsHtml = trace.map(s => `
       <div class="trace-row">
@@ -207,18 +136,15 @@ function addBubble(role, text, variant = '', trace = null) {
         <span class="tr-lat">${s.latency_ms.toFixed(0)}ms</span>
       </div>`).join('');
     traceHtml = `
-      <div class="trace-toggle" onclick="toggleTrace('${traceId}')">
-        ▸ View pipeline trace (${trace.length} steps)
-      </div>
+      <div class="trace-toggle" onclick="toggleTrace('${traceId}')">▸ View AI pipeline trace (${trace.length} steps)</div>
       <div class="trace-box hidden" id="${traceId}">${stepsHtml}</div>`;
   }
 
   div.innerHTML = `
     <div class="bubble-body">${bodyHtml}${traceHtml}</div>
-    <div class="bubble-time">${now}</div>
-  `;
+    <div class="bubble-time">${now}</div>`;
   container.appendChild(div);
-  div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  container.scrollTop = container.scrollHeight;
   return id;
 }
 
@@ -228,20 +154,21 @@ function toggleTrace(id) {
   const hidden = el.classList.contains('hidden');
   el.classList.toggle('hidden');
   const n = el.querySelectorAll('.trace-row').length;
-  toggle.textContent = hidden ? `▾ Hide pipeline trace (${n} steps)` : `▸ View pipeline trace (${n} steps)`;
+  toggle.textContent = hidden
+    ? `▾ Hide AI pipeline trace (${n} steps)`
+    : `▸ View AI pipeline trace (${n} steps)`;
 }
-
-let typingIdCounter = 0;
 
 function addTypingIndicator() {
   const id = `typing-${++typingIdCounter}`;
   const container = document.getElementById('chat-messages');
+  if (!container) return id;
   const div = document.createElement('div');
-  div.className = 'chat-bubble bubble-system typing-bubble';
+  div.className = 'chat-bubble bubble-bot';
   div.id = id;
   div.innerHTML = `<div class="bubble-body"><div class="typing-dots"><span></span><span></span><span></span></div></div>`;
   container.appendChild(div);
-  div.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  container.scrollTop = container.scrollHeight;
   return id;
 }
 
@@ -249,27 +176,16 @@ function removeTypingIndicator(id) {
   document.getElementById(id)?.remove();
 }
 
-// ── Markdown renderer (simple) ────────────────────────────────────────────
+// ── Markdown renderer ──────────────────────────────────────
 
 function renderMarkdown(text) {
   return esc(text)
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code style="font-family:var(--mono);font-size:.8em;background:rgba(255,255,255,.08);padding:1px 4px;border-radius:3px">$1</code>')
+    .replace(/`([^`]+)`/g, '<code style="font-family:monospace;font-size:.8em;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:3px">$1</code>')
     .replace(/\n/g, '<br>');
 }
 
 function esc(str) {
   return String(str ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
-
-function resizeTextarea(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
-
-// ── Init ──────────────────────────────────────────────────────────────────
-
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('chat-input')?.addEventListener('input', function() { resizeTextarea(this); });
-});
