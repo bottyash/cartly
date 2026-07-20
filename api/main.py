@@ -1,5 +1,5 @@
 """
-Cartly FastAPI ingress — Sprint 2.
+Cartly FastAPI ingress — v1.0.0 Production.
 
 Endpoints:
   POST /tickets               — submit a refund ticket
@@ -35,8 +35,8 @@ from data.mock_db import order_lookup, get_orders_by_buyer
 
 app = FastAPI(
     title="Cartly Refund Resolution API",
-    description="AI-powered refund triage and resolution — Sprint 2",
-    version="0.2.0-poc",
+    description="AI-powered refund triage and resolution — Multi-Agent System (v1.0.0)",
+    version="1.0.0",
 )
 
 app.add_middleware(
@@ -67,7 +67,7 @@ def _require_admin(x_admin_token: str | None = Header(default=None)) -> None:
 
 @app.get("/health", tags=["meta"])
 def health():
-    return {"status": "ok", "service": "cartly-api", "version": "0.2.0"}
+    return {"status": "ok", "service": "cartly-api", "version": "1.0.0"}
 
 
 # ──────────────────────────────────────────────

@@ -1,5 +1,5 @@
 """
-LLM Gateway — OpenRouter (Sprint 3, production).
+LLM Gateway — OpenRouter, v1.0 Production.
 
 Replaces the local Ollama gateway with OpenRouter's cloud inference.
 Uses the OpenAI-compatible SDK with a custom base_url — zero code

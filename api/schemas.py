@@ -51,7 +51,7 @@ class TicketRequest(BaseModel):
     )
     buyer_id: str | None = Field(
         default=None,
-        description="Buyer identifier (order_id used as proxy in POC)",
+        description="Buyer identifier (defaults to order_id)",
         examples=["1042"],
     )
     claimed_amount: float = Field(
