@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartly — Refund Resolution</title>
-  <meta name="description" content="Cartly AI-powered refund resolution. Customer portal and admin dashboard." />
+  <title>Cartly — Smart Refund Support</title>
+  <meta name="description" content="Cartly AI-powered refund resolution. Fast, fair, and fully automated for e-commerce." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -12,102 +12,108 @@
 </head>
 <body class="landing-body">
 
-  <!-- Animated background orbs -->
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <div class="topnav-logo">
+      <div class="topnav-logo-icon">🛒</div>
+      <span class="topnav-logo-text">Cartly</span>
+      <span class="topnav-logo-sub">Support</span>
+    </div>
+    <div class="topnav-spacer"></div>
+    <span id="strip-label" style="font-size:13px;color:var(--slate-500);display:flex;align-items:center;gap:6px;">
+      <span class="status-dot" id="strip-dot"></span>
+      <span id="strip-text">Checking…</span>
+    </span>
+  </nav>
 
-  <div class="landing-wrap">
+  <!-- Hero -->
+  <section class="landing-hero">
+    <div class="landing-hero-eyebrow">
+      <span>✦</span> AI-Powered Customer Support
+    </div>
+    <h1 class="landing-hero-title">
+      Refund requests resolved<br><span>in seconds, not days</span>
+    </h1>
+    <p class="landing-hero-sub">
+      Cartly's multi-agent AI system reviews your order, checks our refund policy, and delivers a fair, instant decision — 24/7.
+    </p>
 
-    <!-- Logo -->
-    <header class="landing-header">
-      <div class="logo">
-        <span class="logo-icon">🛒</span>
-        <span class="logo-text">Cartly</span>
-        <span class="logo-badge">v1.0 · Production</span>
-      </div>
-    </header>
+    <!-- Role Cards -->
+    <div class="landing-cards">
 
-    <!-- Hero -->
-    <section class="hero">
-      <p class="hero-eyebrow">AI-Powered Refund Resolution</p>
-      <h1 class="hero-title">Who are you here as?</h1>
-      <p class="hero-sub">Choose your role to access the right experience</p>
-    </section>
-
-    <!-- Role cards -->
-    <div class="role-grid">
-
-      <!-- Customer card -->
-      <div class="role-card role-customer" id="customer-card" onclick="goCustomer()">
-        <div class="role-card-inner">
-          <div class="role-icon-wrap role-icon-customer">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-          </div>
-          <h2 class="role-title">Customer</h2>
-          <p class="role-desc">Track your orders and submit refund requests. Chat with our AI agent for instant resolution.</p>
-          <ul class="role-features">
-            <li>✦ Look up your order status</li>
-            <li>✦ Submit a refund request</li>
-            <li>✦ Get instant AI-powered decisions</li>
-            <li>✦ Track your ticket in real time</li>
-          </ul>
-          <div class="role-cta">
-            <span class="role-btn">Get Started</span>
-            <span class="role-arrow">→</span>
-          </div>
+      <!-- Customer -->
+      <div class="landing-card" id="customer-card" onclick="goCustomer()">
+        <div class="landing-card-icon card-icon-customer">👤</div>
+        <div class="landing-card-title">Customer Support</div>
+        <p class="landing-card-desc">Track your order and submit a refund request. Get an AI-powered resolution in under 10 seconds.</p>
+        <ul class="landing-card-features">
+          <li>Look up any order instantly</li>
+          <li>Submit refund requests via chat</li>
+          <li>Get real-time AI decisions</li>
+          <li>Track your ticket status live</li>
+        </ul>
+        <div class="landing-card-cta">
+          <span>Get Started</span>
+          <span class="landing-card-arrow">→</span>
         </div>
       </div>
 
-      <!-- Admin card -->
-      <div class="role-card role-admin" id="admin-card">
-        <div class="role-card-inner">
-          <div class="role-icon-wrap role-icon-admin">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7"/>
-              <rect x="14" y="3" width="7" height="7"/>
-              <rect x="14" y="14" width="7" height="7"/>
-              <rect x="3" y="14" width="7" height="7"/>
-            </svg>
-          </div>
-          <h2 class="role-title">Admin</h2>
-          <p class="role-desc">Operations dashboard with full observability — tickets, charts, traces, and system metrics.</p>
-          <ul class="role-features">
-            <li>✦ Real-time ticket feed</li>
-            <li>✦ Resolution rate analytics</li>
-            <li>✦ Latency and cost metrics</li>
-            <li>✦ FR1–FR8 coverage tracker</li>
-          </ul>
-
-          <!-- Admin token form -->
-          <div class="admin-token-form" id="admin-form">
-            <div class="token-input-wrap">
-              <input
-                type="password"
-                id="admin-token-input"
-                class="token-input"
-                placeholder="Admin token"
-                onkeydown="if(event.key==='Enter') adminLogin()"
-              />
-              <button class="token-btn" onclick="adminLogin()">Enter →</button>
-            </div>
-            <p class="token-hint" id="token-error"></p>
-          </div>
+      <!-- Admin -->
+      <div class="landing-card" id="admin-card">
+        <div class="landing-card-icon card-icon-admin">📊</div>
+        <div class="landing-card-title">Admin Dashboard</div>
+        <p class="landing-card-desc">Operations dashboard with full observability — live ticket feed, resolution analytics, agent traces.</p>
+        <ul class="landing-card-features">
+          <li>Real-time ticket metrics</li>
+          <li>Resolution rate analytics</li>
+          <li>AI agent pipeline traces</li>
+          <li>FR1–FR8 coverage tracker</li>
+        </ul>
+        <div class="landing-token-gate">
+          <input type="password" id="admin-token-input" class="landing-token-input"
+            placeholder="Enter admin token to continue"
+            onkeydown="if(event.key==='Enter') adminLogin()" />
+          <button class="landing-token-btn" onclick="adminLogin()">Access Dashboard →</button>
+          <p class="landing-token-error" id="token-error"></p>
         </div>
       </div>
 
     </div>
+  </section>
 
-    <!-- API status strip -->
-    <div class="api-strip">
-      <span class="strip-dot" id="strip-dot"></span>
-      <span id="strip-label">Checking API…</span>
-    </div>
-
+  <!-- Feature strip -->
+  <div class="landing-features">
+    <div class="landing-feature"><span class="landing-feature-icon">⚡</span> Sub-10 second resolutions</div>
+    <div class="landing-feature"><span class="landing-feature-icon">🛡️</span> AI Safety Critic on every decision</div>
+    <div class="landing-feature"><span class="landing-feature-icon">📋</span> Policy-grounded, never guesses</div>
+    <div class="landing-feature"><span class="landing-feature-icon">🔍</span> Full audit trail for every ticket</div>
+    <div class="landing-feature"><span class="landing-feature-icon">☁️</span> Cloud-hosted, always available</div>
   </div>
+
+  <!-- Stats -->
+  <div class="landing-stats">
+    <div>
+      <div class="landing-stat-num">~8s</div>
+      <div class="landing-stat-label">Average resolution time</div>
+    </div>
+    <div>
+      <div class="landing-stat-num">₹500</div>
+      <div class="landing-stat-label">Auto-approval threshold</div>
+    </div>
+    <div>
+      <div class="landing-stat-num">0.70</div>
+      <div class="landing-stat-label">Min. faithfulness score</div>
+    </div>
+    <div>
+      <div class="landing-stat-num">8</div>
+      <div class="landing-stat-label">AI agents in the pipeline</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <span>Cartly</span> — AI Refund Resolution Platform &nbsp;·&nbsp; Built with FastAPI, OpenRouter &amp; PostgreSQL &nbsp;·&nbsp; 2026
+  </footer>
 
   <script src="app.js"></script>
 </body>

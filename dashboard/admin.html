@@ -4,166 +4,282 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cartly Admin — Operations Dashboard</title>
-  <meta name="description" content="Cartly admin observability dashboard — tickets, charts, traces and system metrics." />
+  <meta name="description" content="Cartly admin dashboard — real-time ticket analytics, resolution metrics, and AI agent observability." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body class="admin-body">
 
-  <!-- Admin Header -->
-  <header class="admin-header">
-    <div class="admin-header-inner">
-      <div class="logo">
-        <span class="logo-icon">🛒</span>
-        <span class="logo-text">Cartly</span>
-        <span class="logo-badge admin-badge">Admin</span>
+  <!-- Token Gate (shown until authenticated) -->
+  <div id="admin-token-gate-screen">
+    <nav class="admin-topnav">
+      <div class="admin-topnav-logo">
+        <div class="admin-logo-icon">🛒</div>
+        <span class="admin-logo-text">Cartly</span>
+        <span class="admin-logo-badge">Admin</span>
       </div>
-      <div class="admin-header-right">
-        <div class="api-status" id="api-status">
-          <span class="status-dot" id="status-dot"></span>
-          <span id="status-label">Connecting…</span>
-        </div>
-        <button class="admin-refresh-btn" onclick="loadDashboard()" title="Refresh">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-          </svg>
-        </button>
-        <a href="index.html" class="header-logout-btn">← Exit</a>
-      </div>
-    </div>
-  </header>
-
-  <main class="admin-main">
-
-    <!-- ── Stats Cards Row ─────────────────────────────────────────── -->
-    <section class="stats-row" id="stats-row">
-      <div class="stat-card" id="stat-total">
-        <div class="stat-label">Total Tickets</div>
-        <div class="stat-value" id="val-total">—</div>
-        <div class="stat-sub">all time</div>
-      </div>
-      <div class="stat-card stat-green" id="stat-resolved">
-        <div class="stat-label">Resolution Rate</div>
-        <div class="stat-value" id="val-resolved">—</div>
-        <div class="stat-sub" id="sub-resolved">— resolved</div>
-      </div>
-      <div class="stat-card stat-amber" id="stat-escalated">
-        <div class="stat-label">Escalated</div>
-        <div class="stat-value" id="val-escalated">—</div>
-        <div class="stat-sub" id="sub-escalated">of total</div>
-      </div>
-      <div class="stat-card stat-cyan" id="stat-latency">
-        <div class="stat-label">Avg Latency</div>
-        <div class="stat-value" id="val-latency">—</div>
-        <div class="stat-sub">per ticket</div>
-      </div>
-      <div class="stat-card stat-purple" id="stat-tokens">
-        <div class="stat-label">Total Tokens</div>
-        <div class="stat-value" id="val-tokens">—</div>
-        <div class="stat-sub">LLM consumption</div>
-      </div>
-    </section>
-
-    <!-- ── Charts Row ──────────────────────────────────────────────── -->
-    <section class="charts-row">
-
-      <div class="chart-card chart-donut">
-        <div class="chart-title">Resolution Rate</div>
-        <div class="chart-body">
-          <canvas id="chart-resolution" width="200" height="200"></canvas>
-        </div>
-        <div class="donut-legend" id="donut-legend"></div>
-      </div>
-
-      <div class="chart-card chart-bar">
-        <div class="chart-title">Daily Ticket Volume</div>
-        <div class="chart-body">
-          <canvas id="chart-volume"></canvas>
-        </div>
-      </div>
-
-      <div class="chart-card chart-line">
-        <div class="chart-title">Avg Latency Trend (ms)</div>
-        <div class="chart-body">
-          <canvas id="chart-latency"></canvas>
-        </div>
-      </div>
-
-      <div class="chart-card chart-hbar">
-        <div class="chart-title">Escalation Triggers</div>
-        <div class="chart-body">
-          <canvas id="chart-triggers"></canvas>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- ── FR Coverage ─────────────────────────────────────────────── -->
-    <section class="fr-section">
-      <div class="section-title">FR1–FR8 Coverage</div>
-      <div class="fr-coverage-row" id="fr-coverage-row">
-        <!-- filled by JS -->
-      </div>
-    </section>
-
-    <!-- ── Ticket Table ─────────────────────────────────────────────── -->
-    <section class="ticket-table-section">
-      <div class="table-header-row">
-        <div class="section-title">All Tickets</div>
-        <div class="table-controls">
-          <input type="text" class="table-search" id="table-search"
-            placeholder="Search ticket ID, order…" oninput="filterTable()" />
-          <select class="table-filter" id="status-filter" onchange="filterTable()">
-            <option value="">All status</option>
-            <option value="resolved">Resolved</option>
-            <option value="escalated">Escalated</option>
-          </select>
-        </div>
-      </div>
-      <div class="table-wrap">
-        <table class="ticket-table" id="ticket-table">
-          <thead>
-            <tr>
-              <th>Ticket ID</th>
-              <th>Status</th>
-              <th>Order</th>
-              <th>Amount</th>
-              <th>Trigger</th>
-              <th>Latency</th>
-              <th>Tokens</th>
-              <th>Created</th>
-              <th>Trace</th>
-            </tr>
-          </thead>
-          <tbody id="ticket-tbody">
-            <tr><td colspan="9" class="table-loading">Loading tickets…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- ── Trace Detail Modal ─────────────────────────────────────────── -->
-  <div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal()">
-    <div class="modal" id="trace-modal" onclick="event.stopPropagation()">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title" id="modal-title">Ticket Trace</div>
-          <div class="modal-subtitle" id="modal-subtitle"></div>
-        </div>
-        <button class="modal-close" onclick="closeModal()">✕</button>
-      </div>
-      <div class="modal-body" id="modal-body">
-        <!-- trace events rendered here -->
+      <div class="admin-topnav-spacer"></div>
+      <a href="index.html" style="font-size:13px; color:rgba(255,255,255,.4); padding:4px 10px;">← Back</a>
+    </nav>
+    <div class="admin-token-gate-full">
+      <div class="admin-gate-card">
+        <div class="admin-gate-icon">🔐</div>
+        <div class="admin-gate-title">Admin Access</div>
+        <div class="admin-gate-sub">Enter your admin token to access the operations dashboard</div>
+        <input type="password" id="gate-token-input" class="admin-gate-input"
+          placeholder="cartly-admin-2026"
+          onkeydown="if(event.key==='Enter') gateLogin()" />
+        <button class="admin-gate-btn" onclick="gateLogin()">Access Dashboard</button>
+        <p class="admin-gate-error" id="gate-error"></p>
+        <p class="admin-gate-hint">Token is set via the ADMIN_TOKEN environment variable</p>
       </div>
     </div>
   </div>
 
+  <!-- Dashboard (hidden until authenticated) -->
+  <div id="admin-dashboard" class="hidden">
+
+    <!-- Top Nav -->
+    <nav class="admin-topnav">
+      <div class="admin-topnav-logo">
+        <div class="admin-logo-icon">🛒</div>
+        <span class="admin-logo-text">Cartly</span>
+        <span class="admin-logo-badge">Admin</span>
+      </div>
+      <div class="admin-topnav-spacer"></div>
+      <span class="admin-topnav-item active">Overview</span>
+      <div class="admin-topnav-divider"></div>
+      <span class="admin-topnav-item" onclick="refreshAll()" title="Refresh data" style="cursor:pointer;">↻ Refresh</span>
+      <div class="admin-topnav-divider"></div>
+      <a href="index.html" class="admin-topnav-item">← Portal</a>
+    </nav>
+
+    <div class="admin-layout">
+
+      <!-- Sidebar -->
+      <aside class="admin-sidebar">
+        <div class="sidebar-section-label">Overview</div>
+        <div class="sidebar-item active">
+          <span class="sidebar-item-icon">📊</span> Dashboard
+        </div>
+        <div class="sidebar-item" onclick="scrollTo(0, document.getElementById('tickets-section').offsetTop - 80)">
+          <span class="sidebar-item-icon">🎫</span> Tickets
+        </div>
+
+        <div class="sidebar-section-label">Analytics</div>
+        <div class="sidebar-item" onclick="scrollTo(0, document.getElementById('charts-section').offsetTop - 80)">
+          <span class="sidebar-item-icon">📈</span> Charts
+        </div>
+        <div class="sidebar-item" onclick="scrollTo(0, document.getElementById('fr-section').offsetTop - 80)">
+          <span class="sidebar-item-icon">✅</span> FR Coverage
+        </div>
+
+        <div class="sidebar-section-label">System</div>
+        <div class="sidebar-item" id="sidebar-health-item">
+          <span class="sidebar-item-icon" id="sidebar-health-icon">⚪</span>
+          <span id="sidebar-health-label">API Status</span>
+        </div>
+        <div class="sidebar-item" onclick="window.open('http://localhost:8000/docs','_blank')">
+          <span class="sidebar-item-icon">📖</span> API Docs
+        </div>
+        <div class="sidebar-item" onclick="adminLogout()">
+          <span class="sidebar-item-icon">🚪</span> Sign Out
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="admin-main">
+
+        <div class="admin-page-header">
+          <div class="admin-page-title">Operations Dashboard</div>
+          <div class="admin-page-sub" id="last-refresh-label">Loading data…</div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card stat-card-blue">
+            <div class="stat-header">
+              <div class="stat-label">Total Tickets</div>
+              <div class="stat-icon-wrap stat-icon-blue">🎫</div>
+            </div>
+            <div class="stat-value" id="stat-total">—</div>
+            <div class="stat-sub">All time</div>
+          </div>
+          <div class="stat-card stat-card-green">
+            <div class="stat-header">
+              <div class="stat-label">Resolution Rate</div>
+              <div class="stat-icon-wrap stat-icon-green">✅</div>
+            </div>
+            <div class="stat-value" id="stat-rate">—</div>
+            <div class="stat-sub">Auto-resolved</div>
+          </div>
+          <div class="stat-card stat-card-purple">
+            <div class="stat-header">
+              <div class="stat-label">Avg Latency</div>
+              <div class="stat-icon-wrap stat-icon-purple">⚡</div>
+            </div>
+            <div class="stat-value" id="stat-latency">—</div>
+            <div class="stat-sub">Per ticket</div>
+          </div>
+          <div class="stat-card stat-card-amber">
+            <div class="stat-header">
+              <div class="stat-label">Total Tokens</div>
+              <div class="stat-icon-wrap stat-icon-amber">🪙</div>
+            </div>
+            <div class="stat-value" id="stat-tokens">—</div>
+            <div class="stat-sub">LLM usage</div>
+          </div>
+          <div class="stat-card stat-card-red">
+            <div class="stat-header">
+              <div class="stat-label">Escalated</div>
+              <div class="stat-icon-wrap stat-icon-red">⚠️</div>
+            </div>
+            <div class="stat-value" id="stat-escalated">—</div>
+            <div class="stat-sub">Need human review</div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid" id="charts-section">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">Tickets Over Time</div>
+              <div class="chart-card-sub">Daily ticket volume (last 14 days)</div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-daily"></canvas></div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-card-title">Resolution Breakdown</div>
+              <div class="chart-card-sub">Resolved vs escalated distribution</div>
+            </div>
+            <div class="chart-wrap"><canvas id="chart-resolution"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Escalation Breakdown -->
+        <div class="chart-card" style="margin-bottom:20px;" id="fr-section">
+          <div class="chart-card-header">
+            <div class="chart-card-title">Escalation Triggers</div>
+            <div class="chart-card-sub">Why tickets were escalated to human review</div>
+          </div>
+          <div class="escalation-grid">
+            <div class="esc-item">
+              <div class="esc-item-label">⚖️ Threshold Gate</div>
+              <div class="esc-item-value" id="esc-threshold">—</div>
+              <div class="esc-item-sub">Claim &gt; ₹500</div>
+            </div>
+            <div class="esc-item">
+              <div class="esc-item-label">🛡️ Critic Rejection</div>
+              <div class="esc-item-value" id="esc-critic">—</div>
+              <div class="esc-item-sub">Failed faithfulness check</div>
+            </div>
+            <div class="esc-item">
+              <div class="esc-item-label">🚨 Hard Trigger</div>
+              <div class="esc-item-value" id="esc-hard">—</div>
+              <div class="esc-item-sub">Injection detected</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FR Coverage -->
+        <div class="chart-card" style="margin-bottom:20px;">
+          <div class="chart-card-header">
+            <div class="chart-card-title">FR Coverage (FR1–FR8)</div>
+            <div class="chart-card-sub">Functional requirements verified in production</div>
+          </div>
+          <div class="chart-wrap"><canvas id="chart-fr"></canvas></div>
+        </div>
+
+        <!-- Tickets Table -->
+        <div class="table-card" id="tickets-section">
+          <div class="table-card-header">
+            <div class="table-card-title">Recent Tickets</div>
+            <div class="table-card-actions">
+              <button class="table-refresh-btn" onclick="loadTickets()">↻ Refresh</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="admin-table" id="tickets-table">
+              <thead>
+                <tr>
+                  <th>Ticket ID</th>
+                  <th>Status</th>
+                  <th>Escalation</th>
+                  <th>Latency</th>
+                  <th>Tokens</th>
+                  <th>Steps</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tickets-tbody">
+                <tr><td colspan="7" class="table-loading">Loading tickets…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Trace Modal -->
+  <div class="modal-overlay hidden" id="trace-modal" onclick="closeModal(event)">
+    <div class="modal-box" id="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Ticket Trace</div>
+        <button class="modal-close" onclick="closeTraceModal()">×</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
   <script src="admin.js"></script>
+  <script>
+    /* ── Gate logic ─────────────────────────────────────────────── */
+    let adminToken = '';
+
+    function gateLogin() {
+      const val = document.getElementById('gate-token-input').value.trim();
+      if (!val) return;
+      adminToken = val;
+      document.getElementById('admin-token-gate-screen').classList.add('hidden');
+      document.getElementById('admin-dashboard').classList.remove('hidden');
+      initDashboard(adminToken);
+    }
+
+    function adminLogout() {
+      adminToken = '';
+      document.getElementById('admin-dashboard').classList.add('hidden');
+      document.getElementById('admin-token-gate-screen').classList.remove('hidden');
+      document.getElementById('gate-token-input').value = '';
+    }
+
+    function closeModal(e) {
+      if (e.target === document.getElementById('trace-modal')) closeTraceModal();
+    }
+    function closeTraceModal() {
+      document.getElementById('trace-modal').classList.add('hidden');
+    }
+
+    // Health check for sidebar
+    async function checkHealth() {
+      try {
+        const r = await fetch('http://localhost:8000/health');
+        const icon  = document.getElementById('sidebar-health-icon');
+        const label = document.getElementById('sidebar-health-label');
+        if (r.ok) { icon.textContent = '🟢'; label.textContent = 'API Online'; }
+        else       { icon.textContent = '🔴'; label.textContent = 'API Error'; }
+      } catch {
+        document.getElementById('sidebar-health-icon').textContent = '🔴';
+        document.getElementById('sidebar-health-label').textContent = 'API Offline';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', checkHealth);
+  </script>
 </body>
 </html>

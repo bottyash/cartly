@@ -77,16 +77,27 @@ function enterChatMode() {
 
 function renderOrderCard(order) {
   const card = document.getElementById('order-card');
-  const statusColor = order.delivery_status === 'delivered' ? 'var(--accent-green)' : 'var(--accent-amber)';
+  const isDelivered = order.delivery_status === 'delivered';
+  const statusClass = isDelivered ? 'pill-green' : 'pill-amber';
   card.innerHTML = `
-    <div class="order-card-product">📦 ${esc(order.product_name)}</div>
-    <div class="order-card-meta">
-      <span class="order-card-chip">#${esc(order.order_id)}</span>
-      <span class="order-card-chip">${esc(order.product_category)}</span>
-      <span class="order-card-chip" style="color:${statusColor}">${esc(order.delivery_status)}</span>
-      ${order.courier ? `<span class="order-card-chip">${esc(order.courier)}</span>` : ''}
+    <div class="order-product-name">${esc(order.product_name)}</div>
+    <div class="order-detail-row">
+      <span class="order-detail-label">Order ID</span>
+      <span class="order-detail-value">#${esc(order.order_id)}</span>
     </div>
-    <div class="order-card-amount">₹${Number(order.order_amount).toFixed(2)}</div>
+    <div class="order-detail-row">
+      <span class="order-detail-label">Category</span>
+      <span class="order-detail-value">${esc(order.product_category)}</span>
+    </div>
+    <div class="order-detail-row">
+      <span class="order-detail-label">Status</span>
+      <span class="pill ${statusClass}"><span class="pill-dot"></span>${esc(order.delivery_status)}</span>
+    </div>
+    ${order.courier ? `<div class="order-detail-row"><span class="order-detail-label">Courier</span><span class="order-detail-value">${esc(order.courier)}</span></div>` : ''}
+    <div class="order-detail-row" style="border-bottom:none; padding-top:14px;">
+      <span class="order-detail-label">Order Value</span>
+      <span class="order-amount">₹${Number(order.order_amount).toFixed(2)}</span>
+    </div>
   `;
 }
 

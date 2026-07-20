@@ -3,99 +3,148 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartly — My Orders</title>
-  <meta name="description" content="Cartly customer portal — track your orders and request refunds via AI chat." />
+  <title>Cartly — Refund Support</title>
+  <meta name="description" content="Cartly customer support — track your orders and get instant AI-powered refund decisions." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="user-body">
 
-  <!-- Header -->
-  <header class="user-header">
-    <div class="user-header-inner">
-      <div class="logo">
-        <span class="logo-icon">🛒</span>
-        <span class="logo-text">Cartly</span>
-      </div>
-      <div class="user-header-right">
-        <div class="user-order-badge hidden" id="order-badge"></div>
-        <a href="index.html" class="header-logout-btn">← Back</a>
+  <!-- Top Nav -->
+  <nav class="topnav">
+    <div class="topnav-logo">
+      <div class="topnav-logo-icon">🛒</div>
+      <span class="topnav-logo-text">Cartly</span>
+    </div>
+    <div class="topnav-spacer"></div>
+    <div class="topnav-badge hidden" id="order-badge"></div>
+    <a href="index.html" class="topnav-link">← Back to Home</a>
+  </nav>
+
+  <main class="user-screen">
+
+    <!-- ── STEP 1: Order Lookup ─────────────────────────────────── -->
+    <div id="screen-lookup">
+      <div class="lookup-container">
+        <p class="lookup-breadcrumb">
+          <a href="index.html">Home</a>
+          <span>›</span> Order Support
+        </p>
+        <div class="lookup-card">
+          <div class="lookup-header">
+            <div class="lookup-header-icon">📦</div>
+            <div>
+              <div class="lookup-header-title">Find Your Order</div>
+              <div class="lookup-header-sub">Enter your Order ID to get started</div>
+            </div>
+          </div>
+
+          <p class="lookup-label">Order ID</p>
+          <div class="lookup-input-wrap">
+            <input
+              id="lookup-input"
+              type="text"
+              class="lookup-input"
+              placeholder="e.g. 1042"
+              onkeydown="if(event.key==='Enter') lookupOrder()"
+              autofocus
+            />
+            <button class="lookup-btn" id="lookup-btn" onclick="lookupOrder()">
+              <span id="lookup-text">Search</span>
+              <span id="lookup-spinner" class="spinner hidden"></span>
+            </button>
+          </div>
+          <p class="lookup-error hidden" id="lookup-error"></p>
+
+          <div class="lookup-divider">or try a demo order</div>
+          <div class="lookup-demo-hint">
+            <span class="hint-label">Quick fill:</span>
+            <button class="hint-chip" onclick="fillAndLookup('1042')">#1042</button>
+            <button class="hint-chip" onclick="fillAndLookup('1077')">#1077</button>
+            <button class="hint-chip" onclick="fillAndLookup('1090')">#1090</button>
+            <button class="hint-chip" onclick="fillAndLookup('1099')">#1099</button>
+          </div>
+        </div>
+
+        <!-- Help links below card -->
+        <div style="margin-top:20px; text-align:center; font-size:13px; color:var(--slate-500);">
+          Can't find your order? &nbsp;
+          <a href="#" style="color:var(--brand); font-weight:600;">Contact Support</a>
+        </div>
       </div>
     </div>
-  </header>
 
-  <main class="user-main">
+    <!-- ── STEP 2 + 3: Order found + Chat ──────────────────────── -->
+    <div class="hidden" id="screen-chat">
+      <div class="chat-layout">
 
-    <!-- ── STEP 1: Order lookup ───────────────────────────────────── -->
-    <div class="user-screen" id="screen-lookup">
-      <div class="lookup-wrap">
-        <div class="lookup-icon">📦</div>
-        <h1 class="lookup-title">Find Your Order</h1>
-        <p class="lookup-sub">Enter your Order ID to get started with your refund request</p>
-        <div class="lookup-form">
-          <input
-            id="lookup-input"
-            type="text"
-            class="lookup-input"
-            placeholder="e.g. 1042"
-            onkeydown="if(event.key==='Enter') lookupOrder()"
-            autofocus
-          />
-          <button class="lookup-btn" id="lookup-btn" onclick="lookupOrder()">
-            <span id="lookup-text">Find Order</span>
-            <span id="lookup-spinner" class="spinner hidden"></span>
-          </button>
+        <!-- Order sidebar -->
+        <aside class="order-sidebar">
+          <div class="order-sidebar-card">
+            <div class="order-sidebar-head">Your Order</div>
+            <div class="order-sidebar-body" id="order-card">
+              <!-- filled by JS -->
+            </div>
+            <div class="order-sidebar-actions">
+              <button class="change-order-btn" onclick="changeOrder()">← Search a different order</button>
+            </div>
+          </div>
+
+          <!-- Need help box -->
+          <div style="margin-top:14px; background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-lg); padding:16px; font-size:13px; color:var(--slate-600);">
+            <div style="font-weight:700; color:var(--slate-900); margin-bottom:6px;">💡 How it works</div>
+            <ol style="padding-left:16px; line-height:2;">
+              <li>Describe your issue in the chat</li>
+              <li>AI reviews your order + policy</li>
+              <li>Get an instant decision</li>
+            </ol>
+          </div>
+        </aside>
+
+        <!-- Chat -->
+        <div class="chat-main">
+          <div class="chat-messages-wrap">
+            <div class="chat-messages-head">
+              <div class="chat-agent-avatar">🤖</div>
+              <div>
+                <div class="chat-agent-name">Cartly AI Agent</div>
+                <div class="chat-agent-status">Online · Typically replies instantly</div>
+              </div>
+            </div>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input-area" id="chat-input-area">
+              <textarea
+                id="chat-input"
+                class="chat-textarea"
+                placeholder="Describe your issue — e.g. My order arrived damaged, I'd like a refund…"
+                rows="1"
+                onkeydown="handleChatKey(event)"
+              ></textarea>
+              <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()" title="Send message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-        <p class="lookup-error hidden" id="lookup-error"></p>
-        <div class="lookup-demo-hint">
-          <span class="hint-label">Demo orders:</span>
-          <button class="hint-chip" onclick="fillAndLookup('1042')">1042</button>
-          <button class="hint-chip" onclick="fillAndLookup('1077')">1077</button>
-          <button class="hint-chip" onclick="fillAndLookup('1090')">1090</button>
-          <button class="hint-chip" onclick="fillAndLookup('1099')">1099</button>
-        </div>
-      </div>
-    </div>
 
-    <!-- ── STEP 2 + 3: Order found + Chat ────────────────────────── -->
-    <div class="user-screen hidden" id="screen-chat">
-
-      <!-- Order card -->
-      <div class="order-card-strip" id="order-card-strip">
-        <div class="order-card" id="order-card">
-          <!-- filled by JS -->
-        </div>
-      </div>
-
-      <!-- Chat window -->
-      <div class="chat-wrap">
-        <div class="chat-messages" id="chat-messages">
-          <!-- messages filled by JS -->
-        </div>
-
-        <!-- Input area -->
-        <div class="chat-input-area" id="chat-input-area">
-          <textarea
-            id="chat-input"
-            class="chat-textarea"
-            placeholder="Describe your refund request…"
-            rows="2"
-            onkeydown="handleChatKey(event)"
-          ></textarea>
-          <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="22" y1="2" x2="11" y2="13"/>
-              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-          </button>
-        </div>
       </div>
     </div>
 
   </main>
 
   <script src="user.js"></script>
+  <script>
+    function changeOrder() {
+      document.getElementById('screen-chat').classList.add('hidden');
+      document.getElementById('screen-lookup').classList.remove('hidden');
+      document.getElementById('order-badge').classList.add('hidden');
+      document.getElementById('lookup-input').value = '';
+      document.getElementById('chat-messages').innerHTML = '';
+    }
+  </script>
 </body>
 </html>

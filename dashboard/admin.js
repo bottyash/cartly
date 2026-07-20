@@ -5,23 +5,29 @@
 'use strict';
 
 const API_BASE    = 'http://localhost:8000';
-const ADMIN_TOKEN = sessionStorage.getItem('admin_token') || 'cartly-admin-2026';
+let ADMIN_TOKEN = sessionStorage.getItem('cartly_admin_token') || 'cartly-admin-2026';
 
 let allTickets = [];
 let charts     = {};
 
 const CHART_COLORS = {
-  green:  '#22c55e', amber: '#f59e0b',
-  purple: '#a855f7', red:   '#ef4444',
-  blue:   '#6c63ff', cyan:  '#06b6d4',
+  green:  '#059669', amber: '#d97706',
+  purple: '#7c3aed', red:   '#dc2626',
+  blue:   '#1d4ed8', cyan:  '#0891b2',
 };
 
-Chart.defaults.color          = '#475569';
-Chart.defaults.borderColor    = 'rgba(255,255,255,0.06)';
-Chart.defaults.font.family    = "'JetBrains Mono', monospace";
-Chart.defaults.font.size      = 11;
+Chart.defaults.color          = '#64748b';
+Chart.defaults.borderColor    = '#e2e8f0';
+Chart.defaults.font.family    = "'Inter', sans-serif";
+Chart.defaults.font.size      = 12;
 
 const adminHeaders = () => ({ 'x-admin-token': ADMIN_TOKEN });
+
+function initDashboard(token) {
+  ADMIN_TOKEN = token;
+  sessionStorage.setItem('cartly_admin_token', token);
+  loadDashboard();
+}
 
 // ── Utility ───────────────────────────────────────────────────────────────
 
@@ -43,23 +49,19 @@ function formatDate(iso) {
 // ── Health check ──────────────────────────────────────────────────────────
 
 async function checkHealth() {
-  const dot   = document.getElementById('status-dot');
-  const label = document.getElementById('status-label');
-  try {
-    const r = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(4000) });
-    if (r.ok) { dot.classList.add('online'); label.textContent = 'System Online'; }
-    else       { dot.classList.add('error');  label.textContent = 'API Error'; }
-  } catch {
-    dot.classList.add('error');
-    label.textContent = 'Offline';
-  }
+  // handled in admin.html inline script
 }
 
 // ── Load dashboard ────────────────────────────────────────────────────────
 
 async function loadDashboard() {
+  const label = document.getElementById('last-refresh-label');
+  if (label) label.textContent = 'Loading…';
   await Promise.all([loadStats(), loadTickets()]);
+  if (label) label.textContent = `Last updated: ${new Date().toLocaleTimeString('en-IN')}`;
 }
+
+async function refreshAll() { loadDashboard(); }
 
 async function loadStats() {
   try {
