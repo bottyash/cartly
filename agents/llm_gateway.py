@@ -33,7 +33,7 @@ OPENROUTER_BASE_URL  = os.getenv("OPENROUTER_BASE_URL",  "https://openrouter.ai/
 OPENROUTER_SITE_URL  = os.getenv("OPENROUTER_SITE_URL",  "http://localhost:3000")
 OPENROUTER_SITE_NAME = os.getenv("OPENROUTER_SITE_NAME", "Cartly")
 
-MAX_RETRIES  = 3
+MAX_RETRIES  = 2
 RETRY_DELAYS = [1.0, 2.5, 5.0]   # seconds between retries (exponential-ish)
 TIMEOUT_S    = 90.0               # per-request timeout
 
@@ -106,8 +106,17 @@ def call_llm(
     """
     client = _get_client()
 
+    # NOTE: llama-3.2-3b-instruct (and most open models on OpenRouter) do NOT
+    # support response_format={"type":"json_object"} — it silently returns empty
+    # content. We append an explicit JSON instruction to the system prompt instead;
+    # _extract_json() handles fences + prose wrapping returned by the model.
+    effective_system = (
+        system_prompt + "\n\nIMPORTANT: Respond with a single valid JSON object only. No prose, no markdown fences."
+        if expect_json else system_prompt
+    )
+
     messages = [
-        {"role": "system", "content": system_prompt},
+        {"role": "system", "content": effective_system},
         {"role": "user",   "content": user_prompt},
     ]
 
@@ -121,7 +130,6 @@ def call_llm(
                 messages=messages,  # type: ignore[arg-type]
                 temperature=0.1,
                 max_tokens=1024,
-                **({"response_format": {"type": "json_object"}} if expect_json else {}),
             )
             latency_ms = (time.perf_counter() - t0) * 1000
 
@@ -152,7 +160,9 @@ def call_llm(
 
         except (json.JSONDecodeError, IndexError) as exc:
             last_exc = exc
-            break   # Bad response structure — retrying won't help
+            # Retry once — model may have wrapped JSON in prose on first attempt
+            delay = RETRY_DELAYS[min(attempt, len(RETRY_DELAYS) - 1)]
+            time.sleep(delay)
 
     raise LLMGatewayError(
         f"OpenRouter call failed after {attempt + 1} attempt(s). "

@@ -63,14 +63,15 @@ RULES:
 4. Never invent policy rules that are not in the provided text.
 5. Be concise and factual.
 
-Respond ONLY with valid JSON in this exact format:
-{
-  "eligible": <true or false>,
-  "action_taken": <"refund_issued" | "denied" | "replacement_offered">,
-  "source_refs": ["<POLICY-ID>"],
-  "reason": "<one to two sentence explanation citing the policy clause>",
-  "draft_response": "<the message to show the customer — professional, empathetic, specific>"
-}"""
+You MUST respond with a JSON object with exactly these fields:
+- eligible: true or false (boolean)
+- action_taken: one of "refund_issued", "denied", or "replacement_offered" (string)
+- source_refs: list of policy IDs you are citing, e.g. ["POL-001"] (array of strings)
+- reason: one to two sentence explanation citing the policy clause (string)
+- draft_response: the message to show the customer, professional and empathetic (string)
+
+Example of correct output format:
+{"eligible": true, "action_taken": "refund_issued", "source_refs": ["POL-001"], "reason": "Per POL-001, damaged goods are eligible for full refund.", "draft_response": "We apologize for the inconvenience. Your refund has been approved."}"""
 
     def resolve(
         self,
