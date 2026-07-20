@@ -62,16 +62,23 @@ RULES:
 3. If the policy text does NOT support a refund, deny it and explain why using the policy.
 4. Never invent policy rules that are not in the provided text.
 5. Be concise and factual.
+6. The draft_response must reference the specific policy basis for the decision so a quality reviewer
+   can verify it (e.g. "Per our 30-day return policy (§3.1)..." or "As per our return policy...").
+   Do NOT write vague responses that contradict the policy text.
 
 You MUST respond with a JSON object with exactly these fields:
 - eligible: true or false (boolean)
 - action_taken: one of "refund_issued", "denied", or "replacement_offered" (string)
 - source_refs: list of policy IDs you are citing, e.g. ["POL-001"] (array of strings)
 - reason: one to two sentence explanation citing the policy clause (string)
-- draft_response: the message to show the customer, professional and empathetic (string)
+- draft_response: the customer-facing message. Must be professional, empathetic, and consistent
+  with the policy decision. If denied, briefly explain why per the policy. (string)
 
-Example of correct output format:
-{"eligible": true, "action_taken": "refund_issued", "source_refs": ["POL-001"], "reason": "Per POL-001, damaged goods are eligible for full refund.", "draft_response": "We apologize for the inconvenience. Your refund has been approved."}"""
+Example — approved:
+{"eligible": true, "action_taken": "refund_issued", "source_refs": ["POL-001"], "reason": "Per POL-001, items that arrive broken or defective qualify for a full refund.", "draft_response": "We're sorry to hear your item arrived damaged! As per our damaged goods policy (§3.2), you are fully eligible for a refund. We have processed this for you and you should receive the amount within 3-5 business days."}
+
+Example — denied (electronics, 31 days):
+{"eligible": false, "action_taken": "denied", "source_refs": ["POL-003"], "reason": "Per POL-003, electronics may only be returned within 30 days of delivery. This order is outside the return window.", "draft_response": "We appreciate you reaching out! Unfortunately, per our electronics return policy (§5.4), returns for electronics can only be accepted within 30 days of delivery. As your order falls outside this window, we are unable to process a refund at this time. If the item is defective, please contact the manufacturer's warranty support."}"""
 
     def resolve(
         self,

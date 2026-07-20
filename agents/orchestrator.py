@@ -150,6 +150,26 @@ Risk tier guide:
             category=triage.category if triage else "other",
         )
 
+        # ── Step 5: Abstain bypass ────────────────────────────────────────
+        # If the refund agent abstained (no policy found), skip the critic
+        # — there is no draft to evaluate; running the critic would just add
+        # a redundant "citation_missing" rejection on top of the abstention.
+        if agent_result.action_taken == "abstained":
+            log_event(
+                self.ticket_id,
+                step="orchestrator_verdict",
+                latency_ms=(time.monotonic() - t_start) * 1000,
+                cost_tokens=0,
+                decision="ESCALATE — refund agent abstained (no matching policy)",
+                metadata={"reason": agent_result.reason},
+            )
+            return self._build_escalation_response(
+                reason=agent_result.reason,
+                trigger="abstained",
+                t_start=t_start,
+                triage=triage,
+            )
+
         # ── Step 5: Safety Critic review ─────────────────────────────────
         critic = SafetyCritic()
         critic_result = critic.review(
