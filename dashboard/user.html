@@ -666,10 +666,23 @@ function renderSupportQuickOrders() {
 }
 
 async function openOrderChat(orderId) {
-  const local = userOrders.find(o => o.order_id === orderId);
-  if (local) { window._currentOrder = local; setupChat(local); return; }
+  // Client-side guard: verify the order is in this user's list
+  if (currentUser && userOrders.length) {
+    const local = userOrders.find(o => String(o.order_id) === String(orderId));
+    if (!local) {
+      showToast('Access denied: this order does not belong to your account.', 'err');
+      return;
+    }
+    window._currentOrder = local;
+    setupChat(local);
+    return;
+  }
+  // Guest path: fetch with ownership header if user is known
   try {
-    const r = await fetch(`${API}/orders/${orderId}`);
+    const headers = {};
+    if (currentUser) headers['X-Buyer-Name'] = currentUser;
+    const r = await fetch(`${API}/orders/${orderId}`, { headers });
+    if (r.status === 403) { showToast('Access denied: this order does not belong to your account.', 'err'); return; }
     if (!r.ok) { showToast('Order not found.', 'err'); return; }
     window._currentOrder = await r.json();
     setupChat(window._currentOrder);
@@ -691,8 +704,9 @@ function setupChat(order) {
   // Clear and init chat
   document.getElementById('chat-messages').innerHTML = '';
   switchView('chat');
-  const buyer = (order.buyer_name || 'there').split(' ')[0];
-  addBubble('bot', `Hi ${buyer}! 👋 I found your order for **${order.product_name}** (₹${Number(order.order_amount).toLocaleString('en-IN')}). I'm Cartly's AI support agent.\n\nHow can I help you today? I can assist with refunds, delivery tracking, exchanges, complaints, or any other issue.`);
+  // Use logged-in user's name, not buyer_name from DB (prevents cross-user greeting leak)
+  const displayName = (currentUser || order.buyer_name || 'there').split(' ')[0];
+  addBubble('bot', `Hi ${displayName}! 👋 I found your order for **${order.product_name}** (₹${Number(order.order_amount).toLocaleString('en-IN')}). I'm Cartly's AI support agent.\n\nHow can I help you today? I can assist with refunds, delivery tracking, exchanges, complaints, or any other issue.`);
   setTimeout(()=>document.getElementById('chat-inp').focus(), 300);
 }
 
@@ -707,7 +721,14 @@ async function doLookup() {
   if (!id) return;
   btn.disabled = true; btn.textContent = 'Searching…';
   try {
-    const r = await fetch(`${API}/orders/${id}`);
+    // Send buyer identity header so server enforces ownership
+    const headers = {};
+    if (currentUser) headers['X-Buyer-Name'] = currentUser;
+    const r = await fetch(`${API}/orders/${id}`, { headers });
+    if (r.status === 403) {
+      errEl.textContent = 'This order does not belong to your account.';
+      errEl.classList.remove('hidden'); return;
+    }
     if (!r.ok) {
       errEl.textContent = `Order #${id} not found. Try: 1042, 1077, 1090, 1099`;
       errEl.classList.remove('hidden'); return;

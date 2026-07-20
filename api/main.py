@@ -36,7 +36,7 @@ from api.schemas import (
     TicketSummary,
 )
 from agents.orchestrator import Orchestrator
-from data.mock_db import order_lookup, get_orders_by_buyer
+from data.mock_db import order_lookup, get_orders_by_buyer, owns_order
 from data.products import get_all_products, get_product
 from data.policy_kb import _CHUNKS as _policy_chunks
 
@@ -124,21 +124,35 @@ def list_tickets():
 # ──────────────────────────────────────────────
 
 @app.get("/orders/{order_id}", tags=["user"])
-def get_order(order_id: str):
-    """Look up a single order by ID. Used by the user chat interface."""
+def get_order(
+    order_id: str,
+    x_buyer_name: str | None = Header(default=None),
+):
+    """
+    Look up a single order by ID.
+    If X-Buyer-Name header is provided, ownership is validated —
+    a 403 is returned if the order does not belong to that buyer.
+    """
     order = order_lookup(order_id)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
+    # Ownership check: if the caller supplies their name, enforce it
+    if x_buyer_name:
+        if order.get("buyer_name", "").strip().lower() != x_buyer_name.strip().lower():
+            raise HTTPException(
+                status_code=403,
+                detail="Access denied: this order does not belong to your account."
+            )
     return order
 
 
-@app.get("/orders/buyer/{buyer_id}", tags=["user"])
-def get_orders_for_buyer(buyer_id: str):
-    """Return all orders for a given buyer ID."""
-    orders = get_orders_by_buyer(buyer_id)
+@app.get("/orders/buyer/{buyer_name}", tags=["user"])
+def get_orders_for_buyer(buyer_name: str):
+    """Return all orders for a given buyer name (exact, case-insensitive match)."""
+    orders = get_orders_by_buyer(buyer_name)
     if not orders:
-        raise HTTPException(status_code=404, detail=f"No orders found for buyer '{buyer_id}'.")
-    return {"buyer_id": buyer_id, "orders": orders}
+        raise HTTPException(status_code=404, detail=f"No account found for '{buyer_name}'. Please check your name.")
+    return {"buyer_name": buyer_name, "orders": orders}
 
 
 

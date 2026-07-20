@@ -1,8 +1,10 @@
 """
 Mock Order DB — PostgreSQL-backed order lookup.
 
-Provides a single public function:
+Provides public functions:
   order_lookup(order_id: str) -> dict | None
+  get_orders_by_buyer(buyer_name: str) -> list[dict]
+  owns_order(buyer_name: str, order_id: str) -> bool
 """
 
 from __future__ import annotations
@@ -58,10 +60,11 @@ def order_lookup(order_id: str) -> dict[str, Any] | None:
             pass
 
 
-def get_orders_by_buyer(buyer_id: str) -> list[dict]:
+
+def get_orders_by_buyer(buyer_name: str) -> list[dict]:
     """
-    Return all orders where buyer_name ILIKE the buyer_id string,
-    or where order_id = buyer_id (POC: buyer_id is the order_id itself).
+    Return all orders belonging to the given buyer.
+    Uses exact, case-insensitive match on buyer_name.
     """
     try:
         conn = _get_connection()
@@ -70,11 +73,10 @@ def get_orders_by_buyer(buyer_id: str) -> list[dict]:
                 cur.execute(
                     """
                     SELECT * FROM orders
-                    WHERE order_id = %s
-                       OR LOWER(buyer_name) LIKE LOWER(%s)
+                    WHERE LOWER(buyer_name) = LOWER(%s)
                     ORDER BY order_date DESC
                     """,
-                    (buyer_id, f"%{buyer_id}%"),
+                    (buyer_name,),
                 )
                 rows = cur.fetchall()
                 results = []
@@ -88,9 +90,20 @@ def get_orders_by_buyer(buyer_id: str) -> list[dict]:
                     results.append(record)
                 return results
     except psycopg2.Error as exc:
-        raise RuntimeError(f"Mock DB buyer lookup failed for {buyer_id}: {exc}") from exc
+        raise RuntimeError(f"DB buyer lookup failed for '{buyer_name}': {exc}") from exc
     finally:
         try:
             conn.close()
         except Exception:
             pass
+
+
+def owns_order(buyer_name: str, order_id: str) -> bool:
+    """
+    Return True iff the order belongs to the given buyer.
+    Used to prevent cross-user order access.
+    """
+    order = order_lookup(order_id)
+    if order is None:
+        return False
+    return order.get("buyer_name", "").strip().lower() == buyer_name.strip().lower()
