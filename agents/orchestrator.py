@@ -94,7 +94,22 @@ Risk tier guide:
         # ── Step 2: Triage (LLM) ─────────────────────────────────────────
         triage = self._run_triage(request.raw_ticket)
 
-        # ── Step 3: Deterministic threshold gate (NO LLM) ────────────────
+        # ── Step 3: Intent-based routing (threshold gate only for refunds) ─
+        intent = triage.intent if triage else "refund_request"
+
+        # ─── 3a. Delivery / status inquiry — skip threshold gate entirely ─
+        if intent in ("delivery_inquiry", "status_inquiry"):
+            return self._handle_delivery(request, triage, t_start)
+
+        # ─── 3b. Exchange request — skip threshold gate ───────────────────
+        if intent == "exchange_request":
+            return self._handle_complaint(request, triage, t_start, intent)
+
+        # ─── 3c. Complaint / other — skip threshold gate ──────────────────
+        if intent in ("complaint", "other"):
+            return self._handle_complaint(request, triage, t_start, intent)
+
+        # ─── 3d. Refund request — apply threshold gate (FR5) ─────────────
         t_gate = time.monotonic()
         over_threshold = request.claimed_amount > THRESHOLD_AMOUNT
         gate_latency = (time.monotonic() - t_gate) * 1000
@@ -120,22 +135,6 @@ Risk tier guide:
                 triage=triage,
             )
 
-        # ── Step 4: Intent-based routing ──────────────────────────────────
-        intent = triage.intent if triage else "refund_request"
-
-        # ─── 4a. Delivery / status inquiry ───────────────────────────────
-        if intent in ("delivery_inquiry", "status_inquiry"):
-            return self._handle_delivery(request, triage, t_start)
-
-        # ─── 4b. Exchange request ────────────────────────────────────────
-        if intent == "exchange_request":
-            return self._handle_complaint(request, triage, t_start, intent)
-
-        # ─── 4c. Complaint / other ────────────────────────────────────────
-        if intent in ("complaint", "other"):
-            return self._handle_complaint(request, triage, t_start, intent)
-
-        # ─── 4d. Refund request (default) ────────────────────────────────
         refund_agent = RefundAgent()
         agent_result = refund_agent.resolve(
             ticket_id=self.ticket_id,
