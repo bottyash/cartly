@@ -64,7 +64,9 @@ def order_lookup(order_id: str) -> dict[str, Any] | None:
 def get_orders_by_buyer(buyer_name: str) -> list[dict]:
     """
     Return all orders belonging to the given buyer.
-    Uses exact, case-insensitive match on buyer_name.
+    Supports both first-name-only ("Rahul") and full-name ("Rahul Mehta") lookup.
+    Matches buyer_name exactly or where buyer_name starts with the given name
+    followed by a space (i.e. first name match), case-insensitive.
     """
     try:
         conn = _get_connection()
@@ -74,9 +76,10 @@ def get_orders_by_buyer(buyer_name: str) -> list[dict]:
                     """
                     SELECT * FROM orders
                     WHERE LOWER(buyer_name) = LOWER(%s)
+                       OR LOWER(buyer_name) LIKE LOWER(%s)
                     ORDER BY order_date DESC
                     """,
-                    (buyer_name,),
+                    (buyer_name, f"{buyer_name} %"),
                 )
                 rows = cur.fetchall()
                 results = []
@@ -101,9 +104,12 @@ def get_orders_by_buyer(buyer_name: str) -> list[dict]:
 def owns_order(buyer_name: str, order_id: str) -> bool:
     """
     Return True iff the order belongs to the given buyer.
-    Used to prevent cross-user order access.
+    Supports first-name or full-name matching.
     """
     order = order_lookup(order_id)
     if order is None:
         return False
-    return order.get("buyer_name", "").strip().lower() == buyer_name.strip().lower()
+    db_name = order.get("buyer_name", "").strip().lower()
+    query = buyer_name.strip().lower()
+    # Exact full-name match OR first-name prefix match
+    return db_name == query or db_name.startswith(query + " ")

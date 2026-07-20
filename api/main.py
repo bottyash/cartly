@@ -136,9 +136,11 @@ def get_order(
     order = order_lookup(order_id)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
-    # Ownership check: if the caller supplies their name, enforce it
+    # Ownership check: supports first-name ("Rahul") or full-name ("Rahul Mehta")
     if x_buyer_name:
-        if order.get("buyer_name", "").strip().lower() != x_buyer_name.strip().lower():
+        db_name = order.get("buyer_name", "").strip().lower()
+        query   = x_buyer_name.strip().lower()
+        if db_name != query and not db_name.startswith(query + " "):
             raise HTTPException(
                 status_code=403,
                 detail="Access denied: this order does not belong to your account."
