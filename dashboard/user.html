@@ -198,10 +198,44 @@ a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;b
 .toast.success{background:var(--green)}
 .toast.err{background:var(--red)}
 
-/* How it works in chat sidebar */
-.how-box{background:#fff;border:1px solid var(--gray-200);border-radius:13px;padding:14px;font-size:13px;color:var(--gray-500);margin-top:12px}
-.how-title{font-weight:700;color:var(--gray-900);margin-bottom:7px}
-.how-box ol{padding-left:16px;line-height:2.1}
+/* Connect-to-Human CTA bubble */
+.bubble-human-cta .bubble-body{background:linear-gradient(135deg,#eff6ff,#f0fdf4);border:1.5px solid var(--blue);border-radius:14px;padding:18px}
+.hcta-icon{font-size:28px;margin-bottom:8px}
+.hcta-title{font-size:15px;font-weight:800;color:var(--gray-900);margin-bottom:5px}
+.hcta-reason{font-size:13px;color:var(--gray-600);margin-bottom:14px;line-height:1.6}
+.hcta-btn{padding:10px 20px;background:var(--blue);color:#fff;border-radius:9px;font-size:14px;font-weight:700;transition:background .15s;cursor:pointer}
+.hcta-btn:hover:not(:disabled){background:var(--blue-dark)}
+.hcta-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* Chat locked bar */
+.chat-locked-bar{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--gray-50);border-top:1px solid var(--gray-200);font-size:13px;color:var(--gray-600);flex-wrap:wrap}
+.chat-locked-btn{margin-left:auto;padding:8px 16px;background:var(--blue);color:#fff;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.chat-locked-btn:hover{background:var(--blue-dark)}
+
+/* Live chat view */
+.live-wrap{display:flex;gap:16px;padding:20px;max-width:1200px;margin:0 auto;height:calc(100vh - 64px)}
+@media(max-width:768px){.live-wrap{flex-direction:column;padding:12px;height:auto}}
+.live-sidebar{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:12px}
+@media(max-width:768px){.live-sidebar{width:100%;flex-direction:row;flex-wrap:wrap}}
+.live-side-card{background:#fff;border:1px solid var(--gray-200);border-radius:13px;overflow:hidden}
+.live-side-hd{background:var(--blue);padding:10px 14px;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase}
+.live-side-body{padding:14px;font-size:13px}
+.live-info-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--gray-50);font-size:13px;color:var(--gray-400)}
+.live-info-row:last-child{border:none}
+.live-info-row strong{color:var(--gray-900)}
+.live-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.live-window{background:#fff;border:1px solid var(--gray-200);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;flex:1;min-height:400px}
+.live-hd{padding:13px 16px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;gap:10px}
+.live-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#15803d);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.live-agent-name{font-size:14px;font-weight:700}
+.live-agent-status{font-size:12px;margin-top:2px}
+.live-waiting-banner{background:#fffbeb;border-bottom:1px solid #fde68a;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:13px;color:#92400e}
+.live-wait-spin{width:14px;height:14px;border:2px solid #f59e0b;border-top-color:transparent;border-radius:50%;animation:_sp .8s linear infinite;flex-shrink:0}
+.live-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.live-messages::-webkit-scrollbar{width:4px}
+.live-messages::-webkit-scrollbar-thumb{background:var(--gray-200)}
+.bubble-sender{font-size:11px;font-weight:700;color:var(--blue);margin-bottom:4px;opacity:.8}
+.live-inp-wrap{padding:12px 14px;border-top:1px solid var(--gray-100);display:flex;gap:9px;align-items:flex-end}
 </style>
 </head>
 <body>
@@ -425,14 +459,6 @@ a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;b
           <button class="change-order-btn" onclick="switchView('support-hub')">← Choose a different order</button>
         </div>
       </div>
-      <div class="how-box">
-        <div class="how-title">💡 How it works</div>
-        <ol>
-          <li>Describe your issue</li>
-          <li>AI reviews order + policy</li>
-          <li>Get instant resolution</li>
-        </ol>
-      </div>
     </aside>
     <div class="chat-main-area">
       <div class="chat-window">
@@ -449,6 +475,57 @@ a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;b
             placeholder="Describe your issue — refund, delivery, exchange, complaint…"
             onkeydown="handleChatKey(event)"></textarea>
           <button class="send-btn" id="send-btn" onclick="sendMessage()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ VIEW: LIVE HUMAN CHAT ══════════════════════════════ -->
+<div id="view-live-chat" class="hidden">
+  <div class="live-wrap">
+    <!-- Sidebar -->
+    <aside class="live-sidebar">
+      <div class="live-side-card">
+        <div class="live-side-hd">📦 Your Order</div>
+        <div class="live-side-body" id="live-ticket-info">Loading…</div>
+      </div>
+      <div class="live-side-card">
+        <div class="live-side-hd">Session</div>
+        <div class="live-side-body" style="font-size:12px;color:var(--gray-400);line-height:1.7">
+          Connected to Cartly Support.<br>A human agent will join shortly.
+        </div>
+      </div>
+    </aside>
+    <!-- Chat pane -->
+    <div class="live-main">
+      <div class="live-window">
+        <!-- Header -->
+        <div class="live-hd">
+          <div class="live-av">🧑‍💼</div>
+          <div style="flex:1">
+            <div class="live-agent-name">Cartly Support Agent</div>
+            <div class="live-agent-status" id="live-agent-status">⏳ Waiting for an agent…</div>
+          </div>
+          <button onclick="switchView('support-hub')" style="padding:6px 12px;border:1px solid var(--gray-200);border-radius:7px;font-size:12px;color:var(--gray-600)">← Back</button>
+        </div>
+        <!-- Waiting banner -->
+        <div class="live-waiting-banner" id="live-waiting-banner">
+          <div class="live-wait-spin"></div>
+          <span>A support agent will join this chat shortly. You can already type your message below.</span>
+        </div>
+        <!-- Messages -->
+        <div class="live-messages" id="live-messages"></div>
+        <!-- Input -->
+        <div class="live-inp-wrap">
+          <textarea id="live-inp" class="chat-ta" rows="1"
+            placeholder="Type your message…"
+            onkeydown="handleLiveChatKey(event)"></textarea>
+          <button class="send-btn" id="live-send-btn" onclick="sendLiveMessage()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>
@@ -479,7 +556,8 @@ let historyStack = [];
 /* showToast, addBubble, esc, renderMarkdown are defined in user.js (loaded before this inline script) */
 
 /* ═══ VIEW SYSTEM ════════════════════════════════════════ */
-const VIEWS = ['login','orders','support-hub','order-lookup','generic-query','chat'];
+const VIEWS = ['login','orders','support-hub','order-lookup','generic-query','chat','live-chat'];
+
 
 function switchView(name, pushHistory = true) {
   const prev = VIEWS.find(v => !document.getElementById('view-'+v).classList.contains('hidden'));
@@ -506,7 +584,9 @@ function initAuth() {
       const u = JSON.parse(saved);
       currentUser = u.name;
       userOrders = u.orders || [];
+      window._cartlyUser = { name: u.name };  // expose for user.js live chat
       setLoggedInUI(u.name);
+
 
       // Handle URL params
       const params = new URLSearchParams(window.location.search);

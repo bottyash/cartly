@@ -21,6 +21,43 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .tnav-sp{flex:1}
 .tnav-btn{font-size:13px;font-weight:500;color:rgba(255,255,255,.45);padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
 .tnav-btn:hover{color:#fff;background:rgba(255,255,255,.07)}
+/* Live support */
+.live-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:0 5px;margin-left:auto;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.live-panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;margin-bottom:24px}
+.live-panel-t{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.live-ticket-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid rgba(255,255,255,.07);border-radius:11px;cursor:pointer;transition:all .15s;margin-bottom:8px;background:rgba(255,255,255,.03)}
+.live-ticket-row:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.07)}
+.live-ticket-row.selected{border-color:#6366f1;background:rgba(99,102,241,.12)}
+.lt-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.lt-name{font-size:14px;font-weight:600;color:#f1f5f9}
+.lt-sub{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.lt-status{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px}
+.lt-status.waiting{background:rgba(245,158,11,.15);color:#fbbf24}
+.lt-status.active{background:rgba(34,197,94,.15);color:#4ade80}
+.lt-wait{font-size:11px;color:rgba(255,255,255,.3);margin-left:8px;white-space:nowrap}
+.admin-chat-pane{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:480px}
+.admin-chat-hd{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.admin-chat-name{font-size:14px;font-weight:700;color:#f1f5f9}
+.admin-chat-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.admin-chat-resolve{margin-left:auto;padding:6px 14px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.admin-chat-resolve:hover{background:rgba(34,197,94,.25)}
+.admin-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.admin-msgs::-webkit-scrollbar{width:4px}
+.admin-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.admin-bubble{padding:9px 13px;border-radius:11px;font-size:13px;line-height:1.5;max-width:78%;word-wrap:break-word}
+.admin-bubble.from-user{background:rgba(255,255,255,.06);color:#e2e8f0;align-self:flex-start}
+.admin-bubble.from-admin{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;align-self:flex-end}
+.admin-bubble-wrap{display:flex;flex-direction:column}
+.admin-bubble-wrap.user-wrap{align-items:flex-start}
+.admin-bubble-wrap.admin-wrap{align-items:flex-end}
+.admin-bubble-meta{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px;padding:0 3px}
+.admin-inp-row{border-top:1px solid rgba(255,255,255,.08);padding:12px 14px;display:flex;gap:9px;align-items:flex-end}
+.admin-ta{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:#f1f5f9;padding:9px 13px;font-size:13px;font-family:inherit;resize:none;line-height:1.5;min-height:36px;max-height:100px;transition:border .15s}
+.admin-ta:focus{outline:none;border-color:rgba(99,102,241,.5)}
+.admin-send-btn{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity .15s}
+.admin-send-btn:hover{opacity:.85}
+.no-live-msg{text-align:center;padding:40px 20px;color:rgba(255,255,255,.3);font-size:14px}
 .tnav-div{width:1px;height:22px;background:rgba(255,255,255,.08)}
 
 /* ── ADMIN LAYOUT ── */
@@ -176,6 +213,11 @@ tbody tr:last-child td{border:none}
       <div class="sb-sec">Analytics</div>
       <div class="sb-item" onclick="scrollToId('charts-section')"><span class="sb-ic">📈</span> Charts</div>
       <div class="sb-item" onclick="scrollToId('fr-section')"><span class="sb-ic">✅</span> FR Coverage</div>
+      <div class="sb-sec">Live Support</div>
+      <div class="sb-item" id="sb-live" onclick="showLiveSupport()">
+        <span class="sb-ic">📞</span> Live Chats
+        <span id="live-badge" class="live-badge hidden">0</span>
+      </div>
       <div class="sb-sec">System</div>
       <div class="sb-item" id="sb-health"><span class="sb-ic" id="sb-health-ic">⚪</span> <span id="sb-health-lbl">API Status</span></div>
       <div class="sb-item" onclick="window.open('http://localhost:8000/docs','_blank')"><span class="sb-ic">📖</span> API Docs</div>
@@ -265,6 +307,53 @@ tbody tr:last-child td{border:none}
           </table>
         </div>
       </div>
+
+      <!-- ── LIVE SUPPORT SECTION (hidden by default, shown via sidebar) ── -->
+      <div id="live-support-section" class="hidden">
+        <div class="page-hd" style="margin-bottom:20px">
+          <div class="page-t">🔴 Live Support Inbox</div>
+          <div class="page-s">Real-time customer chat — respond to waiting users</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:20px;align-items:start">
+          <!-- Ticket list -->
+          <div class="live-panel">
+            <div class="live-panel-t">
+              <span>Active Tickets</span>
+              <span id="live-count-badge" style="font-size:12px;color:rgba(255,255,255,.4);font-weight:400;margin-left:auto"></span>
+            </div>
+            <div id="live-ticket-list">
+              <div class="no-live-msg">Loading…</div>
+            </div>
+          </div>
+
+          <!-- Chat pane -->
+          <div class="admin-chat-pane" id="admin-chat-pane">
+            <div class="admin-chat-hd" id="admin-chat-hd">
+              <div class="lt-avatar" style="font-size:20px">💬</div>
+              <div>
+                <div class="admin-chat-name" id="admin-chat-hd-name">Select a ticket to start chatting</div>
+                <div class="admin-chat-sub" id="admin-chat-hd-sub">Click a ticket on the left</div>
+              </div>
+              <button class="admin-chat-resolve" id="admin-resolve-btn" onclick="adminResolve()" disabled>✓ Resolve</button>
+            </div>
+            <div class="admin-msgs" id="admin-chat-msgs">
+              <div class="no-live-msg" style="margin-top:60px">Select a ticket from the left to view the conversation and respond.</div>
+            </div>
+            <div class="admin-inp-row">
+              <textarea id="admin-chat-ta" class="admin-ta" rows="1"
+                placeholder="Type your reply… (Enter to send)"
+                onkeydown="adminChatKeydown(event)"></textarea>
+              <div class="admin-send-btn" onclick="adminSendMessage()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -309,6 +398,165 @@ function scrollToId(id) {
 
 function closeModal(e) { if(e.target===document.getElementById('trace-modal')) closeTraceModal(); }
 function closeTraceModal() { document.getElementById('trace-modal').classList.add('hidden'); }
+
+// ─── LIVE SUPPORT ───────────────────────────────────────────────────────────
+const LIVE_API = 'http://localhost:8000';
+let _liveTickets = [];
+let _selectedTicketId = null;
+let _adminLastMsgCount = 0;
+let _ticketPollTimer = null;
+let _chatPollTimer  = null;
+
+function showLiveSupport() {
+  // Hide all sections, show live section
+  document.querySelectorAll('.main > *').forEach(el => el.classList.add('hidden'));
+  const sec = document.getElementById('live-support-section');
+  if (sec) { sec.classList.remove('hidden'); }
+  startTicketPolling();
+}
+
+function startTicketPolling() {
+  clearInterval(_ticketPollTimer);
+  pollLiveTickets(); // immediate
+  _ticketPollTimer = setInterval(pollLiveTickets, 3000);
+}
+
+async function pollLiveTickets() {
+  try {
+    const r = await fetch(`${LIVE_API}/live/tickets`);
+    if (!r.ok) return;
+    const d = await r.json();
+    _liveTickets = d.tickets || [];
+    renderTicketList();
+    // Update badge
+    const badge = document.getElementById('live-badge');
+    if (badge) {
+      const n = _liveTickets.filter(t => t.status !== 'resolved').length;
+      badge.textContent = n;
+      badge.classList.toggle('hidden', n === 0);
+    }
+  } catch(_) {}
+}
+
+function renderTicketList() {
+  const list = document.getElementById('live-ticket-list');
+  if (!list) return;
+  if (_liveTickets.length === 0) {
+    list.innerHTML = '<div class="no-live-msg">🎉 No active support requests right now.</div>';
+    return;
+  }
+  list.innerHTML = _liveTickets.map(t => {
+    const waited = Math.round((Date.now() - new Date(t.created_at).getTime()) / 60000);
+    const sel = t.id === _selectedTicketId ? ' selected' : '';
+    return `<div class="live-ticket-row${sel}" onclick="openAdminChat(${t.id})">
+      <div class="lt-avatar">${(t.buyer_name||'?')[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div class="lt-name">${escAdmin(t.buyer_name)} <span style="color:rgba(255,255,255,.35);font-weight:400;font-size:12px">#${t.order_id}</span></div>
+        <div class="lt-sub">${escAdmin(t.product_name)} · ${escAdmin(t.issue_summary||'')}</div>
+      </div>
+      <span class="lt-status ${t.status}">${t.status==='waiting'?'⏳ Waiting':'🟢 Active'}</span>
+      <span class="lt-wait">${waited}m ago</span>
+    </div>`;
+  }).join('');
+}
+
+async function openAdminChat(ticketId) {
+  _selectedTicketId = ticketId;
+  _adminLastMsgCount = 0;
+  renderTicketList(); // update selection highlight
+
+  clearInterval(_chatPollTimer);
+  await loadAdminChat();
+  _chatPollTimer = setInterval(loadAdminChat, 2000);
+}
+
+async function loadAdminChat() {
+  if (!_selectedTicketId) return;
+  try {
+    const r = await fetch(`${LIVE_API}/live/${_selectedTicketId}`);
+    if (!r.ok) return;
+    const ticket = await r.json();
+
+    // Update chat header
+    const hd = document.getElementById('admin-chat-hd-name');
+    const sub = document.getElementById('admin-chat-hd-sub');
+    if (hd)  hd.textContent  = ticket.buyer_name + ' · #' + ticket.order_id;
+    if (sub) sub.textContent = ticket.product_name + ' · ' + ticket.status;
+
+    // Render new messages
+    const msgs = ticket.messages || [];
+    if (msgs.length > _adminLastMsgCount) {
+      const msgEl = document.getElementById('admin-chat-msgs');
+      if (msgs.length === 0 || _adminLastMsgCount === 0) {
+        // Full re-render
+        if (msgEl) msgEl.innerHTML = '';
+        msgs.forEach(m => appendAdminMsg(m));
+      } else {
+        msgs.slice(_adminLastMsgCount).forEach(m => appendAdminMsg(m));
+      }
+      _adminLastMsgCount = msgs.length;
+      if (msgEl) msgEl.scrollTop = msgEl.scrollHeight;
+    }
+
+    // Enable/disable resolve button
+    const resolveBtn = document.getElementById('admin-resolve-btn');
+    if (resolveBtn) resolveBtn.disabled = (ticket.status === 'resolved');
+    if (resolveBtn && ticket.status === 'resolved') resolveBtn.textContent = '✅ Resolved';
+
+    // Enable input only when active
+    const ta = document.getElementById('admin-chat-ta');
+    if (ta) ta.disabled = (ticket.status === 'resolved');
+  } catch(_) {}
+}
+
+function appendAdminMsg(msg) {
+  const msgEl = document.getElementById('admin-chat-msgs');
+  if (!msgEl) return;
+  const isAdmin = msg.sender === 'admin';
+  const wrap = document.createElement('div');
+  wrap.className = `admin-bubble-wrap ${isAdmin ? 'admin-wrap' : 'user-wrap'}`;
+  const time = new Date(msg.created_at).toLocaleTimeString('en-IN', {hour:'2-digit',minute:'2-digit'});
+  wrap.innerHTML = `
+    <div class="admin-bubble ${isAdmin ? 'from-admin' : 'from-user'}">${escAdmin(msg.message)}</div>
+    <div class="admin-bubble-meta">${isAdmin ? 'You' : escAdmin(msg.sender_name)} · ${time}</div>`;
+  msgEl.appendChild(wrap);
+}
+
+async function adminSendMessage() {
+  if (!_selectedTicketId) return;
+  const ta = document.getElementById('admin-chat-ta');
+  const text = (ta?.value || '').trim();
+  if (!text) return;
+  ta.value = '';
+  try {
+    await fetch(`${LIVE_API}/live/${_selectedTicketId}/message`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sender: 'admin', sender_name: 'Support Agent', message: text }),
+    });
+    _adminLastMsgCount = 0; // force re-render
+    await loadAdminChat();
+  } catch(_) { alert('Failed to send. Please try again.'); }
+}
+
+async function adminResolve() {
+  if (!_selectedTicketId) return;
+  if (!confirm('Mark this ticket as resolved? The user\'s chat will be closed.')) return;
+  try {
+    await fetch(`${LIVE_API}/live/${_selectedTicketId}/resolve`, { method: 'PATCH' });
+    _adminLastMsgCount = 0;
+    await loadAdminChat();
+    await pollLiveTickets();
+  } catch(_) { alert('Failed to resolve.'); }
+}
+
+function escAdmin(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function adminChatKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); adminSendMessage(); }
+}
 
 async function checkSidebarHealth() {
   const ic = document.getElementById('sb-health-ic');

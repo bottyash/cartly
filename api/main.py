@@ -17,6 +17,12 @@ Endpoints:
 
   GET  /admin/tickets         — admin: list all tickets with summary
   GET  /admin/stats           — admin: aggregated statistics + chart data
+
+  POST   /live/connect        — user: request human agent (opens live ticket)
+  GET    /live/tickets        — admin: list active/waiting live tickets
+  GET    /live/{ticket_id}    — get live ticket + message history (user + admin poll)
+  POST   /live/{ticket_id}/message  — send message (user or admin)
+  PATCH  /live/{ticket_id}/resolve  — admin: close ticket
 """
 
 from __future__ import annotations
@@ -36,7 +42,11 @@ from api.schemas import (
     TicketSummary,
 )
 from agents.orchestrator import Orchestrator
-from data.mock_db import order_lookup, get_orders_by_buyer, owns_order
+from data.mock_db import (
+    order_lookup, get_orders_by_buyer, owns_order,
+    create_live_ticket, get_live_tickets, get_live_ticket,
+    add_live_message, resolve_live_ticket, set_ticket_active,
+)
 from data.products import get_all_products, get_product
 from data.policy_kb import _CHUNKS as _policy_chunks
 
@@ -369,3 +379,72 @@ def admin_stats(x_admin_token: str | None = Header(default=None)):
         avg_latency_by_day=avg_lat_by_day,
         fr_coverage=fr_coverage,
     )
+
+
+# ──────────────────────────────────────────────
+# LIVE CHAT  —  human-agent endpoints
+# ──────────────────────────────────────────────
+
+from pydantic import BaseModel as _BM
+
+class LiveConnectRequest(_BM):
+    order_id:      str
+    buyer_name:    str
+    product_name:  str = ""
+    issue_summary: str = "Customer requested human support"
+
+class LiveMessageRequest(_BM):
+    sender:      str        # 'user' | 'admin'
+    sender_name: str
+    message:     str
+
+
+@app.post("/live/connect", tags=["live"])
+def live_connect(req: LiveConnectRequest):
+    """User opens a live-chat ticket requesting a human agent."""
+    ticket = create_live_ticket(
+        order_id=req.order_id,
+        buyer_name=req.buyer_name,
+        product_name=req.product_name,
+        issue_summary=req.issue_summary,
+    )
+    return ticket
+
+
+@app.get("/live/tickets", tags=["live"])
+def live_tickets(status: str | None = None):
+    """Admin: list all active/waiting live tickets."""
+    return {"tickets": get_live_tickets(status)}
+
+
+@app.get("/live/{ticket_id}", tags=["live"])
+def live_ticket_detail(ticket_id: int):
+    """Get a single live ticket with full message history. Polled by both user and admin."""
+    ticket = get_live_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Live ticket not found")
+    return ticket
+
+
+@app.post("/live/{ticket_id}/message", tags=["live"])
+def live_send_message(ticket_id: int, req: LiveMessageRequest):
+    """Append a message to a live ticket. Called by user or admin."""
+    ticket = get_live_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Live ticket not found")
+    if ticket["status"] == "resolved":
+        raise HTTPException(status_code=409, detail="This ticket has been resolved")
+    # Auto-activate when admin sends first message
+    if req.sender == "admin" and ticket["status"] == "waiting":
+        set_ticket_active(ticket_id)
+    msg = add_live_message(ticket_id, req.sender, req.sender_name, req.message)
+    return msg
+
+
+@app.patch("/live/{ticket_id}/resolve", tags=["live"])
+def live_resolve(ticket_id: int):
+    """Admin resolves a live ticket."""
+    ok = resolve_live_ticket(ticket_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Live ticket not found")
+    return {"status": "resolved", "ticket_id": ticket_id}
