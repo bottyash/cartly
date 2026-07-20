@@ -1,120 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartly — Smart Refund Support</title>
-  <meta name="description" content="Cartly AI-powered refund resolution. Fast, fair, and fully automated for e-commerce." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cartly — Smart Refund Support</title>
+<meta name="description" content="Cartly AI-powered refund resolution — fast, fair, automated."/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:#fff;color:#0f172a;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:99;background:#fff;border-bottom:1px solid #e2e8f0;height:62px;display:flex;align-items:center;padding:0 40px;gap:14px}
+.nav-icon{width:36px;height:36px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.nav-name{font-size:20px;font-weight:800;letter-spacing:-.5px}
+.nav-sub{font-size:12px;color:#64748b;font-weight:500}
+.nav-space{flex:1}
+.nav-status{display:flex;align-items:center;gap:7px;font-size:13px;color:#64748b}
+.nav-dot{width:8px;height:8px;border-radius:50%;background:#cbd5e1}
+.nav-dot.on{background:#22c55e;box-shadow:0 0 0 3px #dcfce7}
+.nav-dot.off{background:#ef4444}
+
+/* HERO */
+.hero{background:linear-gradient(150deg,#0f172a 0%,#1e3a8a 55%,#1d4ed8 100%);padding:80px 40px 90px;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(59,130,246,.15) 0%,transparent 60%);pointer-events:none}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.85);font-size:13px;font-weight:600;padding:6px 18px;border-radius:20px;margin-bottom:28px;letter-spacing:.3px}
+h1{font-size:clamp(34px,5vw,56px);font-weight:800;color:#fff;letter-spacing:-1.5px;line-height:1.1;margin-bottom:18px}
+h1 span{color:#93c5fd}
+.hero-sub{font-size:17px;color:rgba(255,255,255,.6);max-width:500px;margin:0 auto 52px;line-height:1.75}
+
+/* CARDS GRID */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:840px;margin:0 auto;position:relative;z-index:1}
+@media(max-width:640px){.cards{grid-template-columns:1fr}}
+.card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.13);border-radius:18px;padding:30px 26px;text-align:left;backdrop-filter:blur(16px);transition:all .25s;cursor:pointer}
+.card:hover{background:rgba(255,255,255,.13);transform:translateY(-4px);border-color:rgba(255,255,255,.28)}
+.card-ico{width:54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px}
+.ico-b{background:rgba(59,130,246,.25)}
+.ico-p{background:rgba(124,58,237,.25)}
+.card-t{font-size:19px;font-weight:700;color:#fff;margin-bottom:8px}
+.card-d{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65;margin-bottom:18px}
+.card-list{list-style:none}
+.card-list li{font-size:13px;color:rgba(255,255,255,.5);padding:4px 0;display:flex;align-items:center;gap:8px}
+.card-list li::before{content:'✓';color:#93c5fd;font-weight:700;font-size:12px}
+.card-cta{margin-top:22px;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;color:#93c5fd}
+.card-arrow{transition:transform .2s}
+.card:hover .card-arrow{transform:translateX(5px)}
+
+/* Admin token gate inside card */
+.gate-wrap{margin-top:14px}
+.gate-inp{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:9px;padding:10px 14px;color:#fff;font-size:14px;font-family:inherit;transition:border-color .15s}
+.gate-inp::placeholder{color:rgba(255,255,255,.3)}
+.gate-inp:focus{outline:none;border-color:rgba(255,255,255,.4)}
+.gate-btn{margin-top:10px;width:100%;background:rgba(124,58,237,.75);color:#fff;font-size:14px;font-weight:700;padding:10px;border-radius:9px;border:none;cursor:pointer;transition:background .15s}
+.gate-btn:hover{background:#7c3aed}
+.gate-err{font-size:12px;color:#fca5a5;margin-top:7px}
+
+/* STRIPS */
+.feat-strip{background:#0f172a;padding:20px 40px;display:flex;justify-content:center;flex-wrap:wrap;gap:28px;border-bottom:1px solid rgba(255,255,255,.05)}
+.feat-item{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.45);font-weight:500}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));max-width:860px;margin:0 auto;padding:52px 40px;text-align:center;gap:20px}
+.stat-n{font-size:38px;font-weight:800;color:#1d4ed8;letter-spacing:-1px}
+.stat-l{font-size:13px;color:#64748b;margin-top:4px}
+footer{background:#0f172a;padding:28px 40px;text-align:center;font-size:13px;color:rgba(255,255,255,.3)}
+footer b{color:rgba(255,255,255,.5)}
+</style>
 </head>
-<body class="landing-body">
+<body>
 
-  <!-- Top Nav -->
-  <nav class="topnav">
-    <div class="topnav-logo">
-      <div class="topnav-logo-icon">🛒</div>
-      <span class="topnav-logo-text">Cartly</span>
-      <span class="topnav-logo-sub">Support</span>
-    </div>
-    <div class="topnav-spacer"></div>
-    <span id="strip-label" style="font-size:13px;color:var(--slate-500);display:flex;align-items:center;gap:6px;">
-      <span class="status-dot" id="strip-dot"></span>
-      <span id="strip-text">Checking…</span>
-    </span>
-  </nav>
-
-  <!-- Hero -->
-  <section class="landing-hero">
-    <div class="landing-hero-eyebrow">
-      <span>✦</span> AI-Powered Customer Support
-    </div>
-    <h1 class="landing-hero-title">
-      Refund requests resolved<br><span>in seconds, not days</span>
-    </h1>
-    <p class="landing-hero-sub">
-      Cartly's multi-agent AI system reviews your order, checks our refund policy, and delivers a fair, instant decision — 24/7.
-    </p>
-
-    <!-- Role Cards -->
-    <div class="landing-cards">
-
-      <!-- Customer -->
-      <div class="landing-card" id="customer-card" onclick="goCustomer()">
-        <div class="landing-card-icon card-icon-customer">👤</div>
-        <div class="landing-card-title">Customer Support</div>
-        <p class="landing-card-desc">Track your order and submit a refund request. Get an AI-powered resolution in under 10 seconds.</p>
-        <ul class="landing-card-features">
-          <li>Look up any order instantly</li>
-          <li>Submit refund requests via chat</li>
-          <li>Get real-time AI decisions</li>
-          <li>Track your ticket status live</li>
-        </ul>
-        <div class="landing-card-cta">
-          <span>Get Started</span>
-          <span class="landing-card-arrow">→</span>
-        </div>
-      </div>
-
-      <!-- Admin -->
-      <div class="landing-card" id="admin-card">
-        <div class="landing-card-icon card-icon-admin">📊</div>
-        <div class="landing-card-title">Admin Dashboard</div>
-        <p class="landing-card-desc">Operations dashboard with full observability — live ticket feed, resolution analytics, agent traces.</p>
-        <ul class="landing-card-features">
-          <li>Real-time ticket metrics</li>
-          <li>Resolution rate analytics</li>
-          <li>AI agent pipeline traces</li>
-          <li>FR1–FR8 coverage tracker</li>
-        </ul>
-        <div class="landing-token-gate">
-          <input type="password" id="admin-token-input" class="landing-token-input"
-            placeholder="Enter admin token to continue"
-            onkeydown="if(event.key==='Enter') adminLogin()" />
-          <button class="landing-token-btn" onclick="adminLogin()">Access Dashboard →</button>
-          <p class="landing-token-error" id="token-error"></p>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- Feature strip -->
-  <div class="landing-features">
-    <div class="landing-feature"><span class="landing-feature-icon">⚡</span> Sub-10 second resolutions</div>
-    <div class="landing-feature"><span class="landing-feature-icon">🛡️</span> AI Safety Critic on every decision</div>
-    <div class="landing-feature"><span class="landing-feature-icon">📋</span> Policy-grounded, never guesses</div>
-    <div class="landing-feature"><span class="landing-feature-icon">🔍</span> Full audit trail for every ticket</div>
-    <div class="landing-feature"><span class="landing-feature-icon">☁️</span> Cloud-hosted, always available</div>
+<nav>
+  <div class="nav-icon">🛒</div>
+  <span class="nav-name">Cartly</span>
+  <span class="nav-sub">Support</span>
+  <div class="nav-space"></div>
+  <div class="nav-status">
+    <span class="nav-dot" id="strip-dot"></span>
+    <span id="strip-text">Checking…</span>
   </div>
+</nav>
 
-  <!-- Stats -->
-  <div class="landing-stats">
-    <div>
-      <div class="landing-stat-num">~8s</div>
-      <div class="landing-stat-label">Average resolution time</div>
+<section class="hero">
+  <div class="hero-tag">✦ AI-Powered Customer Support</div>
+  <h1>Refund requests resolved<br><span>in seconds, not days</span></h1>
+  <p class="hero-sub">Cartly's multi-agent AI reviews your order, checks the refund policy, and delivers a fair, instant decision — 24 / 7.</p>
+
+  <div class="cards">
+    <!-- Customer -->
+    <div class="card" id="customer-card" onclick="goCustomer()">
+      <div class="card-ico ico-b">👤</div>
+      <div class="card-t">Customer Support</div>
+      <p class="card-d">Track your order and submit a refund request. Get an AI-powered decision in under 10 seconds.</p>
+      <ul class="card-list">
+        <li>Look up any order instantly</li>
+        <li>Submit refund requests via chat</li>
+        <li>Real-time AI decisions</li>
+        <li>Track your ticket live</li>
+      </ul>
+      <div class="card-cta"><span>Get Started</span><span class="card-arrow">→</span></div>
     </div>
-    <div>
-      <div class="landing-stat-num">₹500</div>
-      <div class="landing-stat-label">Auto-approval threshold</div>
-    </div>
-    <div>
-      <div class="landing-stat-num">0.70</div>
-      <div class="landing-stat-label">Min. faithfulness score</div>
-    </div>
-    <div>
-      <div class="landing-stat-num">8</div>
-      <div class="landing-stat-label">AI agents in the pipeline</div>
+
+    <!-- Admin -->
+    <div class="card" id="admin-card">
+      <div class="card-ico ico-p">📊</div>
+      <div class="card-t">Admin Dashboard</div>
+      <p class="card-d">Operations dashboard — live ticket feed, resolution analytics, and full AI agent traces.</p>
+      <ul class="card-list">
+        <li>Real-time ticket metrics</li>
+        <li>Resolution rate analytics</li>
+        <li>Full AI pipeline traces</li>
+        <li>FR1–FR8 coverage tracker</li>
+      </ul>
+      <div class="gate-wrap">
+        <input type="password" id="admin-token-input" class="gate-inp" placeholder="Enter admin token" onkeydown="if(event.key==='Enter')adminLogin()"/>
+        <button class="gate-btn" onclick="adminLogin()">Access Dashboard →</button>
+        <p class="gate-err" id="token-error"></p>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- Footer -->
-  <footer class="landing-footer">
-    <span>Cartly</span> — AI Refund Resolution Platform &nbsp;·&nbsp; Built with FastAPI, OpenRouter &amp; PostgreSQL &nbsp;·&nbsp; 2026
-  </footer>
+<div class="feat-strip">
+  <div class="feat-item">⚡ Sub-10 second resolutions</div>
+  <div class="feat-item">🛡️ AI Safety Critic on every decision</div>
+  <div class="feat-item">📋 Policy-grounded, never guesses</div>
+  <div class="feat-item">🔍 Full audit trail per ticket</div>
+  <div class="feat-item">☁️ Cloud-hosted, always available</div>
+</div>
 
-  <script src="app.js"></script>
+<div class="stats-row">
+  <div><div class="stat-n">~8s</div><div class="stat-l">Average resolution time</div></div>
+  <div><div class="stat-n">₹500</div><div class="stat-l">Auto-approval threshold</div></div>
+  <div><div class="stat-n">0.70</div><div class="stat-l">Min. faithfulness score</div></div>
+  <div><div class="stat-n">8</div><div class="stat-l">AI agents in the pipeline</div></div>
+</div>
+
+<footer>
+  <b>Cartly</b> — AI Refund Resolution Platform &nbsp;·&nbsp; FastAPI + OpenRouter + PostgreSQL &nbsp;·&nbsp; 2026
+</footer>
+
+<script src="app.js"></script>
 </body>
 </html>

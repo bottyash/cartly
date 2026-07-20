@@ -1,150 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartly — Refund Support</title>
-  <meta name="description" content="Cartly customer support — track your orders and get instant AI-powered refund decisions." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cartly — Refund Support</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#0f172a;min-height:100vh;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+.hidden{display:none!important}
+
+/* ── TOP NAV ── */
+.topnav{position:sticky;top:0;z-index:99;background:#fff;border-bottom:1px solid #e2e8f0;height:62px;display:flex;align-items:center;padding:0 32px;gap:12px}
+.tn-icon{width:34px;height:34px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.tn-name{font-size:19px;font-weight:800;letter-spacing:-.5px}
+.tn-sp{flex:1}
+.tn-badge{display:flex;align-items:center;gap:6px;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:600;padding:5px 12px;border-radius:20px}
+.tn-back{font-size:13px;font-weight:500;color:#64748b;padding:6px 12px;border-radius:7px;transition:background .15s}
+.tn-back:hover{background:#f1f5f9;color:#1e293b}
+
+/* ── LOOKUP SCREEN ── */
+#screen-lookup{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.lk-wrap{width:100%;max-width:460px}
+.lk-bc{font-size:13px;color:#64748b;margin-bottom:22px;display:flex;align-items:center;gap:5px}
+.lk-bc a{color:#1d4ed8;font-weight:500}
+.lk-bc a:hover{text-decoration:underline}
+.lk-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:38px 34px;box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.lk-head{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.lk-head-ic{width:54px;height:54px;background:#eff6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.lk-head-t{font-size:21px;font-weight:700;color:#0f172a}
+.lk-head-s{font-size:14px;color:#64748b;margin-top:3px}
+.lk-label{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px}
+.lk-row{display:flex;gap:10px}
+.lk-inp{flex:1;padding:11px 15px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;color:#0f172a;transition:border-color .15s,box-shadow .15s;background:#fff}
+.lk-inp:focus{outline:none;border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+.lk-btn{padding:11px 22px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:600;border-radius:9px;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:background .15s;min-width:110px;justify-content:center}
+.lk-btn:hover:not(:disabled){background:#1e40af}
+.lk-btn:disabled{opacity:.6;cursor:not-allowed}
+.lk-err{margin-top:10px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;color:#dc2626}
+.lk-div{display:flex;align-items:center;gap:12px;margin:22px 0;color:#94a3b8;font-size:12px;font-weight:500}
+.lk-div::before,.lk-div::after{content:'';flex:1;height:1px;background:#e2e8f0}
+.lk-hints{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.lk-hl{font-size:13px;color:#64748b}
+.lk-chip{padding:5px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:600;color:#1d4ed8;transition:all .15s}
+.lk-chip:hover{background:#eff6ff;border-color:#1d4ed8}
+.lk-help{margin-top:18px;text-align:center;font-size:13px;color:#64748b}
+.lk-help a{color:#1d4ed8;font-weight:600}
+
+/* ── SPINNER ── */
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:_spin .7s linear infinite;display:inline-block}
+@keyframes _spin{to{transform:rotate(360deg)}}
+
+/* ── CHAT SCREEN ── */
+#screen-chat{min-height:calc(100vh - 62px)}
+.chat-layout{display:flex;max-width:1080px;margin:0 auto;padding:24px 20px;gap:20px}
+
+/* Order sidebar */
+.order-sb{width:270px;flex-shrink:0}
+.order-sb-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:78px}
+.order-sb-hd{padding:13px 16px;background:#1d4ed8;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase}
+.order-sb-body{padding:16px}
+.order-pname{font-size:15px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.order-row:last-child{border:none}
+.order-key{color:#64748b}
+.order-val{font-weight:600;color:#1e293b}
+.order-amt{font-size:22px;font-weight:800;color:#1d4ed8;letter-spacing:-.5px}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px}
+.pill-g{background:#ecfdf5;color:#059669}
+.pill-a{background:#fffbeb;color:#d97706}
+.pdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.order-sb-ft{padding:12px 16px;border-top:1px solid #f1f5f9}
+.change-btn{width:100%;padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#475569;transition:all .15s}
+.change-btn:hover{background:#f1f5f9;color:#1e293b}
+
+/* How it works box */
+.how-box{margin-top:14px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;font-size:13px;color:#475569}
+.how-title{font-weight:700;color:#0f172a;margin-bottom:8px}
+.how-box ol{padding-left:17px;line-height:2.1}
+
+/* Chat main */
+.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
+.chat-win{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column;min-height:480px}
+.chat-hd{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:11px}
+.chat-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.chat-aname{font-size:14px;font-weight:700;color:#0f172a}
+.chat-asta{font-size:12px;color:#22c55e;display:flex;align-items:center;gap:4px;margin-top:1px}
+.chat-asta::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px}
+
+/* Bubbles */
+.chat-bubble{max-width:78%;display:flex;flex-direction:column}
+.bubble-user{align-self:flex-end;align-items:flex-end}
+.bubble-system{align-self:flex-start;align-items:flex-start}
+.bubble-body{padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6}
+.bubble-user .bubble-body{background:#1d4ed8;color:#fff;border-bottom-right-radius:4px}
+.bubble-system .bubble-body{background:#f1f5f9;color:#1e293b;border:1px solid #e2e8f0;border-bottom-left-radius:4px}
+.bubble-resolved .bubble-body{background:#ecfdf5;border:1px solid #a7f3d0;color:#1e293b}
+.bubble-escalated .bubble-body{background:#fffbeb;border:1px solid #fde68a;color:#1e293b}
+.bubble-time{font-size:11px;color:#94a3b8;margin-top:4px;padding:0 4px}
+
+/* Typing */
+.typing-dots{display:flex;gap:4px;align-items:center;padding:4px 2px}
+.typing-dots span{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:_tb 1.4s infinite}
+.typing-dots span:nth-child(2){animation-delay:.2s}
+.typing-dots span:nth-child(3){animation-delay:.4s}
+@keyframes _tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* Trace */
+.trace-toggle{margin-top:9px;font-size:12px;font-weight:600;color:#1d4ed8;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;background:#eff6ff;transition:background .15s}
+.trace-toggle:hover{background:#dbeafe}
+.trace-box{margin-top:9px;background:#0f172a;border-radius:8px;overflow:hidden;border:1px solid #1e293b;font-size:11.5px}
+.trace-row{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
+.trace-row:hover{background:rgba(255,255,255,.03)}
+.trace-row:last-child{border:none}
+.tr-step{color:#7dd3fc;font-weight:600;min-width:195px;font-family:monospace}
+.tr-dec{color:#e2e8f0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tr-lat{color:#475569;min-width:50px;text-align:right;font-family:monospace}
+
+/* Input area */
+.chat-inp-area{padding:14px 16px;border-top:1px solid #f1f5f9;display:flex;gap:10px;align-items:flex-end;background:#fff}
+.chat-ta{flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:22px;font-size:14px;font-family:inherit;color:#0f172a;resize:none;min-height:42px;max-height:100px;transition:border-color .15s;line-height:1.5}
+.chat-ta:focus{outline:none;border-color:#1d4ed8}
+.chat-ta::placeholder{color:#94a3b8}
+.chat-send{width:42px;height:42px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.chat-send:hover:not(:disabled){background:#1e40af;transform:scale(1.05)}
+.chat-send:disabled{opacity:.5;cursor:not-allowed}
+
+@media(max-width:760px){.chat-layout{flex-direction:column}.order-sb{width:100%}.order-sb-card{position:static}.chat-bubble{max-width:88%}}
+</style>
 </head>
-<body class="user-body">
+<body>
 
-  <!-- Top Nav -->
-  <nav class="topnav">
-    <div class="topnav-logo">
-      <div class="topnav-logo-icon">🛒</div>
-      <span class="topnav-logo-text">Cartly</span>
+<!-- TOP NAV -->
+<nav class="topnav">
+  <div class="tn-icon">🛒</div>
+  <span class="tn-name">Cartly</span>
+  <div class="tn-sp"></div>
+  <div class="tn-badge hidden" id="order-badge">📦 Order</div>
+  <a href="index.html" class="tn-back">← Back to Home</a>
+</nav>
+
+<main>
+
+  <!-- STEP 1: Order Lookup -->
+  <div id="screen-lookup">
+    <div class="lk-wrap">
+      <p class="lk-bc"><a href="index.html">Home</a> <span>›</span> Order Support</p>
+      <div class="lk-card">
+        <div class="lk-head">
+          <div class="lk-head-ic">📦</div>
+          <div>
+            <div class="lk-head-t">Find Your Order</div>
+            <div class="lk-head-s">Enter your Order ID to get started</div>
+          </div>
+        </div>
+        <p class="lk-label">Order ID</p>
+        <div class="lk-row">
+          <input id="lookup-input" type="text" class="lk-inp" placeholder="e.g. 1042"
+            onkeydown="if(event.key==='Enter')lookupOrder()" autofocus/>
+          <button class="lk-btn" id="lookup-btn" onclick="lookupOrder()">
+            <span id="lookup-text">Search</span>
+            <span id="lookup-spinner" class="spin hidden"></span>
+          </button>
+        </div>
+        <p class="lk-err hidden" id="lookup-error"></p>
+        <div class="lk-div">or try a demo order</div>
+        <div class="lk-hints">
+          <span class="lk-hl">Quick fill:</span>
+          <button class="lk-chip" onclick="fillAndLookup('1042')">#1042</button>
+          <button class="lk-chip" onclick="fillAndLookup('1077')">#1077</button>
+          <button class="lk-chip" onclick="fillAndLookup('1090')">#1090</button>
+          <button class="lk-chip" onclick="fillAndLookup('1099')">#1099</button>
+        </div>
+      </div>
+      <p class="lk-help">Can't find your order? <a href="#">Contact Support</a></p>
     </div>
-    <div class="topnav-spacer"></div>
-    <div class="topnav-badge hidden" id="order-badge"></div>
-    <a href="index.html" class="topnav-link">← Back to Home</a>
-  </nav>
+  </div>
 
-  <main class="user-screen">
+  <!-- STEP 2: Chat -->
+  <div class="hidden" id="screen-chat">
+    <div class="chat-layout">
 
-    <!-- ── STEP 1: Order Lookup ─────────────────────────────────── -->
-    <div id="screen-lookup">
-      <div class="lookup-container">
-        <p class="lookup-breadcrumb">
-          <a href="index.html">Home</a>
-          <span>›</span> Order Support
-        </p>
-        <div class="lookup-card">
-          <div class="lookup-header">
-            <div class="lookup-header-icon">📦</div>
+      <!-- Sidebar -->
+      <aside class="order-sb">
+        <div class="order-sb-card">
+          <div class="order-sb-hd">Your Order</div>
+          <div class="order-sb-body" id="order-card"><!-- JS fills --></div>
+          <div class="order-sb-ft">
+            <button class="change-btn" onclick="changeOrder()">← Search a different order</button>
+          </div>
+        </div>
+        <div class="how-box">
+          <div class="how-title">💡 How it works</div>
+          <ol>
+            <li>Describe your issue in chat</li>
+            <li>AI reviews order + policy</li>
+            <li>Get an instant decision</li>
+          </ol>
+        </div>
+      </aside>
+
+      <!-- Chat window -->
+      <div class="chat-main">
+        <div class="chat-win">
+          <div class="chat-hd">
+            <div class="chat-av">🤖</div>
             <div>
-              <div class="lookup-header-title">Find Your Order</div>
-              <div class="lookup-header-sub">Enter your Order ID to get started</div>
+              <div class="chat-aname">Cartly AI Agent</div>
+              <div class="chat-asta">Online · Typically replies instantly</div>
             </div>
           </div>
-
-          <p class="lookup-label">Order ID</p>
-          <div class="lookup-input-wrap">
-            <input
-              id="lookup-input"
-              type="text"
-              class="lookup-input"
-              placeholder="e.g. 1042"
-              onkeydown="if(event.key==='Enter') lookupOrder()"
-              autofocus
-            />
-            <button class="lookup-btn" id="lookup-btn" onclick="lookupOrder()">
-              <span id="lookup-text">Search</span>
-              <span id="lookup-spinner" class="spinner hidden"></span>
+          <div class="chat-messages" id="chat-messages"></div>
+          <div class="chat-inp-area" id="chat-input-area">
+            <textarea id="chat-input" class="chat-ta" rows="1"
+              placeholder="Describe your issue — e.g. My order arrived damaged, I'd like a refund…"
+              onkeydown="handleChatKey(event)"></textarea>
+            <button class="chat-send" id="chat-send-btn" onclick="sendMessage()" title="Send">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
             </button>
           </div>
-          <p class="lookup-error hidden" id="lookup-error"></p>
-
-          <div class="lookup-divider">or try a demo order</div>
-          <div class="lookup-demo-hint">
-            <span class="hint-label">Quick fill:</span>
-            <button class="hint-chip" onclick="fillAndLookup('1042')">#1042</button>
-            <button class="hint-chip" onclick="fillAndLookup('1077')">#1077</button>
-            <button class="hint-chip" onclick="fillAndLookup('1090')">#1090</button>
-            <button class="hint-chip" onclick="fillAndLookup('1099')">#1099</button>
-          </div>
-        </div>
-
-        <!-- Help links below card -->
-        <div style="margin-top:20px; text-align:center; font-size:13px; color:var(--slate-500);">
-          Can't find your order? &nbsp;
-          <a href="#" style="color:var(--brand); font-weight:600;">Contact Support</a>
         </div>
       </div>
+
     </div>
+  </div>
+</main>
 
-    <!-- ── STEP 2 + 3: Order found + Chat ──────────────────────── -->
-    <div class="hidden" id="screen-chat">
-      <div class="chat-layout">
-
-        <!-- Order sidebar -->
-        <aside class="order-sidebar">
-          <div class="order-sidebar-card">
-            <div class="order-sidebar-head">Your Order</div>
-            <div class="order-sidebar-body" id="order-card">
-              <!-- filled by JS -->
-            </div>
-            <div class="order-sidebar-actions">
-              <button class="change-order-btn" onclick="changeOrder()">← Search a different order</button>
-            </div>
-          </div>
-
-          <!-- Need help box -->
-          <div style="margin-top:14px; background:#fff; border:1px solid var(--slate-200); border-radius:var(--radius-lg); padding:16px; font-size:13px; color:var(--slate-600);">
-            <div style="font-weight:700; color:var(--slate-900); margin-bottom:6px;">💡 How it works</div>
-            <ol style="padding-left:16px; line-height:2;">
-              <li>Describe your issue in the chat</li>
-              <li>AI reviews your order + policy</li>
-              <li>Get an instant decision</li>
-            </ol>
-          </div>
-        </aside>
-
-        <!-- Chat -->
-        <div class="chat-main">
-          <div class="chat-messages-wrap">
-            <div class="chat-messages-head">
-              <div class="chat-agent-avatar">🤖</div>
-              <div>
-                <div class="chat-agent-name">Cartly AI Agent</div>
-                <div class="chat-agent-status">Online · Typically replies instantly</div>
-              </div>
-            </div>
-            <div class="chat-messages" id="chat-messages"></div>
-            <div class="chat-input-area" id="chat-input-area">
-              <textarea
-                id="chat-input"
-                class="chat-textarea"
-                placeholder="Describe your issue — e.g. My order arrived damaged, I'd like a refund…"
-                rows="1"
-                onkeydown="handleChatKey(event)"
-              ></textarea>
-              <button class="chat-send-btn" id="chat-send-btn" onclick="sendMessage()" title="Send message">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-  </main>
-
-  <script src="user.js"></script>
-  <script>
-    function changeOrder() {
-      document.getElementById('screen-chat').classList.add('hidden');
-      document.getElementById('screen-lookup').classList.remove('hidden');
-      document.getElementById('order-badge').classList.add('hidden');
-      document.getElementById('lookup-input').value = '';
-      document.getElementById('chat-messages').innerHTML = '';
-    }
-  </script>
+<script src="user.js"></script>
+<script>
+function changeOrder(){
+  document.getElementById('screen-chat').classList.add('hidden');
+  document.getElementById('screen-lookup').classList.remove('hidden');
+  document.getElementById('order-badge').classList.add('hidden');
+  document.getElementById('lookup-input').value='';
+  document.getElementById('chat-messages').innerHTML='';
+}
+</script>
 </body>
 </html>

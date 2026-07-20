@@ -78,28 +78,17 @@ function enterChatMode() {
 function renderOrderCard(order) {
   const card = document.getElementById('order-card');
   const isDelivered = order.delivery_status === 'delivered';
-  const statusClass = isDelivered ? 'pill-green' : 'pill-amber';
+  const pillCls = isDelivered ? 'pill pill-g' : 'pill pill-a';
   card.innerHTML = `
-    <div class="order-product-name">${esc(order.product_name)}</div>
-    <div class="order-detail-row">
-      <span class="order-detail-label">Order ID</span>
-      <span class="order-detail-value">#${esc(order.order_id)}</span>
-    </div>
-    <div class="order-detail-row">
-      <span class="order-detail-label">Category</span>
-      <span class="order-detail-value">${esc(order.product_category)}</span>
-    </div>
-    <div class="order-detail-row">
-      <span class="order-detail-label">Status</span>
-      <span class="pill ${statusClass}"><span class="pill-dot"></span>${esc(order.delivery_status)}</span>
-    </div>
-    ${order.courier ? `<div class="order-detail-row"><span class="order-detail-label">Courier</span><span class="order-detail-value">${esc(order.courier)}</span></div>` : ''}
-    <div class="order-detail-row" style="border-bottom:none; padding-top:14px;">
-      <span class="order-detail-label">Order Value</span>
-      <span class="order-amount">₹${Number(order.order_amount).toFixed(2)}</span>
-    </div>
+    <div class="order-pname">${esc(order.product_name)}</div>
+    <div class="order-row"><span class="order-key">Order ID</span><span class="order-val">#${esc(order.order_id)}</span></div>
+    <div class="order-row"><span class="order-key">Category</span><span class="order-val">${esc(order.product_category)}</span></div>
+    <div class="order-row"><span class="order-key">Status</span><span class="${pillCls}"><span class="pdot"></span>${esc(order.delivery_status)}</span></div>
+    ${order.courier ? `<div class="order-row"><span class="order-key">Courier</span><span class="order-val">${esc(order.courier)}</span></div>` : ''}
+    <div class="order-row" style="padding-top:14px;border:none"><span class="order-key">Order Value</span><span class="order-amt">₹${Number(order.order_amount).toFixed(2)}</span></div>
   `;
 }
+
 
 // ── Step 3: Chat ──────────────────────────────────────────────────────────
 
@@ -206,16 +195,16 @@ function addBubble(role, text, variant = '', trace = null) {
       refund_agent_llm: '🤖', safety_critic: '🛡️', orchestrator_verdict: '📊',
     };
     const stepsHtml = trace.map(s => `
-      <div class="trace-line">
-        <span class="trace-step-name">${ICONS[s.step] || '·'} ${s.step}</span>
-        <span class="trace-decision" title="${esc(s.decision || '')}">${esc(s.decision || '')}</span>
-        <span class="trace-lat">${s.latency_ms.toFixed(0)}ms</span>
+      <div class="trace-row">
+        <span class="tr-step">${ICONS[s.step] || '·'} ${s.step}</span>
+        <span class="tr-dec" title="${esc(s.decision || '')}">${esc(s.decision || '')}</span>
+        <span class="tr-lat">${s.latency_ms.toFixed(0)}ms</span>
       </div>`).join('');
     traceHtml = `
-      <div class="bubble-trace-toggle" onclick="toggleTrace('${traceId}')">
+      <div class="trace-toggle" onclick="toggleTrace('${traceId}')">
         ▸ View pipeline trace (${trace.length} steps)
       </div>
-      <div class="bubble-trace hidden" id="${traceId}">${stepsHtml}</div>`;
+      <div class="trace-box hidden" id="${traceId}">${stepsHtml}</div>`;
   }
 
   div.innerHTML = `
@@ -232,9 +221,8 @@ function toggleTrace(id) {
   const toggle = el.previousElementSibling;
   const hidden = el.classList.contains('hidden');
   el.classList.toggle('hidden');
-  toggle.textContent = hidden
-    ? `▾ Hide pipeline trace (${el.querySelectorAll('.trace-line').length} steps)`
-    : `▸ View pipeline trace (${el.querySelectorAll('.trace-line').length} steps)`;
+  const n = el.querySelectorAll('.trace-row').length;
+  toggle.textContent = hidden ? `▾ Hide pipeline trace (${n} steps)` : `▸ View pipeline trace (${n} steps)`;
 }
 
 let typingIdCounter = 0;

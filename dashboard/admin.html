@@ -1,285 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cartly Admin — Operations Dashboard</title>
-  <meta name="description" content="Cartly admin dashboard — real-time ticket analytics, resolution metrics, and AI agent observability." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cartly Admin — Operations Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:#f1f5f9;color:#0f172a;min-height:100vh}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit;border:none;outline:none}
+.hidden{display:none!important}
+
+/* ── TOP NAV (dark) ── */
+.tnav{position:sticky;top:0;z-index:99;background:#0f172a;border-bottom:1px solid rgba(255,255,255,.06);height:60px;display:flex;align-items:center;padding:0 26px;gap:14px}
+.tnav-ic{width:34px;height:34px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.tnav-name{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.tnav-badge{font-size:10px;font-weight:700;color:#a78bfa;background:rgba(124,58,237,.15);padding:2px 8px;border-radius:10px;letter-spacing:.5px;text-transform:uppercase}
+.tnav-sp{flex:1}
+.tnav-btn{font-size:13px;font-weight:500;color:rgba(255,255,255,.45);padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
+.tnav-btn:hover{color:#fff;background:rgba(255,255,255,.07)}
+.tnav-div{width:1px;height:22px;background:rgba(255,255,255,.08)}
+
+/* ── ADMIN LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 60px)}
+
+/* Sidebar */
+.sb{width:216px;flex-shrink:0;background:#1e293b;padding:18px 10px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.sb-sec{font-size:10px;font-weight:700;color:rgba(255,255,255,.28);letter-spacing:1px;text-transform:uppercase;padding:0 10px;margin:20px 0 7px}
+.sb-sec:first-child{margin-top:0}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:8px;font-size:13px;font-weight:500;color:rgba(255,255,255,.45);cursor:pointer;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.8)}
+.sb-item.active{background:#1d4ed8;color:#fff}
+.sb-ic{font-size:15px;width:19px;text-align:center}
+
+/* Main */
+.main{flex:1;padding:26px;overflow-x:hidden}
+.page-hd{margin-bottom:22px}
+.page-t{font-size:21px;font-weight:700;color:#0f172a}
+.page-s{font-size:13px;color:#64748b;margin-top:3px}
+
+/* ── GATE ── */
+.gate-wrap{min-height:calc(100vh - 60px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:#f1f5f9}
+.gate-card{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:48px 40px;max-width:400px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.07);text-align:center}
+.gate-ico{font-size:46px;margin-bottom:14px}
+.gate-t{font-size:22px;font-weight:700;margin-bottom:8px}
+.gate-s{font-size:14px;color:#64748b;margin-bottom:26px;line-height:1.6}
+.gate-inp{width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;font-family:inherit;text-align:center;background:#f8fafc;transition:border-color .15s}
+.gate-inp:focus{outline:none;border-color:#1d4ed8;background:#fff}
+.gate-btn{width:100%;margin-top:12px;padding:13px;background:#1d4ed8;color:#fff;font-size:15px;font-weight:700;border-radius:9px;transition:background .15s}
+.gate-btn:hover{background:#1e40af}
+.gate-err{font-size:13px;color:#dc2626;margin-top:10px}
+.gate-hint{font-size:12px;color:#94a3b8;margin-top:14px}
+
+/* ── STAT CARDS ── */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+.scard{background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05);position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.sc-blue::before{background:#1d4ed8}
+.sc-green::before{background:#059669}
+.sc-purple::before{background:#7c3aed}
+.sc-amber::before{background:#d97706}
+.sc-red::before{background:#dc2626}
+.sc-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.sc-lbl{font-size:11px;font-weight:700;color:#64748b;letter-spacing:.3px;text-transform:uppercase}
+.sc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.sc-icon-blue{background:#eff6ff}
+.sc-icon-green{background:#ecfdf5}
+.sc-icon-purple{background:#f5f3ff}
+.sc-icon-amber{background:#fffbeb}
+.sc-icon-red{background:#fef2f2}
+.sc-val{font-size:30px;font-weight:800;color:#0f172a;letter-spacing:-1px}
+.sc-sub{font-size:12px;color:#64748b;margin-top:3px}
+
+/* ── CHARTS ── */
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+@media(max-width:860px){.charts{grid-template-columns:1fr}}
+.ccard{background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.ccard-t{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:3px}
+.ccard-s{font-size:12px;color:#64748b;margin-bottom:16px}
+.chart-h{height:210px;position:relative}
+
+/* Escalation breakdown */
+.esc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
+.esc-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;padding:14px}
+.esc-lbl{font-size:12px;color:#64748b;font-weight:500}
+.esc-val{font-size:26px;font-weight:800;color:#0f172a;margin-top:4px}
+.esc-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+
+/* ── TABLE ── */
+.tcard{background:#fff;border:1px solid #e2e8f0;border-radius:13px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden}
+.tcard-hd{padding:16px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between}
+.tcard-t{font-size:14px;font-weight:700;color:#0f172a}
+.ref-btn{padding:7px 14px;border-radius:8px;background:#f1f5f9;color:#475569;font-size:13px;font-weight:600;transition:background .15s;display:inline-flex;align-items:center;gap:6px}
+.ref-btn:hover{background:#e2e8f0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:#f8fafc}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:700;color:#64748b;letter-spacing:.5px;text-transform:uppercase;border-bottom:1px solid #e2e8f0;white-space:nowrap}
+td{padding:12px 16px;border-bottom:1px solid #f1f5f9;color:#475569;vertical-align:middle}
+tbody tr{transition:background .1s;cursor:pointer}
+tbody tr:hover{background:#f8fafc}
+tbody tr:last-child td{border:none}
+.td-id{font-family:monospace;font-size:12px;color:#64748b}
+.tbl-empty{text-align:center;padding:36px;color:#94a3b8}
+
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px}
+.p-g{background:#ecfdf5;color:#059669}
+.p-a{background:#fffbeb;color:#d97706}
+.p-r{background:#fef2f2;color:#dc2626}
+.pdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ── MODAL ── */
+.modal-ov{position:fixed;inset:0;z-index:200;background:rgba(15,23,42,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:#fff;border-radius:16px;width:100%;max-width:680px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+.modal-hd{padding:18px 22px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-t{font-size:15px;font-weight:700;color:#0f172a}
+.modal-x{width:30px;height:30px;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s}
+.modal-x:hover{background:#e2e8f0}
+.modal-body{padding:22px}
+.trace-sc{border:1px solid #e2e8f0;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.trace-sh{padding:11px 14px;background:#f8fafc;display:flex;align-items:center;gap:10px}
+.trace-si{font-size:17px;width:22px;text-align:center}
+.trace-sn{font-size:12px;font-weight:700;color:#0f172a;font-family:monospace}
+.trace-sd{font-size:12px;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:350px}
+.trace-sl{font-size:12px;font-weight:600;color:#64748b;font-family:monospace;margin-left:auto}
+</style>
 </head>
-<body class="admin-body">
+<body>
 
-  <!-- Token Gate (shown until authenticated) -->
-  <div id="admin-token-gate-screen">
-    <nav class="admin-topnav">
-      <div class="admin-topnav-logo">
-        <div class="admin-logo-icon">🛒</div>
-        <span class="admin-logo-text">Cartly</span>
-        <span class="admin-logo-badge">Admin</span>
-      </div>
-      <div class="admin-topnav-spacer"></div>
-      <a href="index.html" style="font-size:13px; color:rgba(255,255,255,.4); padding:4px 10px;">← Back</a>
-    </nav>
-    <div class="admin-token-gate-full">
-      <div class="admin-gate-card">
-        <div class="admin-gate-icon">🔐</div>
-        <div class="admin-gate-title">Admin Access</div>
-        <div class="admin-gate-sub">Enter your admin token to access the operations dashboard</div>
-        <input type="password" id="gate-token-input" class="admin-gate-input"
-          placeholder="cartly-admin-2026"
-          onkeydown="if(event.key==='Enter') gateLogin()" />
-        <button class="admin-gate-btn" onclick="gateLogin()">Access Dashboard</button>
-        <p class="admin-gate-error" id="gate-error"></p>
-        <p class="admin-gate-hint">Token is set via the ADMIN_TOKEN environment variable</p>
-      </div>
+<!-- ── TOKEN GATE ── -->
+<div id="admin-token-gate-screen">
+  <nav class="tnav">
+    <div class="tnav-ic">🛒</div>
+    <span class="tnav-name">Cartly</span>
+    <span class="tnav-badge">Admin</span>
+    <div class="tnav-sp"></div>
+    <a href="index.html" class="tnav-btn">← Back</a>
+  </nav>
+  <div class="gate-wrap">
+    <div class="gate-card">
+      <div class="gate-ico">🔐</div>
+      <div class="gate-t">Admin Access</div>
+      <p class="gate-s">Enter your admin token to access the operations dashboard</p>
+      <input type="password" id="gate-token-input" class="gate-inp"
+        placeholder="cartly-admin-2026" onkeydown="if(event.key==='Enter')gateLogin()"/>
+      <button class="gate-btn" onclick="gateLogin()">Access Dashboard</button>
+      <p class="gate-err" id="gate-error"></p>
+      <p class="gate-hint">Hint: cartly-admin-2026</p>
     </div>
   </div>
+</div>
 
-  <!-- Dashboard (hidden until authenticated) -->
-  <div id="admin-dashboard" class="hidden">
+<!-- ── DASHBOARD ── -->
+<div id="admin-dashboard" class="hidden">
+  <nav class="tnav">
+    <div class="tnav-ic">🛒</div>
+    <span class="tnav-name">Cartly</span>
+    <span class="tnav-badge">Admin</span>
+    <div class="tnav-sp"></div>
+    <span class="tnav-btn" onclick="refreshAll()">↻ Refresh</span>
+    <div class="tnav-div"></div>
+    <a href="user.html" class="tnav-btn">Customer Portal</a>
+    <div class="tnav-div"></div>
+    <a href="index.html" class="tnav-btn">← Home</a>
+  </nav>
 
-    <!-- Top Nav -->
-    <nav class="admin-topnav">
-      <div class="admin-topnav-logo">
-        <div class="admin-logo-icon">🛒</div>
-        <span class="admin-logo-text">Cartly</span>
-        <span class="admin-logo-badge">Admin</span>
+  <div class="layout">
+    <!-- Sidebar -->
+    <aside class="sb">
+      <div class="sb-sec">Overview</div>
+      <div class="sb-item active"><span class="sb-ic">📊</span> Dashboard</div>
+      <div class="sb-item" onclick="scrollToId('tickets-section')"><span class="sb-ic">🎫</span> Tickets</div>
+      <div class="sb-sec">Analytics</div>
+      <div class="sb-item" onclick="scrollToId('charts-section')"><span class="sb-ic">📈</span> Charts</div>
+      <div class="sb-item" onclick="scrollToId('fr-section')"><span class="sb-ic">✅</span> FR Coverage</div>
+      <div class="sb-sec">System</div>
+      <div class="sb-item" id="sb-health"><span class="sb-ic" id="sb-health-ic">⚪</span> <span id="sb-health-lbl">API Status</span></div>
+      <div class="sb-item" onclick="window.open('http://localhost:8000/docs','_blank')"><span class="sb-ic">📖</span> API Docs</div>
+      <div class="sb-item" onclick="adminLogout()"><span class="sb-ic">🚪</span> Sign Out</div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <div class="page-hd">
+        <div class="page-t">Operations Dashboard</div>
+        <div class="page-s" id="last-refresh-label">Loading data…</div>
       </div>
-      <div class="admin-topnav-spacer"></div>
-      <span class="admin-topnav-item active">Overview</span>
-      <div class="admin-topnav-divider"></div>
-      <span class="admin-topnav-item" onclick="refreshAll()" title="Refresh data" style="cursor:pointer;">↻ Refresh</span>
-      <div class="admin-topnav-divider"></div>
-      <a href="index.html" class="admin-topnav-item">← Portal</a>
-    </nav>
 
-    <div class="admin-layout">
-
-      <!-- Sidebar -->
-      <aside class="admin-sidebar">
-        <div class="sidebar-section-label">Overview</div>
-        <div class="sidebar-item active">
-          <span class="sidebar-item-icon">📊</span> Dashboard
+      <!-- Stat Cards -->
+      <div class="stats">
+        <div class="scard sc-blue">
+          <div class="sc-hd"><div class="sc-lbl">Total Tickets</div><div class="sc-icon sc-icon-blue">🎫</div></div>
+          <div class="sc-val" id="stat-total">—</div><div class="sc-sub">All time</div>
         </div>
-        <div class="sidebar-item" onclick="scrollTo(0, document.getElementById('tickets-section').offsetTop - 80)">
-          <span class="sidebar-item-icon">🎫</span> Tickets
+        <div class="scard sc-green">
+          <div class="sc-hd"><div class="sc-lbl">Resolution Rate</div><div class="sc-icon sc-icon-green">✅</div></div>
+          <div class="sc-val" id="stat-rate">—</div><div class="sc-sub">Auto-resolved</div>
         </div>
-
-        <div class="sidebar-section-label">Analytics</div>
-        <div class="sidebar-item" onclick="scrollTo(0, document.getElementById('charts-section').offsetTop - 80)">
-          <span class="sidebar-item-icon">📈</span> Charts
+        <div class="scard sc-purple">
+          <div class="sc-hd"><div class="sc-lbl">Avg Latency</div><div class="sc-icon sc-icon-purple">⚡</div></div>
+          <div class="sc-val" id="stat-latency">—</div><div class="sc-sub">Per ticket</div>
         </div>
-        <div class="sidebar-item" onclick="scrollTo(0, document.getElementById('fr-section').offsetTop - 80)">
-          <span class="sidebar-item-icon">✅</span> FR Coverage
+        <div class="scard sc-amber">
+          <div class="sc-hd"><div class="sc-lbl">Total Tokens</div><div class="sc-icon sc-icon-amber">🪙</div></div>
+          <div class="sc-val" id="stat-tokens">—</div><div class="sc-sub">LLM usage</div>
         </div>
-
-        <div class="sidebar-section-label">System</div>
-        <div class="sidebar-item" id="sidebar-health-item">
-          <span class="sidebar-item-icon" id="sidebar-health-icon">⚪</span>
-          <span id="sidebar-health-label">API Status</span>
+        <div class="scard sc-red">
+          <div class="sc-hd"><div class="sc-lbl">Escalated</div><div class="sc-icon sc-icon-red">⚠️</div></div>
+          <div class="sc-val" id="stat-escalated">—</div><div class="sc-sub">Need human review</div>
         </div>
-        <div class="sidebar-item" onclick="window.open('http://localhost:8000/docs','_blank')">
-          <span class="sidebar-item-icon">📖</span> API Docs
-        </div>
-        <div class="sidebar-item" onclick="adminLogout()">
-          <span class="sidebar-item-icon">🚪</span> Sign Out
-        </div>
-      </aside>
-
-      <!-- Main -->
-      <main class="admin-main">
-
-        <div class="admin-page-header">
-          <div class="admin-page-title">Operations Dashboard</div>
-          <div class="admin-page-sub" id="last-refresh-label">Loading data…</div>
-        </div>
-
-        <!-- Stat Cards -->
-        <div class="stats-grid" id="stats-grid">
-          <div class="stat-card stat-card-blue">
-            <div class="stat-header">
-              <div class="stat-label">Total Tickets</div>
-              <div class="stat-icon-wrap stat-icon-blue">🎫</div>
-            </div>
-            <div class="stat-value" id="stat-total">—</div>
-            <div class="stat-sub">All time</div>
-          </div>
-          <div class="stat-card stat-card-green">
-            <div class="stat-header">
-              <div class="stat-label">Resolution Rate</div>
-              <div class="stat-icon-wrap stat-icon-green">✅</div>
-            </div>
-            <div class="stat-value" id="stat-rate">—</div>
-            <div class="stat-sub">Auto-resolved</div>
-          </div>
-          <div class="stat-card stat-card-purple">
-            <div class="stat-header">
-              <div class="stat-label">Avg Latency</div>
-              <div class="stat-icon-wrap stat-icon-purple">⚡</div>
-            </div>
-            <div class="stat-value" id="stat-latency">—</div>
-            <div class="stat-sub">Per ticket</div>
-          </div>
-          <div class="stat-card stat-card-amber">
-            <div class="stat-header">
-              <div class="stat-label">Total Tokens</div>
-              <div class="stat-icon-wrap stat-icon-amber">🪙</div>
-            </div>
-            <div class="stat-value" id="stat-tokens">—</div>
-            <div class="stat-sub">LLM usage</div>
-          </div>
-          <div class="stat-card stat-card-red">
-            <div class="stat-header">
-              <div class="stat-label">Escalated</div>
-              <div class="stat-icon-wrap stat-icon-red">⚠️</div>
-            </div>
-            <div class="stat-value" id="stat-escalated">—</div>
-            <div class="stat-sub">Need human review</div>
-          </div>
-        </div>
-
-        <!-- Charts -->
-        <div class="charts-grid" id="charts-section">
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-card-title">Tickets Over Time</div>
-              <div class="chart-card-sub">Daily ticket volume (last 14 days)</div>
-            </div>
-            <div class="chart-wrap"><canvas id="chart-daily"></canvas></div>
-          </div>
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-card-title">Resolution Breakdown</div>
-              <div class="chart-card-sub">Resolved vs escalated distribution</div>
-            </div>
-            <div class="chart-wrap"><canvas id="chart-resolution"></canvas></div>
-          </div>
-        </div>
-
-        <!-- Escalation Breakdown -->
-        <div class="chart-card" style="margin-bottom:20px;" id="fr-section">
-          <div class="chart-card-header">
-            <div class="chart-card-title">Escalation Triggers</div>
-            <div class="chart-card-sub">Why tickets were escalated to human review</div>
-          </div>
-          <div class="escalation-grid">
-            <div class="esc-item">
-              <div class="esc-item-label">⚖️ Threshold Gate</div>
-              <div class="esc-item-value" id="esc-threshold">—</div>
-              <div class="esc-item-sub">Claim &gt; ₹500</div>
-            </div>
-            <div class="esc-item">
-              <div class="esc-item-label">🛡️ Critic Rejection</div>
-              <div class="esc-item-value" id="esc-critic">—</div>
-              <div class="esc-item-sub">Failed faithfulness check</div>
-            </div>
-            <div class="esc-item">
-              <div class="esc-item-label">🚨 Hard Trigger</div>
-              <div class="esc-item-value" id="esc-hard">—</div>
-              <div class="esc-item-sub">Injection detected</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- FR Coverage -->
-        <div class="chart-card" style="margin-bottom:20px;">
-          <div class="chart-card-header">
-            <div class="chart-card-title">FR Coverage (FR1–FR8)</div>
-            <div class="chart-card-sub">Functional requirements verified in production</div>
-          </div>
-          <div class="chart-wrap"><canvas id="chart-fr"></canvas></div>
-        </div>
-
-        <!-- Tickets Table -->
-        <div class="table-card" id="tickets-section">
-          <div class="table-card-header">
-            <div class="table-card-title">Recent Tickets</div>
-            <div class="table-card-actions">
-              <button class="table-refresh-btn" onclick="loadTickets()">↻ Refresh</button>
-            </div>
-          </div>
-          <div style="overflow-x:auto;">
-            <table class="admin-table" id="tickets-table">
-              <thead>
-                <tr>
-                  <th>Ticket ID</th>
-                  <th>Status</th>
-                  <th>Escalation</th>
-                  <th>Latency</th>
-                  <th>Tokens</th>
-                  <th>Steps</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="tickets-tbody">
-                <tr><td colspan="7" class="table-loading">Loading tickets…</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-      </main>
-    </div>
-  </div>
-
-  <!-- Trace Modal -->
-  <div class="modal-overlay hidden" id="trace-modal" onclick="closeModal(event)">
-    <div class="modal-box" id="modal-box">
-      <div class="modal-header">
-        <div class="modal-title" id="modal-title">Ticket Trace</div>
-        <button class="modal-close" onclick="closeTraceModal()">×</button>
       </div>
-      <div class="modal-body" id="modal-body"></div>
-    </div>
+
+      <!-- Charts -->
+      <div class="charts" id="charts-section">
+        <div class="ccard">
+          <div class="ccard-t">Tickets Over Time</div>
+          <div class="ccard-s">Daily ticket volume (last 14 days)</div>
+          <div class="chart-h"><canvas id="chart-daily"></canvas></div>
+        </div>
+        <div class="ccard">
+          <div class="ccard-t">Resolution Breakdown</div>
+          <div class="ccard-s">Resolved vs escalated</div>
+          <div class="chart-h"><canvas id="chart-resolution"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Escalation breakdown -->
+      <div class="ccard" style="margin-bottom:18px" id="fr-section">
+        <div class="ccard-t">Escalation Triggers</div>
+        <div class="ccard-s">Why tickets were escalated to human review</div>
+        <div class="esc-grid">
+          <div class="esc-item"><div class="esc-lbl">⚖️ Threshold Gate</div><div class="esc-val" id="esc-threshold">—</div><div class="esc-sub">Claim > ₹500</div></div>
+          <div class="esc-item"><div class="esc-lbl">🛡️ Critic Rejection</div><div class="esc-val" id="esc-critic">—</div><div class="esc-sub">Failed faithfulness</div></div>
+          <div class="esc-item"><div class="esc-lbl">🚨 Hard Trigger</div><div class="esc-val" id="esc-hard">—</div><div class="esc-sub">Injection detected</div></div>
+        </div>
+      </div>
+
+      <!-- FR Coverage -->
+      <div class="ccard" style="margin-bottom:18px">
+        <div class="ccard-t">FR Coverage (FR1–FR8)</div>
+        <div class="ccard-s">Functional requirements verified in production</div>
+        <div class="chart-h"><canvas id="chart-fr"></canvas></div>
+      </div>
+
+      <!-- Tickets table -->
+      <div class="tcard" id="tickets-section">
+        <div class="tcard-hd">
+          <div class="tcard-t">Recent Tickets</div>
+          <button class="ref-btn" onclick="loadTickets()">↻ Refresh</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table id="tickets-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th><th>Status</th><th>Escalation</th>
+                <th>Latency</th><th>Tokens</th><th>Steps</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tickets-tbody">
+              <tr><td colspan="7" class="tbl-empty">Loading tickets…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
   </div>
+</div>
 
-  <script src="admin.js"></script>
-  <script>
-    /* ── Gate logic ─────────────────────────────────────────────── */
-    let adminToken = '';
+<!-- Modal -->
+<div class="modal-ov hidden" id="trace-modal" onclick="closeModal(event)">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-hd">
+      <div class="modal-t" id="modal-title">Ticket Trace</div>
+      <div class="modal-x" onclick="closeTraceModal()">×</div>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
 
-    function gateLogin() {
-      const val = document.getElementById('gate-token-input').value.trim();
-      if (!val) return;
-      adminToken = val;
-      document.getElementById('admin-token-gate-screen').classList.add('hidden');
-      document.getElementById('admin-dashboard').classList.remove('hidden');
-      initDashboard(adminToken);
-    }
+<script src="admin.js"></script>
+<script>
+let adminToken = '';
 
-    function adminLogout() {
-      adminToken = '';
-      document.getElementById('admin-dashboard').classList.add('hidden');
-      document.getElementById('admin-token-gate-screen').classList.remove('hidden');
-      document.getElementById('gate-token-input').value = '';
-    }
+function gateLogin() {
+  const v = document.getElementById('gate-token-input').value.trim();
+  const errEl = document.getElementById('gate-error');
+  if (!v) { errEl.textContent = 'Please enter a token.'; return; }
+  adminToken = v;
+  document.getElementById('admin-token-gate-screen').classList.add('hidden');
+  document.getElementById('admin-dashboard').classList.remove('hidden');
+  initDashboard(adminToken);
+  checkSidebarHealth();
+}
 
-    function closeModal(e) {
-      if (e.target === document.getElementById('trace-modal')) closeTraceModal();
-    }
-    function closeTraceModal() {
-      document.getElementById('trace-modal').classList.add('hidden');
-    }
+function adminLogout() {
+  adminToken = '';
+  sessionStorage.removeItem('cartly_admin_token');
+  document.getElementById('admin-dashboard').classList.add('hidden');
+  document.getElementById('admin-token-gate-screen').classList.remove('hidden');
+  document.getElementById('gate-token-input').value = '';
+}
 
-    // Health check for sidebar
-    async function checkHealth() {
-      try {
-        const r = await fetch('http://localhost:8000/health');
-        const icon  = document.getElementById('sidebar-health-icon');
-        const label = document.getElementById('sidebar-health-label');
-        if (r.ok) { icon.textContent = '🟢'; label.textContent = 'API Online'; }
-        else       { icon.textContent = '🔴'; label.textContent = 'API Error'; }
-      } catch {
-        document.getElementById('sidebar-health-icon').textContent = '🔴';
-        document.getElementById('sidebar-health-label').textContent = 'API Offline';
-      }
-    }
+function scrollToId(id) {
+  document.getElementById(id)?.scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
-    document.addEventListener('DOMContentLoaded', checkHealth);
-  </script>
+function closeModal(e) { if(e.target===document.getElementById('trace-modal')) closeTraceModal(); }
+function closeTraceModal() { document.getElementById('trace-modal').classList.add('hidden'); }
+
+async function checkSidebarHealth() {
+  const ic = document.getElementById('sb-health-ic');
+  const lb = document.getElementById('sb-health-lbl');
+  try {
+    const r = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(4000) });
+    if (r.ok) { ic.textContent='🟢'; lb.textContent='API Online'; }
+    else { ic.textContent='🔴'; lb.textContent='API Error'; }
+  } catch { ic.textContent='🔴'; lb.textContent='API Offline'; }
+}
+
+// Auto-login if token stored
+document.addEventListener('DOMContentLoaded', () => {
+  const stored = sessionStorage.getItem('cartly_admin_token');
+  if (stored) {
+    document.getElementById('gate-token-input').value = stored;
+    gateLogin();
+  }
+});
+</script>
 </body>
 </html>
