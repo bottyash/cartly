@@ -59,8 +59,8 @@ Intent guide:
 - exchange_request: customer wants replacement or exchange of item
 - delivery_inquiry: customer asking about delivery status, tracking, ETA
 - complaint: dissatisfaction, quality issue, bad experience (no specific refund ask)
-- product_inquiry: generic question about a product or policy (no order needed — e.g. is X returnable? what is the warranty?)
-- other: general question, not covered above
+- product_inquiry: any shopping or product question (no order ID needed) — e.g. "which phone should I buy?", "is X returnable?", "what is the warranty?", "how long does shipping take?", "what payment methods do you accept?", "can I cancel before dispatch?"
+- other: anything not covered above
 
 Risk tier guide:
 - low: clear-cut case, straightforward

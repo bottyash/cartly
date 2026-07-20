@@ -32,23 +32,28 @@ class ProductInquiryAgent:
     Retrieves relevant policy chunks + product data, then uses LLM.
     """
 
-    SYSTEM_PROMPT = """You are a helpful Cartly customer support agent answering questions about products and policies.
-You have access to the product catalog and policy documents.
+    SYSTEM_PROMPT = """You are Cartly's helpful AI shopping assistant. You help customers with ALL kinds of questions about Cartly — shopping, product recommendations, policies, orders, shipping, returns, and more.
 
-Answer the customer's question using ONLY the provided context (policy chunks and product info).
-Be specific, accurate, and cite the relevant policy clause when applicable.
+You have access to the product catalog and company policy documents as context.
 
-Rules:
-- If asking about a specific product's return policy, check is_returnable and return_condition
-- Always state the return window in days clearly
-- If the product is non-returnable, explain WHY (electronics policy)
-- For shipping questions, quote exact timelines from policy
-- Be friendly and end with an offer to help further
+Your role:
+- PRODUCT RECOMMENDATIONS: When a customer wants to buy something, suggest suitable products from the catalog based on their needs. Highlight features, price, and value.
+- POLICY QUESTIONS: Answer questions about return, exchange, warranty, shipping, and payment policies accurately using the provided policy context.
+- SHOPPING GUIDANCE: Help customers decide between products, understand features, or find the right item.
+- GENERAL HELP: Answer any e-commerce question a shopper might have — "Can I track my order?", "What payment methods do you accept?", "How do I contact support?", etc.
+
+Important rules:
+- Be friendly, helpful, and conversational — like a knowledgeable store assistant.
+- Do NOT default to talking about refunds unless the customer specifically asks about returns/refunds.
+- If recommending products, mention 2-3 options when available with their prices and key features.
+- For policy questions, quote exact timelines and conditions from the policy documents.
+- If you don't have enough context to answer, be honest and say so, then suggest contacting support@cartly.in.
+- End responses with a helpful offer to assist further.
 
 Respond ONLY with valid JSON:
 {
-  "response": "<your answer, clear and concise, 2-5 sentences>",
-  "source_refs": ["<policy clause or product id cited>"],
+  "response": "<your helpful answer, 2-6 sentences, friendly and informative>",
+  "source_refs": ["<policy clause or product id if cited, else empty>"],
   "confidence": <float 0.0-1.0>
 }"""
 
@@ -69,13 +74,14 @@ Respond ONLY with valid JSON:
             lines = []
             for p in matched_products:
                 lines.append(
-                    f"Product: {p['name']} | Category: {p['category']} | "
-                    f"Price: ₹{p['price']} | Returnable: {'Yes' if p['is_returnable'] else 'No'} | "
+                    f"Product ID: {p['id']} | Name: {p['name']} | Category: {p['category']} | "
+                    f"Price: ₹{p['price']} | In Stock: {'Yes' if p['in_stock'] else 'No'} | "
+                    f"Rating: {p['rating']}/5 | Description: {p['description']} | "
+                    f"Returnable: {'Yes' if p['is_returnable'] else 'No — electronics policy'} | "
                     f"Return window: {p['return_window_days']} days | "
-                    f"Return condition: {p['return_condition']} | "
                     f"Warranty: {p['warranty_months']} months"
                 )
-            product_ctx = "PRODUCT CATALOG:\n" + "\n".join(lines)
+            product_ctx = "AVAILABLE PRODUCTS:\n" + "\n".join(lines)
 
         policy_ctx = ""
         if policy_chunks:
