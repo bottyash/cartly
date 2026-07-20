@@ -33,6 +33,7 @@ class ActionTaken(str, Enum):
     escalated            = "escalated"
     abstained            = "abstained"
     info_provided        = "info_provided"     # delivery / status queries
+    info_required        = "info_required"     # agent asked for more info (mapped → complaint_logged)
     complaint_logged     = "complaint_logged"  # complaint acknowledgement
     exchange_initiated   = "exchange_initiated" # exchange requests
 

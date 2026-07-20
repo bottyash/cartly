@@ -288,7 +288,7 @@ Risk tier guide:
             status=ResolutionStatus.resolved,
             resolution=ResolutionDetail(
                 eligible=False,
-                action_taken=ActionTaken(result.action_taken),
+                action_taken=self._safe_action(result.action_taken),
                 reason=result.draft_response,
                 source_refs=[],
                 transaction_ref=None,
@@ -327,7 +327,7 @@ Risk tier guide:
             status=ResolutionStatus.resolved,
             resolution=ResolutionDetail(
                 eligible=False,
-                action_taken=ActionTaken(result.action_taken),
+                action_taken=self._safe_action(result.action_taken),
                 reason=result.draft_response,
                 source_refs=[],
                 transaction_ref=None,
@@ -339,6 +339,16 @@ Risk tier guide:
         )
 
     # ── Private helpers ───────────────────────────────────────────────────
+
+    @staticmethod
+    def _safe_action(value: str) -> ActionTaken:
+        """Coerce any LLM-generated action string to a valid ActionTaken enum value.
+        If the value is unrecognised (e.g. 'info_required', 'ask_for_info'),
+        fall back to 'complaint_logged' rather than crashing with ValueError."""
+        try:
+            return ActionTaken(value)
+        except ValueError:
+            return ActionTaken.complaint_logged
 
     def _run_triage(self, raw_ticket: str) -> TriageResult | None:
         t0 = time.monotonic()
