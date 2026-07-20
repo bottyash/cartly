@@ -54,25 +54,31 @@ async function lookupOrder() {
 // ── Step 2: Enter Chat Mode ───────────────────────────────────────────────
 
 function enterChatMode() {
-  document.getElementById('screen-lookup').classList.add('hidden');
-  const screen = document.getElementById('screen-chat');
-  screen.classList.remove('hidden');
+  // Use showScreen if available (new multi-screen user.html)
+  if (typeof showScreen === 'function') {
+    showScreen('screen-chat');
+  } else {
+    document.getElementById('screen-lookup').classList.add('hidden');
+    document.getElementById('screen-chat').classList.remove('hidden');
+  }
 
   // Order badge in header
   const badge = document.getElementById('order-badge');
-  badge.textContent = `Order #${currentOrder.order_id}`;
-  badge.classList.remove('hidden');
+  if (badge) { badge.textContent = `Order #${currentOrder.order_id}`; badge.classList.remove('hidden'); }
 
   // Render order card
   renderOrderCard(currentOrder);
-
-  // First system greeting
-  const buyer = currentOrder.buyer_name || 'there';
-  const product = currentOrder.product_name || 'your item';
-  const amount  = currentOrder.order_amount ? `₹${currentOrder.order_amount.toFixed(0)}` : '';
-  addBubble('system', `Hi ${buyer.split(' ')[0]}! 👋 I found your order for **${product}** (${amount}). I'm Cartly's AI refund agent.\n\nHow can I help you today? Describe your issue and I'll resolve it right away.`);
-
+  addWelcomeMessage(currentOrder);
   setTimeout(() => document.getElementById('chat-input').focus(), 300);
+}
+
+function addWelcomeMessage(order) {
+  // Clear any existing messages first if this is a fresh start
+  const buyer   = (order.buyer_name || 'there').split(' ')[0];
+  const product = order.product_name || 'your item';
+  const amount  = order.order_amount ? `₹${Number(order.order_amount).toFixed(0)}` : '';
+  addBubble('system',
+    `Hi ${buyer}! 👋 I found your order for **${product}** (${amount}). I'm Cartly's AI support agent.\n\nHow can I help you today? I can assist with refunds, delivery status, exchanges, complaints, or any other issue.`);
 }
 
 function renderOrderCard(order) {

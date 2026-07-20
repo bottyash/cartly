@@ -2,13 +2,18 @@
 Cartly FastAPI ingress — v1.0.0 Production.
 
 Endpoints:
-  POST /tickets               — submit a refund ticket
+  POST /tickets               — submit a support ticket (any intent)
+  POST /tickets/generic       — generic product/policy query (no order ID)
   GET  /logs/{id}             — per-ticket observability trace
   GET  /tickets               — list recent tickets
   GET  /health                — liveness probe
 
   GET  /orders/{order_id}     — user-facing: look up a single order by ID
-  GET  /orders/buyer/{id}     — user-facing: all orders for a buyer ID
+  GET  /orders/buyer/{name}   — user-facing: all orders for a buyer name
+
+  GET  /products              — product catalog (all products)
+  GET  /products/{id}         — single product details
+  GET  /policies              — all policy chunks
 
   GET  /admin/tickets         — admin: list all tickets with summary
   GET  /admin/stats           — admin: aggregated statistics + chart data
@@ -32,6 +37,8 @@ from api.schemas import (
 )
 from agents.orchestrator import Orchestrator
 from data.mock_db import order_lookup, get_orders_by_buyer
+from data.products import get_all_products, get_product
+from data.policy_kb import _CHUNKS as _policy_chunks
 
 app = FastAPI(
     title="Cartly Refund Resolution API",
@@ -132,6 +139,63 @@ def get_orders_for_buyer(buyer_id: str):
     if not orders:
         raise HTTPException(status_code=404, detail=f"No orders found for buyer '{buyer_id}'.")
     return {"buyer_id": buyer_id, "orders": orders}
+
+
+
+# ──────────────────────────────────────────────
+# Product Catalog endpoints
+# ──────────────────────────────────────────────
+
+@app.get("/products", tags=["catalog"])
+def list_products(category: str | None = None):
+    """Return the product catalog, optionally filtered by category."""
+    products = get_all_products()
+    if category:
+        products = [p for p in products if p["category"] == category]
+    return {"products": products, "total": len(products)}
+
+
+@app.get("/products/{product_id}", tags=["catalog"])
+def get_product_detail(product_id: str):
+    """Return details for a single product."""
+    product = get_product(product_id)
+    if not product:
+        raise HTTPException(status_code=404, detail=f"Product '{product_id}' not found.")
+    return product
+
+
+@app.get("/policies", tags=["catalog"])
+def list_policies():
+    """Return all policy chunks (excluding legal escalation policy)."""
+    public = [c for c in _policy_chunks if c["id"] != "POL-005"]
+    return {"policies": public, "total": len(public)}
+
+
+# ──────────────────────────────────────────────
+# Generic ticket (no order ID required)
+# ──────────────────────────────────────────────
+
+@app.post("/tickets/generic", tags=["tickets"])
+def submit_generic_ticket(body: dict):
+    """
+    Submit a product/policy question without an order ID.
+    Body: { "query": "Is the SoundMax Pro returnable?" }
+    """
+    query = (body.get("query") or "").strip()
+    if not query:
+        raise HTTPException(status_code=422, detail="'query' field is required.")
+    ticket_id = f"GEN-{uuid.uuid4().hex[:8].upper()}"
+    from api.schemas import TicketRequest
+    request = TicketRequest(
+        raw_ticket=query,
+        order_id="NONE",
+        claimed_amount=0,
+        buyer_id="anonymous",
+        channel="web",
+    )
+    orchestrator = Orchestrator(ticket_id)
+    result = orchestrator.handle(request)
+    return result
 
 
 # ──────────────────────────────────────────────

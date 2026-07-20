@@ -1,133 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Cartly — Refund Support</title>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cartly — Customer Support</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',system-ui,sans-serif;background:#f8fafc;color:#0f172a;min-height:100vh;-webkit-font-smoothing:antialiased}
-a{text-decoration:none;color:inherit}
-button{cursor:pointer;font-family:inherit;border:none;outline:none}
+a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .hidden{display:none!important}
 
-/* ── TOP NAV ── */
+/* NAV */
 .topnav{position:sticky;top:0;z-index:99;background:#fff;border-bottom:1px solid #e2e8f0;height:62px;display:flex;align-items:center;padding:0 32px;gap:12px}
 .tn-icon{width:34px;height:34px;background:linear-gradient(135deg,#1d4ed8,#3b82f6);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px}
 .tn-name{font-size:19px;font-weight:800;letter-spacing:-.5px}
 .tn-sp{flex:1}
-.tn-badge{display:flex;align-items:center;gap:6px;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:600;padding:5px 12px;border-radius:20px}
-.tn-back{font-size:13px;font-weight:500;color:#64748b;padding:6px 12px;border-radius:7px;transition:background .15s}
-.tn-back:hover{background:#f1f5f9;color:#1e293b}
+.tn-user-pill{display:flex;align-items:center;gap:7px;background:#f1f5f9;padding:6px 12px;border-radius:20px;font-size:13px;font-weight:600;color:#1e293b}
+.tn-user-ico{width:26px;height:26px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.tn-logout{font-size:12px;color:#94a3b8;cursor:pointer;padding:2px 6px;border-radius:4px}
+.tn-logout:hover{background:#e2e8f0;color:#475569}
+.nav-link{font-size:13px;font-weight:500;color:#64748b;padding:6px 12px;border-radius:7px;transition:all .15s}
+.nav-link:hover{background:#f1f5f9;color:#1e293b}
 
-/* ── LOOKUP SCREEN ── */
+/* ═══════════════════════════════════════════
+   SCREEN 0: LOGIN
+════════════════════════════════════════════ */
+#screen-login{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:linear-gradient(150deg,#0f172a 0%,#1e3a8a 100%)}
+.login-card{background:#fff;border-radius:18px;padding:42px 38px;max-width:420px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.login-icon{width:60px;height:60px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 18px}
+.login-t{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
+.login-s{font-size:14px;color:#64748b;text-align:center;margin-bottom:28px;line-height:1.6}
+.login-lbl{font-size:13px;font-weight:600;color:#374151;margin-bottom:7px}
+.login-inp{width:100%;padding:12px 15px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;font-family:inherit;transition:all .15s;margin-bottom:16px}
+.login-inp:focus{outline:none;border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1)}
+.login-btn{width:100%;padding:13px;background:#1d4ed8;color:#fff;border-radius:9px;font-size:15px;font-weight:700;transition:background .15s;margin-bottom:12px}
+.login-btn:hover{background:#1e40af}
+.login-err{font-size:13px;color:#dc2626;text-align:center;margin-bottom:10px}
+.login-div{display:flex;align-items:center;gap:10px;margin:14px 0;color:#94a3b8;font-size:12px}
+.login-div::before,.login-div::after{content:'';flex:1;height:1px;background:#e2e8f0}
+.login-skip{width:100%;padding:11px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:14px;font-weight:600;color:#475569;background:#fff;transition:all .15s}
+.login-skip:hover{border-color:#1d4ed8;color:#1d4ed8}
+.login-hint{text-align:center;font-size:12px;color:#94a3b8;margin-top:12px}
+.demo-names{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center}
+.demo-name{font-size:12px;padding:4px 10px;border-radius:14px;background:#eff6ff;color:#1d4ed8;cursor:pointer;font-weight:600;border:1px solid #bfdbfe}
+.demo-name:hover{background:#dbeafe}
+
+/* ═══════════════════════════════════════════
+   SCREEN 1: HOME (after login)
+════════════════════════════════════════════ */
+#screen-home{min-height:calc(100vh - 62px);padding:32px 20px;max-width:900px;margin:0 auto}
+.home-greeting{font-size:22px;font-weight:800;margin-bottom:4px}
+.home-sub{font-size:15px;color:#64748b;margin-bottom:28px}
+.home-cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:28px}
+@media(max-width:700px){.home-cards{grid-template-columns:1fr}}
+.home-card{background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:22px 20px;cursor:pointer;transition:all .2s}
+.home-card:hover{border-color:#1d4ed8;transform:translateY(-2px);box-shadow:0 6px 20px rgba(29,78,216,.1)}
+.home-card-ico{font-size:28px;margin-bottom:12px}
+.home-card-t{font-size:15px;font-weight:700;margin-bottom:5px}
+.home-card-s{font-size:13px;color:#64748b;line-height:1.6}
+
+/* Order history */
+.orders-sec-t{font-size:16px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.orders-list{display:flex;flex-direction:column;gap:10px}
+.order-item{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all .15s}
+.order-item:hover{border-color:#1d4ed8;background:#eff6ff}
+.order-item-ico{width:42px;height:42px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.order-item-info{flex:1;min-width:0}
+.order-item-name{font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-item-meta{font-size:12px;color:#64748b;margin-top:2px}
+.order-item-right{text-align:right;flex-shrink:0}
+.order-item-amt{font-size:15px;font-weight:800;color:#1d4ed8}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:14px}
+.pill-g{background:#ecfdf5;color:#059669}
+.pill-a{background:#fffbeb;color:#d97706}
+.pill-r{background:#fef2f2;color:#dc2626}
+
+/* ═══════════════════════════════════════════
+   SCREEN 2: ORDER LOOKUP (skip login path)
+════════════════════════════════════════════ */
 #screen-lookup{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
 .lk-wrap{width:100%;max-width:460px}
-.lk-bc{font-size:13px;color:#64748b;margin-bottom:22px;display:flex;align-items:center;gap:5px}
+.lk-bc{font-size:13px;color:#64748b;margin-bottom:20px;display:flex;align-items:center;gap:5px}
 .lk-bc a{color:#1d4ed8;font-weight:500}
 .lk-bc a:hover{text-decoration:underline}
-.lk-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:38px 34px;box-shadow:0 4px 20px rgba(0,0,0,.07)}
-.lk-head{display:flex;align-items:center;gap:16px;margin-bottom:28px}
-.lk-head-ic{width:54px;height:54px;background:#eff6ff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
-.lk-head-t{font-size:21px;font-weight:700;color:#0f172a}
-.lk-head-s{font-size:14px;color:#64748b;margin-top:3px}
-.lk-label{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px}
+.lk-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:36px 32px;box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.lk-head{display:flex;align-items:center;gap:14px;margin-bottom:26px}
+.lk-head-ic{width:50px;height:50px;background:#eff6ff;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.lk-head-t{font-size:20px;font-weight:700}
+.lk-head-s{font-size:13px;color:#64748b;margin-top:2px}
+.lk-lbl{font-size:13px;font-weight:600;color:#374151;margin-bottom:8px}
 .lk-row{display:flex;gap:10px}
-.lk-inp{flex:1;padding:11px 15px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;color:#0f172a;transition:border-color .15s,box-shadow .15s;background:#fff}
+.lk-inp{flex:1;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:15px;color:#0f172a;transition:all .15s}
 .lk-inp:focus{outline:none;border-color:#1d4ed8;box-shadow:0 0 0 3px rgba(29,78,216,.1)}
-.lk-btn{padding:11px 22px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:600;border-radius:9px;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:background .15s;min-width:110px;justify-content:center}
+.lk-btn{padding:11px 20px;background:#1d4ed8;color:#fff;font-size:14px;font-weight:600;border-radius:9px;transition:background .15s;min-width:100px;display:flex;align-items:center;justify-content:center;gap:6px}
 .lk-btn:hover:not(:disabled){background:#1e40af}
-.lk-btn:disabled{opacity:.6;cursor:not-allowed}
+.lk-btn:disabled{opacity:.55;cursor:not-allowed}
 .lk-err{margin-top:10px;padding:10px 14px;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;font-size:13px;color:#dc2626}
-.lk-div{display:flex;align-items:center;gap:12px;margin:22px 0;color:#94a3b8;font-size:12px;font-weight:500}
+.lk-div{display:flex;align-items:center;gap:10px;margin:20px 0;color:#94a3b8;font-size:12px;font-weight:500}
 .lk-div::before,.lk-div::after{content:'';flex:1;height:1px;background:#e2e8f0}
-.lk-hints{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.lk-hints{display:flex;flex-wrap:wrap;align-items:center;gap:7px}
 .lk-hl{font-size:13px;color:#64748b}
-.lk-chip{padding:5px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:600;color:#1d4ed8;transition:all .15s}
+.lk-chip{padding:5px 13px;border-radius:18px;border:1.5px solid #e2e8f0;background:#fff;font-size:13px;font-weight:600;color:#1d4ed8;transition:all .15s}
 .lk-chip:hover{background:#eff6ff;border-color:#1d4ed8}
-.lk-help{margin-top:18px;text-align:center;font-size:13px;color:#64748b}
-.lk-help a{color:#1d4ed8;font-weight:600}
 
-/* ── SPINNER ── */
-.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:_spin .7s linear infinite;display:inline-block}
-@keyframes _spin{to{transform:rotate(360deg)}}
+/* ═══════════════════════════════════════════
+   SCREEN 3: GENERIC QUERY (no order)
+════════════════════════════════════════════ */
+#screen-generic{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.gen-wrap{width:100%;max-width:580px}
+.gen-card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:36px 32px;box-shadow:0 4px 20px rgba(0,0,0,.07)}
+.gen-head{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.gen-ico{width:50px;height:50px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.gen-t{font-size:20px;font-weight:700}
+.gen-s{font-size:13px;color:#64748b;margin-top:2px}
+.gen-examples{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:20px}
+.gen-ex{padding:5px 13px;border-radius:18px;border:1.5px solid #e2e8f0;background:#f8fafc;font-size:13px;color:#475569;cursor:pointer;transition:all .15s}
+.gen-ex:hover{background:#eff6ff;border-color:#1d4ed8;color:#1d4ed8}
+.gen-ta-wrap{position:relative;margin-bottom:14px}
+.gen-ta{width:100%;padding:13px 15px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:15px;font-family:inherit;resize:vertical;min-height:88px;transition:all .15s;color:#0f172a}
+.gen-ta:focus{outline:none;border-color:#1d4ed8}
+.gen-btn{width:100%;padding:13px;background:#1d4ed8;color:#fff;border-radius:9px;font-size:15px;font-weight:700;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.gen-btn:hover:not(:disabled){background:#1e40af}
+.gen-btn:disabled{opacity:.55;cursor:not-allowed}
+.gen-result{margin-top:18px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:16px;font-size:14px;line-height:1.7;color:#0f172a}
+.gen-result-hd{font-size:11px;font-weight:700;color:#0369a1;margin-bottom:8px;letter-spacing:.5px;text-transform:uppercase}
+.spin{width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:_s .7s linear infinite}
+@keyframes _s{to{transform:rotate(360deg)}}
 
-/* ── CHAT SCREEN ── */
+/* ═══════════════════════════════════════════
+   SCREEN 4: CHAT
+════════════════════════════════════════════ */
 #screen-chat{min-height:calc(100vh - 62px)}
-.chat-layout{display:flex;max-width:1080px;margin:0 auto;padding:24px 20px;gap:20px}
-
-/* Order sidebar */
-.order-sb{width:270px;flex-shrink:0}
-.order-sb-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);position:sticky;top:78px}
-.order-sb-hd{padding:13px 16px;background:#1d4ed8;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase}
-.order-sb-body{padding:16px}
-.order-pname{font-size:15px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f1f5f9}
-.order-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f8fafc;font-size:13px}
+.chat-layout{display:flex;max-width:1080px;margin:0 auto;padding:20px;gap:18px}
+.order-sb{width:260px;flex-shrink:0}
+.order-sb-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);position:sticky;top:78px}
+.order-sb-hd{padding:11px 14px;background:#1d4ed8;font-size:10px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.5px;text-transform:uppercase}
+.order-sb-body{padding:14px}
+.order-pname{font-size:14px;font-weight:700;color:#0f172a;line-height:1.4;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #f1f5f9}
+.order-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #f8fafc;font-size:13px}
 .order-row:last-child{border:none}
 .order-key{color:#64748b}
 .order-val{font-weight:600;color:#1e293b}
-.order-amt{font-size:22px;font-weight:800;color:#1d4ed8;letter-spacing:-.5px}
-.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px}
-.pill-g{background:#ecfdf5;color:#059669}
-.pill-a{background:#fffbeb;color:#d97706}
+.order-amt{font-size:20px;font-weight:800;color:#1d4ed8}
 .pdot{width:5px;height:5px;border-radius:50%;background:currentColor}
-.order-sb-ft{padding:12px 16px;border-top:1px solid #f1f5f9}
-.change-btn{width:100%;padding:8px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#475569;transition:all .15s}
+.order-sb-ft{padding:10px 14px;border-top:1px solid #f1f5f9}
+.change-btn{width:100%;padding:7px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:7px;font-size:13px;font-weight:600;color:#475569;transition:all .15s}
 .change-btn:hover{background:#f1f5f9;color:#1e293b}
+.how-box{margin-top:12px;background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:14px;font-size:13px;color:#475569}
+.how-title{font-weight:700;color:#0f172a;margin-bottom:7px}
+.how-box ol{padding-left:16px;line-height:2.1}
 
-/* How it works box */
-.how-box{margin-top:14px;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px;font-size:13px;color:#475569}
-.how-title{font-weight:700;color:#0f172a;margin-bottom:8px}
-.how-box ol{padding-left:17px;line-height:2.1}
-
-/* Chat main */
-.chat-main{flex:1;display:flex;flex-direction:column;min-width:0}
-.chat-win{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.05);overflow:hidden;display:flex;flex-direction:column;min-height:480px}
-.chat-hd{padding:14px 18px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:11px}
-.chat-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.chat-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.chat-win{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:460px}
+.chat-hd{padding:13px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px}
+.chat-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d4ed8,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .chat-aname{font-size:14px;font-weight:700;color:#0f172a}
 .chat-asta{font-size:12px;color:#22c55e;display:flex;align-items:center;gap:4px;margin-top:1px}
 .chat-asta::before{content:'';width:6px;height:6px;border-radius:50%;background:#22c55e}
-.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
+.chat-messages{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth;min-height:200px}
 .chat-messages::-webkit-scrollbar{width:4px}
 .chat-messages::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:2px}
-
-/* Bubbles */
 .chat-bubble{max-width:78%;display:flex;flex-direction:column}
 .bubble-user{align-self:flex-end;align-items:flex-end}
 .bubble-system{align-self:flex-start;align-items:flex-start}
-.bubble-body{padding:12px 16px;border-radius:18px;font-size:14px;line-height:1.6}
+.bubble-body{padding:11px 15px;border-radius:18px;font-size:14px;line-height:1.6}
 .bubble-user .bubble-body{background:#1d4ed8;color:#fff;border-bottom-right-radius:4px}
 .bubble-system .bubble-body{background:#f1f5f9;color:#1e293b;border:1px solid #e2e8f0;border-bottom-left-radius:4px}
 .bubble-resolved .bubble-body{background:#ecfdf5;border:1px solid #a7f3d0;color:#1e293b}
 .bubble-escalated .bubble-body{background:#fffbeb;border:1px solid #fde68a;color:#1e293b}
-.bubble-time{font-size:11px;color:#94a3b8;margin-top:4px;padding:0 4px}
-
-/* Typing */
-.typing-dots{display:flex;gap:4px;align-items:center;padding:4px 2px}
+.bubble-time{font-size:11px;color:#94a3b8;margin-top:3px;padding:0 3px}
+.typing-dots{display:flex;gap:4px;align-items:center;padding:3px 2px}
 .typing-dots span{width:7px;height:7px;border-radius:50%;background:#94a3b8;animation:_tb 1.4s infinite}
 .typing-dots span:nth-child(2){animation-delay:.2s}
 .typing-dots span:nth-child(3){animation-delay:.4s}
 @keyframes _tb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-
-/* Trace */
-.trace-toggle{margin-top:9px;font-size:12px;font-weight:600;color:#1d4ed8;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:6px;background:#eff6ff;transition:background .15s}
+.trace-toggle{margin-top:8px;font-size:12px;font-weight:600;color:#1d4ed8;cursor:pointer;display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:5px;background:#eff6ff}
 .trace-toggle:hover{background:#dbeafe}
-.trace-box{margin-top:9px;background:#0f172a;border-radius:8px;overflow:hidden;border:1px solid #1e293b;font-size:11.5px}
-.trace-row{display:flex;align-items:center;gap:8px;padding:8px 13px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .1s}
-.trace-row:hover{background:rgba(255,255,255,.03)}
+.trace-box{margin-top:8px;background:#0f172a;border-radius:8px;overflow:hidden;border:1px solid #1e293b;font-size:11.5px}
+.trace-row{display:flex;align-items:center;gap:7px;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.04)}
 .trace-row:last-child{border:none}
-.tr-step{color:#7dd3fc;font-weight:600;min-width:195px;font-family:monospace}
+.tr-step{color:#7dd3fc;font-weight:600;min-width:190px;font-family:monospace}
 .tr-dec{color:#e2e8f0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tr-lat{color:#475569;min-width:50px;text-align:right;font-family:monospace}
-
-/* Input area */
-.chat-inp-area{padding:14px 16px;border-top:1px solid #f1f5f9;display:flex;gap:10px;align-items:flex-end;background:#fff}
-.chat-ta{flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:22px;font-size:14px;font-family:inherit;color:#0f172a;resize:none;min-height:42px;max-height:100px;transition:border-color .15s;line-height:1.5}
+.chat-inp-area{padding:12px 14px;border-top:1px solid #f1f5f9;display:flex;gap:9px;align-items:flex-end}
+.chat-ta{flex:1;padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:22px;font-size:14px;font-family:inherit;resize:none;min-height:40px;max-height:100px;transition:all .15s;line-height:1.5}
 .chat-ta:focus{outline:none;border-color:#1d4ed8}
 .chat-ta::placeholder{color:#94a3b8}
-.chat-send{width:42px;height:42px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.chat-send{width:40px;height:40px;border-radius:50%;background:#1d4ed8;color:#fff;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
 .chat-send:hover:not(:disabled){background:#1e40af;transform:scale(1.05)}
 .chat-send:disabled{opacity:.5;cursor:not-allowed}
 
@@ -141,107 +200,347 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
   <div class="tn-icon">🛒</div>
   <span class="tn-name">Cartly</span>
   <div class="tn-sp"></div>
-  <div class="tn-badge hidden" id="order-badge">📦 Order</div>
-  <a href="index.html" class="tn-back">← Back to Home</a>
+  <div id="nav-user-pill" class="hidden tn-user-pill">
+    <div class="tn-user-ico" id="nav-user-ico">?</div>
+    <span id="nav-user-name">Guest</span>
+    <span class="tn-logout" onclick="logout()" title="Sign out">✕</span>
+  </div>
+  <a href="catalog.html" class="nav-link">Catalog</a>
+  <a href="index.html" class="nav-link">← Home</a>
 </nav>
 
-<main>
+<main id="main-content">
 
-  <!-- STEP 1: Order Lookup -->
-  <div id="screen-lookup">
-    <div class="lk-wrap">
-      <p class="lk-bc"><a href="index.html">Home</a> <span>›</span> Order Support</p>
-      <div class="lk-card">
-        <div class="lk-head">
-          <div class="lk-head-ic">📦</div>
+<!-- ═══ SCREEN 0: LOGIN ═══════════════════════════════════════════ -->
+<div id="screen-login">
+  <div class="login-card">
+    <div class="login-icon">🛒</div>
+    <div class="login-t">Welcome to Cartly Support</div>
+    <p class="login-s">Sign in to see your orders and get instant support, or continue as a guest.</p>
+
+    <p class="login-lbl">Your Name</p>
+    <input type="text" id="login-name-inp" class="login-inp" placeholder="e.g. Rahul" onkeydown="if(event.key==='Enter')loginUser()"/>
+    <p class="login-err hidden" id="login-err"></p>
+    <button class="login-btn" onclick="loginUser()">Sign In & View My Orders</button>
+
+    <div class="login-div">Try a demo account</div>
+    <div class="demo-names">
+      <span class="demo-name" onclick="fillLogin('Rahul')">Rahul</span>
+      <span class="demo-name" onclick="fillLogin('Ananya')">Ananya</span>
+      <span class="demo-name" onclick="fillLogin('Priya')">Priya</span>
+      <span class="demo-name" onclick="fillLogin('Arjun')">Arjun</span>
+    </div>
+
+    <div class="login-div" style="margin-top:18px">or</div>
+    <button class="login-skip" onclick="skipToLookup()">Continue without signing in →</button>
+    <p class="login-hint">Cartly uses your name to find your orders. No password required.</p>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 1: HOME (logged in) ══════════════════════════════ -->
+<div id="screen-home" class="hidden">
+  <p class="home-greeting">Hello, <span id="home-user-name">there</span>! 👋</p>
+  <p class="home-sub">What would you like help with today?</p>
+
+  <div class="home-cards">
+    <div class="home-card" onclick="showScreen('screen-chat-from-home')">
+      <div class="home-card-ico">📦</div>
+      <div class="home-card-t">My Orders</div>
+      <div class="home-card-s">View your order history and get support for a specific order</div>
+    </div>
+    <div class="home-card" onclick="showScreen('screen-generic')">
+      <div class="home-card-ico">💬</div>
+      <div class="home-card-t">Ask a Question</div>
+      <div class="home-card-s">Ask about return policy, shipping, warranty — no order ID needed</div>
+    </div>
+    <div class="home-card" onclick="window.location.href='catalog.html'">
+      <div class="home-card-ico">🛍️</div>
+      <div class="home-card-t">Browse Catalog</div>
+      <div class="home-card-s">Explore products and check return eligibility before buying</div>
+    </div>
+  </div>
+
+  <div class="orders-sec-t">📦 Your Recent Orders <span style="font-size:12px;font-weight:500;color:#94a3b8" id="orders-count"></span></div>
+  <div class="orders-list" id="orders-list">
+    <div style="text-align:center;padding:24px;color:#94a3b8">Loading your orders…</div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2: ORDER LOOKUP (guest path) ══════════════════════ -->
+<div id="screen-lookup" class="hidden">
+  <div class="lk-wrap">
+    <p class="lk-bc"><a href="#" onclick="showScreen('screen-login')">Home</a> <span>›</span> Order Lookup</p>
+    <div class="lk-card">
+      <div class="lk-head">
+        <div class="lk-head-ic">📦</div>
+        <div><div class="lk-head-t">Find Your Order</div><div class="lk-head-s">Enter your Order ID to get started</div></div>
+      </div>
+      <p class="lk-lbl">Order ID</p>
+      <div class="lk-row">
+        <input id="lookup-input" type="text" class="lk-inp" placeholder="e.g. 1042" onkeydown="if(event.key==='Enter')lookupOrder()"/>
+        <button class="lk-btn" id="lookup-btn" onclick="lookupOrder()">
+          <span id="lookup-text">Search</span>
+          <span id="lookup-spinner" class="spin hidden"></span>
+        </button>
+      </div>
+      <p class="lk-err hidden" id="lookup-error"></p>
+      <div class="lk-div">or try a demo order</div>
+      <div class="lk-hints">
+        <span class="lk-hl">Quick fill:</span>
+        <button class="lk-chip" onclick="fillAndLookup('1042')">#1042</button>
+        <button class="lk-chip" onclick="fillAndLookup('1077')">#1077</button>
+        <button class="lk-chip" onclick="fillAndLookup('1090')">#1090</button>
+        <button class="lk-chip" onclick="fillAndLookup('1099')">#1099</button>
+      </div>
+    </div>
+    <div style="margin-top:14px;text-align:center">
+      <button class="nav-link" onclick="showScreen('screen-generic')" style="padding:8px 16px;font-size:13px;color:#1d4ed8;font-weight:600">💬 Ask a generic question instead →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3: GENERIC QUERY ═══════════════════════════════════ -->
+<div id="screen-generic" class="hidden">
+  <div class="gen-wrap">
+    <p class="lk-bc" style="margin-bottom:16px">
+      <a href="#" onclick="goBack()">← Back</a>
+    </p>
+    <div class="gen-card">
+      <div class="gen-head">
+        <div class="gen-ico">💬</div>
+        <div><div class="gen-t">Ask Anything</div><div class="gen-s">No order ID needed — ask about products, policies, shipping</div></div>
+      </div>
+      <div class="gen-examples">
+        <span class="gen-ex" onclick="fillGeneric(this.textContent)">Is the SoundMax Pro returnable?</span>
+        <span class="gen-ex" onclick="fillGeneric(this.textContent)">What is the return window for electronics?</span>
+        <span class="gen-ex" onclick="fillGeneric(this.textContent)">How long does shipping take?</span>
+        <span class="gen-ex" onclick="fillGeneric(this.textContent)">Can I exchange a kurta for a different size?</span>
+        <span class="gen-ex" onclick="fillGeneric(this.textContent)">What is the warranty on the TimeFit X1?</span>
+        <span class="gen-ex" onclick="fillGeneric(this.textContent)">How do I cancel an order?</span>
+      </div>
+      <div class="gen-ta-wrap">
+        <textarea id="gen-query" class="gen-ta" placeholder="Type your question — e.g. Is the SoundBuds Lite returnable?"></textarea>
+      </div>
+      <button class="gen-btn" id="gen-btn" onclick="submitGeneric()">
+        <span id="gen-btn-text">Ask Cartly AI</span>
+        <span id="gen-spinner" class="spin hidden"></span>
+      </button>
+      <div class="gen-result hidden" id="gen-result">
+        <div class="gen-result-hd">🤖 Cartly AI Answer</div>
+        <div id="gen-result-text"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4: CHAT ════════════════════════════════════════════ -->
+<div class="hidden" id="screen-chat">
+  <div class="chat-layout">
+    <aside class="order-sb">
+      <div class="order-sb-card">
+        <div class="order-sb-hd">Your Order</div>
+        <div class="order-sb-body" id="order-card"></div>
+        <div class="order-sb-ft">
+          <button class="change-btn" onclick="changeOrder()">← Search a different order</button>
+        </div>
+      </div>
+      <div class="how-box">
+        <div class="how-title">💡 How it works</div>
+        <ol>
+          <li>Describe your issue in chat</li>
+          <li>AI reviews order + policy</li>
+          <li>Get an instant decision</li>
+        </ol>
+      </div>
+    </aside>
+    <div class="chat-main">
+      <div class="chat-win">
+        <div class="chat-hd">
+          <div class="chat-av">🤖</div>
           <div>
-            <div class="lk-head-t">Find Your Order</div>
-            <div class="lk-head-s">Enter your Order ID to get started</div>
+            <div class="chat-aname">Cartly AI Agent</div>
+            <div class="chat-asta">Online · Typically replies instantly</div>
           </div>
         </div>
-        <p class="lk-label">Order ID</p>
-        <div class="lk-row">
-          <input id="lookup-input" type="text" class="lk-inp" placeholder="e.g. 1042"
-            onkeydown="if(event.key==='Enter')lookupOrder()" autofocus/>
-          <button class="lk-btn" id="lookup-btn" onclick="lookupOrder()">
-            <span id="lookup-text">Search</span>
-            <span id="lookup-spinner" class="spin hidden"></span>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-inp-area" id="chat-input-area">
+          <textarea id="chat-input" class="chat-ta" rows="1"
+            placeholder="Describe your issue — refund, delivery, exchange, complaint…"
+            onkeydown="handleChatKey(event)"></textarea>
+          <button class="chat-send" id="chat-send-btn" onclick="sendMessage()">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
           </button>
         </div>
-        <p class="lk-err hidden" id="lookup-error"></p>
-        <div class="lk-div">or try a demo order</div>
-        <div class="lk-hints">
-          <span class="lk-hl">Quick fill:</span>
-          <button class="lk-chip" onclick="fillAndLookup('1042')">#1042</button>
-          <button class="lk-chip" onclick="fillAndLookup('1077')">#1077</button>
-          <button class="lk-chip" onclick="fillAndLookup('1090')">#1090</button>
-          <button class="lk-chip" onclick="fillAndLookup('1099')">#1099</button>
-        </div>
       </div>
-      <p class="lk-help">Can't find your order? <a href="#">Contact Support</a></p>
     </div>
   </div>
+</div>
 
-  <!-- STEP 2: Chat -->
-  <div class="hidden" id="screen-chat">
-    <div class="chat-layout">
-
-      <!-- Sidebar -->
-      <aside class="order-sb">
-        <div class="order-sb-card">
-          <div class="order-sb-hd">Your Order</div>
-          <div class="order-sb-body" id="order-card"><!-- JS fills --></div>
-          <div class="order-sb-ft">
-            <button class="change-btn" onclick="changeOrder()">← Search a different order</button>
-          </div>
-        </div>
-        <div class="how-box">
-          <div class="how-title">💡 How it works</div>
-          <ol>
-            <li>Describe your issue in chat</li>
-            <li>AI reviews order + policy</li>
-            <li>Get an instant decision</li>
-          </ol>
-        </div>
-      </aside>
-
-      <!-- Chat window -->
-      <div class="chat-main">
-        <div class="chat-win">
-          <div class="chat-hd">
-            <div class="chat-av">🤖</div>
-            <div>
-              <div class="chat-aname">Cartly AI Agent</div>
-              <div class="chat-asta">Online · Typically replies instantly</div>
-            </div>
-          </div>
-          <div class="chat-messages" id="chat-messages"></div>
-          <div class="chat-inp-area" id="chat-input-area">
-            <textarea id="chat-input" class="chat-ta" rows="1"
-              placeholder="Describe your issue — e.g. My order arrived damaged, I'd like a refund…"
-              onkeydown="handleChatKey(event)"></textarea>
-            <button class="chat-send" id="chat-send-btn" onclick="sendMessage()" title="Send">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
 </main>
 
 <script src="user.js"></script>
 <script>
-function changeOrder(){
-  document.getElementById('screen-chat').classList.add('hidden');
-  document.getElementById('screen-lookup').classList.remove('hidden');
-  document.getElementById('order-badge').classList.add('hidden');
-  document.getElementById('lookup-input').value='';
-  document.getElementById('chat-messages').innerHTML='';
+const API = 'http://localhost:8000';
+let currentUser = null;
+let userOrders  = [];
+let prevScreen  = 'screen-login';
+
+/* ── Helpers ─────────────────────────────────────────────── */
+function showScreen(id) {
+  ['screen-login','screen-home','screen-lookup','screen-generic','screen-chat']
+    .forEach(s => document.getElementById(s).classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
 }
+
+function goBack() {
+  const dest = currentUser ? 'screen-home' : 'screen-login';
+  showScreen(dest);
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ── Login ───────────────────────────────────────────────── */
+function fillLogin(name) { document.getElementById('login-name-inp').value = name; }
+
+async function loginUser() {
+  const name = document.getElementById('login-name-inp').value.trim();
+  const errEl = document.getElementById('login-err');
+  errEl.classList.add('hidden');
+  if (!name) { errEl.textContent='Please enter your name.'; errEl.classList.remove('hidden'); return; }
+
+  try {
+    const r = await fetch(`${API}/orders/buyer/${encodeURIComponent(name)}`);
+    if (!r.ok) { errEl.textContent=`No orders found for "${name}". Try: Rahul, Ananya, Priya, Arjun.`; errEl.classList.remove('hidden'); return; }
+    const d = await r.json();
+    currentUser = name;
+    userOrders  = d.orders || [];
+    setNavUser(name);
+    renderOrderList();
+    document.getElementById('home-user-name').textContent = name;
+    document.getElementById('orders-count').textContent = `(${userOrders.length})`;
+    showScreen('screen-home');
+  } catch { errEl.textContent='Could not connect to server.'; errEl.classList.remove('hidden'); }
+}
+
+function setNavUser(name) {
+  const pill = document.getElementById('nav-user-pill');
+  pill.classList.remove('hidden');
+  document.getElementById('nav-user-name').textContent = name;
+  document.getElementById('nav-user-ico').textContent = name.charAt(0).toUpperCase();
+}
+
+function logout() {
+  currentUser = null; userOrders = [];
+  document.getElementById('nav-user-pill').classList.add('hidden');
+  document.getElementById('login-name-inp').value = '';
+  showScreen('screen-login');
+}
+
+function skipToLookup() { showScreen('screen-lookup'); }
+
+/* ── Order list ──────────────────────────────────────────── */
+const DELIVERY_ICONS = {delivered:'✅',not_delivered:'⚠️',in_transit:'🚚',shipped:'📬',processing:'⚙️',pending:'🕐',cancelled:'❌'};
+const STATUS_PILLS = {delivered:'pill-g',not_delivered:'pill-a',in_transit:'pill-g',shipped:'pill-g',processing:'pill-a',pending:'pill-a',cancelled:'pill-r'};
+
+function renderOrderList() {
+  const el = document.getElementById('orders-list');
+  if (!userOrders.length) { el.innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8">No orders found.</div>'; return; }
+  el.innerHTML = userOrders.map(o => {
+    const ico  = DELIVERY_ICONS[o.delivery_status] || '📦';
+    const pc   = STATUS_PILLS[o.delivery_status]  || 'pill-a';
+    return `
+    <div class="order-item" onclick="openOrderChat('${o.order_id}')">
+      <div class="order-item-ico">${ico}</div>
+      <div class="order-item-info">
+        <div class="order-item-name">${esc(o.product_name)}</div>
+        <div class="order-item-meta">#${esc(o.order_id)} · ${esc(o.product_category)} · ${esc(o.order_date||'')}</div>
+      </div>
+      <div class="order-item-right">
+        <div class="order-item-amt">₹${Number(o.order_amount).toFixed(0)}</div>
+        <div class="pill ${pc}" style="margin-top:4px"><span class="pdot"></span>${esc(o.delivery_status)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function openOrderChat(orderId) {
+  document.getElementById('lookup-input') && (document.getElementById('lookup-input').value = orderId);
+  // Directly load the order and go to chat
+  const r = await fetch(`${API}/orders/${orderId}`);
+  if (!r.ok) return;
+  const order = await r.json();
+  window._currentOrder = order;
+  renderOrderCard(order);
+  document.getElementById('chat-messages').innerHTML = '';
+  showScreen('screen-chat');
+  // Trigger welcome message
+  if (typeof addWelcomeMessage === 'function') addWelcomeMessage(order);
+  else appendBotMessage(`Hi ${order.buyer_name}! 👋 I found your order for **${order.product_name}** (₹${order.order_amount}). How can I help you today?`);
+}
+
+function showScreen_fromHome(id) { prevScreen = 'screen-home'; showScreen(id); }
+
+/* ── Generic query ──────────────────────────────────────── */
+function fillGeneric(q) { document.getElementById('gen-query').value = q; }
+
+async function submitGeneric() {
+  const q   = document.getElementById('gen-query').value.trim();
+  const btn = document.getElementById('gen-btn');
+  const txt = document.getElementById('gen-btn-text');
+  const sp  = document.getElementById('gen-spinner');
+  const res = document.getElementById('gen-result');
+  const rtxt= document.getElementById('gen-result-text');
+  if (!q) return;
+
+  btn.disabled = true; txt.textContent = 'Thinking…'; sp.classList.remove('hidden');
+  res.classList.add('hidden');
+
+  try {
+    const r = await fetch(`${API}/tickets/generic`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ query: q })
+    });
+    const d = await r.json();
+    const answer = d.resolution?.reason || d.handoff_brief?.reason || 'I could not find a specific answer. Please contact support@cartly.in';
+    // Render markdown-ish bold
+    rtxt.innerHTML = answer.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+    res.classList.remove('hidden');
+  } catch {
+    rtxt.textContent = 'Could not connect to server. Please try again.';
+    res.classList.remove('hidden');
+  } finally {
+    btn.disabled = false; txt.textContent = 'Ask Cartly AI'; sp.classList.add('hidden');
+  }
+}
+
+/* ── Chat helpers (used by user.js) ─────────────────────── */
+function changeOrder() {
+  document.getElementById('screen-chat').classList.add('hidden');
+  document.getElementById('chat-messages').innerHTML = '';
+  if (currentUser) showScreen('screen-home');
+  else showScreen('screen-lookup');
+}
+
+function appendBotMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div  = document.createElement('div');
+  div.className = 'chat-bubble bubble-system';
+  div.innerHTML = `<div class="bubble-body">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+/* ── Init: check URL params ──────────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('mode') === 'generic') {
+    const q = params.get('query') || '';
+    showScreen('screen-generic');
+    if (q) document.getElementById('gen-query').value = decodeURIComponent(q);
+  }
+});
 </script>
 </body>
 </html>

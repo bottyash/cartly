@@ -5,7 +5,7 @@
     "keywords": ["damaged", "broken", "defective", "faulty", "cracked", "not working", "arrived broken"],
     "title": "Damaged Goods Refund Policy",
     "text": "If an item arrives damaged or defective, the buyer is eligible for a full refund or replacement within 7 days of delivery. The buyer must provide photo evidence of the damage. Refunds are processed within 3-5 business days after verification. This policy applies to all product categories except digital goods and perishables.",
-    "clause": "\u00a73.2 \u2014 Damaged or Defective Items"
+    "clause": "§3.2 — Damaged or Defective Items"
   },
   {
     "id": "POL-002",
@@ -13,23 +13,23 @@
     "keywords": ["not arrived", "never received", "lost", "missing", "not delivered", "where is my order", "wismo", "not delivered", "never arrived"],
     "title": "Non-Delivery Refund Policy",
     "text": "If an order is confirmed as lost or undelivered by the courier within the expected delivery window, the buyer is eligible for a full refund. The claim must be raised within 15 days of the expected delivery date. The platform will initiate a courier investigation before issuing the refund. Refunds are processed within 5-7 business days after investigation completion.",
-    "clause": "\u00a74.1 \u2014 Non-Delivery Claims"
+    "clause": "§4.1 — Non-Delivery Claims"
   },
   {
     "id": "POL-003",
     "category": "electronics_return",
     "keywords": ["electronics", "laptop", "phone", "mobile", "tablet", "television", "tv", "earbuds", "headphones", "speaker", "gadget", "30-day", "30 day", "return policy"],
-    "title": "Electronics Return Policy \u2014 Non-Returnable",
+    "title": "Electronics Return Policy — Non-Returnable",
     "text": "Electronics and gadgets are NON-RETURNABLE once opened and used, unless the item is defective on arrival (Dead on Arrival). The general 30-day return window does NOT apply to electronics, laptops, mobile phones, tablets, audio equipment, or any electronic accessories. Defective electronics may be exchanged or refunded within 7 days of delivery with clear proof of manufacturing defect. Change of mind, incompatibility, or buyer preference are not valid grounds for return of electronics.",
-    "clause": "\u00a75.4 \u2014 Electronics \u2014 Non-Returnable Category"
+    "clause": "§5.4 — Electronics — Non-Returnable Category"
   },
   {
     "id": "POL-004",
     "category": "general_return",
-    "keywords": ["return", "change of mind", "wrong size", "wrong colour", "not as described", "different from listing"],
+    "keywords": ["return", "change of mind", "wrong size", "wrong colour", "not as described", "different from listing", "returnable", "return window", "30 days"],
     "title": "General Return Policy",
     "text": "Most non-electronic items are eligible for return within 30 days of delivery, provided they are unused, undamaged, and in original packaging with all tags intact. Refunds are processed within 5-7 business days after the returned item is received and passes inspection. Items that show signs of use, damage, or missing accessories are not eligible for return under this policy.",
-    "clause": "\u00a73.1 \u2014 General 30-Day Return Window"
+    "clause": "§3.1 — General 30-Day Return Window"
   },
   {
     "id": "POL-005",
@@ -37,6 +37,46 @@
     "keywords": ["fraud", "legal", "lawyer", "court", "sue", "lawsuit", "police", "report", "crime", "chargeback", "dispute bank", "consumer court"],
     "title": "Legal Threat and Fraud Escalation Policy",
     "text": "Any ticket containing legal threats, allegations of fraud or criminal conduct, or references to law enforcement, courts, or legal proceedings must be immediately escalated to a senior human compliance agent. Automated resolution is strictly prohibited for such cases. A unique case reference number is issued within 15 minutes and the case is reviewed by the compliance team within 24 hours.",
-    "clause": "\u00a78.1 \u2014 Legal Threat Kill-Switch"
+    "clause": "§8.1 — Legal Threat Kill-Switch"
+  },
+  {
+    "id": "POL-006",
+    "category": "shipping",
+    "keywords": ["shipping", "delivery time", "estimated delivery", "how long", "when will", "dispatch", "shipped", "standard delivery", "express", "speed", "days to deliver"],
+    "title": "Shipping & Delivery Policy",
+    "text": "Cartly offers Standard Delivery (5-7 business days, free on orders above ₹499) and Express Delivery (1-2 business days, flat ₹99 fee). Orders are dispatched within 24 hours of payment confirmation (Monday to Friday). Weekend orders are dispatched the next business day. Remote pin codes may require an additional 2-3 days. Once dispatched, a tracking ID is shared via email and SMS. Cartly is not responsible for delays caused by courier partners, natural disasters, or government restrictions.",
+    "clause": "§2.1 — Shipping & Delivery Timelines"
+  },
+  {
+    "id": "POL-007",
+    "category": "exchange",
+    "keywords": ["exchange", "replace", "replacement", "swap", "different size", "wrong size", "wrong colour", "different colour", "size exchange", "colour exchange", "want another"],
+    "title": "Exchange & Replacement Policy",
+    "text": "Cartly allows product exchanges for non-electronic items within 30 days of delivery for size, colour, or model variants of the same product, subject to availability. To initiate an exchange, the original item must be returned in unused condition with original packaging. Exchange shipping is free for the first exchange request per order. For electronics, exchanges are only permitted for manufacturing defects (Dead on Arrival) within 7 days. Exchanges are processed within 5-7 business days after the original item is received.",
+    "clause": "§3.5 — Exchange & Replacement Guidelines"
+  },
+  {
+    "id": "POL-008",
+    "category": "warranty",
+    "keywords": ["warranty", "guarantee", "manufacturer warranty", "brand warranty", "after sales", "repair", "service centre", "warranty claim", "warranty period"],
+    "title": "Warranty Policy",
+    "text": "All electronics sold on Cartly carry the manufacturer's warranty as stated in the product listing. Cartly does not offer an additional warranty beyond the manufacturer's warranty. To claim warranty, customers must contact the brand's authorised service centre with proof of purchase. Cartly will provide purchase invoices upon request to assist with warranty claims. Warranty covers manufacturing defects only and does not cover physical damage, water damage, or improper use. Warranty period varies by product: electronics typically 1 year, appliances 1-2 years, accessories 6 months.",
+    "clause": "§6.1 — Manufacturer Warranty Coverage"
+  },
+  {
+    "id": "POL-009",
+    "category": "payment_cancellation",
+    "keywords": ["cancel", "cancellation", "payment", "refund payment", "payment failed", "payment mode", "upi", "cod", "cash on delivery", "credit card", "debit card", "prepaid", "order cancel", "before delivery"],
+    "title": "Payment & Cancellation Policy",
+    "text": "Orders can be cancelled within 12 hours of placement for a full refund to the original payment method. After 12 hours, cancellation is only possible if the order has not been dispatched. Once dispatched, orders cannot be cancelled — customers must follow the return policy after delivery. For prepaid orders (UPI, card, net banking), refunds are credited within 5-7 business days. For Cash on Delivery (COD) orders, refunds are processed via bank transfer within 7-10 business days after return verification. Failed payment orders are automatically cancelled within 24 hours.",
+    "clause": "§1.3 — Order Cancellation & Payment Refund"
+  },
+  {
+    "id": "POL-010",
+    "category": "returnable_check",
+    "keywords": ["is it returnable", "can i return", "returnable product", "return this", "eligible for return", "return eligible", "return policy for", "can i get refund", "refundable", "non-returnable", "which products"],
+    "title": "Product Return Eligibility Guide",
+    "text": "The following product categories are eligible for return within 30 days: clothing, footwear, home decor, kitchen items, books, toys, sports equipment, beauty & personal care (sealed/unused), stationery. The following are NON-RETURNABLE: electronics (once opened), perishables (food, flowers), digital products (software, gift cards), undergarments, customised/personalised items, hazardous materials, and items marked 'non-returnable' on the product page. Always check the product page for category-specific return eligibility before purchase.",
+    "clause": "§3.3 — Return Eligibility by Category"
   }
 ]

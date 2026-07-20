@@ -20,6 +20,7 @@ from agents.llm_gateway import call_llm, LLMGatewayError
 from agents.refund_agent import RefundAgent
 from agents.delivery_agent import DeliveryAgent
 from agents.complaint_agent import ComplaintAgent
+from agents.product_agent import ProductInquiryAgent
 from agents.safety_critic import SafetyCritic
 from api.schemas import (
     ActionTaken,
@@ -58,6 +59,7 @@ Intent guide:
 - exchange_request: customer wants replacement or exchange of item
 - delivery_inquiry: customer asking about delivery status, tracking, ETA
 - complaint: dissatisfaction, quality issue, bad experience (no specific refund ask)
+- product_inquiry: generic question about a product or policy (no order needed — e.g. is X returnable? what is the warranty?)
 - other: general question, not covered above
 
 Risk tier guide:
@@ -97,19 +99,23 @@ Risk tier guide:
         # ── Step 3: Intent-based routing (threshold gate only for refunds) ─
         intent = triage.intent if triage else "refund_request"
 
-        # ─── 3a. Delivery / status inquiry — skip threshold gate entirely ─
+        # ─── 3a. Product / policy inquiry (no order needed) ───────────────────
+        if intent == "product_inquiry":
+            return self._handle_product_inquiry(request, triage, t_start)
+
+        # ─── 3b. Delivery / status inquiry ───────────────────────────────
         if intent in ("delivery_inquiry", "status_inquiry"):
             return self._handle_delivery(request, triage, t_start)
 
-        # ─── 3b. Exchange request — skip threshold gate ───────────────────
+        # ─── 3c. Exchange request ───────────────────────────────────────
         if intent == "exchange_request":
             return self._handle_complaint(request, triage, t_start, intent)
 
-        # ─── 3c. Complaint / other — skip threshold gate ──────────────────
+        # ─── 3d. Complaint / other ───────────────────────────────────────
         if intent in ("complaint", "other"):
             return self._handle_complaint(request, triage, t_start, intent)
 
-        # ─── 3d. Refund request — apply threshold gate (FR5) ─────────────
+        # ─── 3e. Refund request — apply threshold gate (FR5) ─────────────
         t_gate = time.monotonic()
         over_threshold = request.claimed_amount > THRESHOLD_AMOUNT
         gate_latency = (time.monotonic() - t_gate) * 1000
@@ -218,6 +224,25 @@ Risk tier guide:
         )
 
     # ── Delivery handler ──────────────────────────────────────────────────
+
+    def _handle_product_inquiry(self, request: TicketRequest, triage, t_start: float) -> ResolutionResponse:
+        agent = ProductInquiryAgent()
+        result = agent.resolve(ticket_id=self.ticket_id, raw_query=request.raw_ticket)
+        total_latency = (time.monotonic() - t_start) * 1000
+        log_event(self.ticket_id, step="orchestrator_verdict", latency_ms=total_latency,
+                  cost_tokens=0, decision="RESOLVED — info_provided (product_inquiry)",
+                  metadata={"source_refs": result.source_refs})
+        events = read_events(self.ticket_id)
+        trace = [ObsStep(step=e["step"], latency_ms=e["latency_ms"], cost_tokens=e["cost_tokens"],
+                         decision=e.get("decision"), metadata=e.get("metadata", {})) for e in events]
+        return ResolutionResponse(
+            ticket_id=self.ticket_id, status=ResolutionStatus.resolved,
+            resolution=ResolutionDetail(eligible=False, action_taken=ActionTaken.info_provided,
+                reason=result.draft_response, source_refs=result.source_refs,
+                transaction_ref=None, faithfulness_score=None),
+            trace=trace, total_latency_ms=total_latency,
+            total_cost_tokens=sum(e["cost_tokens"] for e in events),
+        )
 
     def _handle_delivery(self, request: TicketRequest, triage, t_start: float) -> ResolutionResponse:
         agent = DeliveryAgent()
