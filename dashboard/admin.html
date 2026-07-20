@@ -22,42 +22,45 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .tnav-btn{font-size:13px;font-weight:500;color:rgba(255,255,255,.45);padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s}
 .tnav-btn:hover{color:#fff;background:rgba(255,255,255,.07)}
 /* Live support */
-.live-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:0 5px;margin-left:auto;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
-.live-panel{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;margin-bottom:24px}
-.live-panel-t{font-size:16px;font-weight:700;color:#f1f5f9;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.live-ticket-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid rgba(255,255,255,.07);border-radius:11px;cursor:pointer;transition:all .15s;margin-bottom:8px;background:rgba(255,255,255,.03)}
-.live-ticket-row:hover{border-color:rgba(99,102,241,.5);background:rgba(99,102,241,.07)}
-.live-ticket-row.selected{border-color:#6366f1;background:rgba(99,102,241,.12)}
-.lt-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.lt-name{font-size:14px;font-weight:600;color:#f1f5f9}
-.lt-sub{font-size:12px;color:rgba(255,255,255,.4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
-.lt-status{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px}
-.lt-status.waiting{background:rgba(245,158,11,.15);color:#fbbf24}
-.lt-status.active{background:rgba(34,197,94,.15);color:#4ade80}
-.lt-wait{font-size:11px;color:rgba(255,255,255,.3);margin-left:8px;white-space:nowrap}
-.admin-chat-pane{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:480px}
-.admin-chat-hd{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
-.admin-chat-name{font-size:14px;font-weight:700;color:#f1f5f9}
-.admin-chat-sub{font-size:12px;color:rgba(255,255,255,.4)}
-.admin-chat-resolve{margin-left:auto;padding:6px 14px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#4ade80;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
-.admin-chat-resolve:hover{background:rgba(34,197,94,.25)}
-.admin-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+/* Live support badge */
+.live-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;border-radius:9px;background:#ef4444;color:#fff;font-size:10px;font-weight:800;padding:0 5px;margin-left:auto;animation:pulse-badge 2s ease-in-out infinite}
+@keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:.55}}
+/* Live Support — light main area theme */
+.live-panel{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;margin-bottom:0;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.live-panel-t{font-size:16px;font-weight:700;color:#0f172a;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.live-ticket-row{display:flex;align-items:center;gap:12px;padding:13px 16px;border:1px solid #e2e8f0;border-radius:11px;cursor:pointer;transition:all .15s;margin-bottom:8px;background:#f8fafc}
+.live-ticket-row:hover{border-color:#6366f1;background:#eef2ff}
+.live-ticket-row.selected{border-color:#6366f1;background:#eef2ff}
+.lt-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#8b5cf6);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:#fff;font-weight:700}
+.lt-name{font-size:14px;font-weight:600;color:#0f172a}
+.lt-sub{font-size:12px;color:#64748b;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.lt-status{margin-left:auto;font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;white-space:nowrap}
+.lt-status.waiting{background:#fffbeb;color:#b45309;border:1px solid #fde68a}
+.lt-status.active{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0}
+.lt-wait{font-size:11px;color:#94a3b8;margin-left:8px;white-space:nowrap}
+.admin-chat-pane{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;height:520px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.admin-chat-hd{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;background:#fff}
+.admin-chat-name{font-size:14px;font-weight:700;color:#0f172a}
+.admin-chat-sub{font-size:12px;color:#64748b}
+.admin-chat-resolve{margin-left:auto;padding:6px 14px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.admin-chat-resolve:hover:not(:disabled){background:#dcfce7}
+.admin-chat-resolve:disabled{opacity:.5;cursor:not-allowed}
+.admin-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#f8fafc}
 .admin-msgs::-webkit-scrollbar{width:4px}
-.admin-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+.admin-msgs::-webkit-scrollbar-thumb{background:#cbd5e1}
 .admin-bubble{padding:9px 13px;border-radius:11px;font-size:13px;line-height:1.5;max-width:78%;word-wrap:break-word}
-.admin-bubble.from-user{background:rgba(255,255,255,.06);color:#e2e8f0;align-self:flex-start}
+.admin-bubble.from-user{background:#fff;color:#1e293b;border:1px solid #e2e8f0;align-self:flex-start}
 .admin-bubble.from-admin{background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;align-self:flex-end}
 .admin-bubble-wrap{display:flex;flex-direction:column}
 .admin-bubble-wrap.user-wrap{align-items:flex-start}
 .admin-bubble-wrap.admin-wrap{align-items:flex-end}
-.admin-bubble-meta{font-size:10px;color:rgba(255,255,255,.3);margin-top:3px;padding:0 3px}
-.admin-inp-row{border-top:1px solid rgba(255,255,255,.08);padding:12px 14px;display:flex;gap:9px;align-items:flex-end}
-.admin-ta{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:#f1f5f9;padding:9px 13px;font-size:13px;font-family:inherit;resize:none;line-height:1.5;min-height:36px;max-height:100px;transition:border .15s}
-.admin-ta:focus{outline:none;border-color:rgba(99,102,241,.5)}
+.admin-bubble-meta{font-size:10px;color:#94a3b8;margin-top:3px;padding:0 3px}
+.admin-inp-row{border-top:1px solid #f1f5f9;padding:12px 14px;display:flex;gap:9px;align-items:flex-end;background:#fff}
+.admin-ta{flex:1;background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:9px;color:#0f172a;padding:9px 13px;font-size:13px;font-family:inherit;resize:none;line-height:1.5;min-height:36px;max-height:100px;transition:border .15s}
+.admin-ta:focus{outline:none;border-color:#6366f1;background:#fff}
 .admin-send-btn{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#1d4ed8,#4f46e5);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:opacity .15s}
 .admin-send-btn:hover{opacity:.85}
-.no-live-msg{text-align:center;padding:40px 20px;color:rgba(255,255,255,.3);font-size:14px}
+.no-live-msg{text-align:center;padding:40px 20px;color:#94a3b8;font-size:14px}
 .tnav-div{width:1px;height:22px;background:rgba(255,255,255,.08)}
 
 /* ── ADMIN LAYOUT ── */
@@ -208,13 +211,13 @@ tbody tr:last-child td{border:none}
     <!-- Sidebar -->
     <aside class="sb">
       <div class="sb-sec">Overview</div>
-      <div class="sb-item active"><span class="sb-ic">📊</span> Dashboard</div>
-      <div class="sb-item" onclick="scrollToId('tickets-section')"><span class="sb-ic">🎫</span> Tickets</div>
+      <div class="sb-item active" id="sb-dashboard" onclick="showSection('dashboard')"><span class="sb-ic">📊</span> Dashboard</div>
+      <div class="sb-item" id="sb-tickets" onclick="showSection('dashboard');scrollToId('tickets-section')"><span class="sb-ic">🎫</span> Tickets</div>
       <div class="sb-sec">Analytics</div>
-      <div class="sb-item" onclick="scrollToId('charts-section')"><span class="sb-ic">📈</span> Charts</div>
-      <div class="sb-item" onclick="scrollToId('fr-section')"><span class="sb-ic">✅</span> FR Coverage</div>
+      <div class="sb-item" id="sb-charts" onclick="showSection('dashboard');scrollToId('charts-section')"><span class="sb-ic">📈</span> Charts</div>
+      <div class="sb-item" id="sb-fr" onclick="showSection('dashboard');scrollToId('fr-section')"><span class="sb-ic">✅</span> FR Coverage</div>
       <div class="sb-sec">Live Support</div>
-      <div class="sb-item" id="sb-live" onclick="showLiveSupport()">
+      <div class="sb-item" id="sb-live" onclick="showSection('live')">
         <span class="sb-ic">📞</span> Live Chats
         <span id="live-badge" class="live-badge hidden">0</span>
       </div>
@@ -407,13 +410,39 @@ let _adminLastMsgCount = 0;
 let _ticketPollTimer = null;
 let _chatPollTimer  = null;
 
-function showLiveSupport() {
-  // Hide all sections, show live section
-  document.querySelectorAll('.main > *').forEach(el => el.classList.add('hidden'));
-  const sec = document.getElementById('live-support-section');
-  if (sec) { sec.classList.remove('hidden'); }
-  startTicketPolling();
+// ── SECTION NAVIGATION ────────────────────────────────────────────────────
+const DASHBOARD_IDS = ['stats-section','charts-section-wrap','fr-section-wrap','tickets-section'];
+
+function showSection(name) {
+  // Update sidebar active state
+  const sidebarMap = {
+    dashboard: ['sb-dashboard','sb-tickets','sb-charts','sb-fr'],
+    live:      ['sb-live'],
+  };
+  document.querySelectorAll('.sb-item').forEach(el => el.classList.remove('active'));
+  (sidebarMap[name] || []).forEach(id => document.getElementById(id)?.classList.add('active'));
+
+  if (name === 'live') {
+    // Hide dashboard content, show live panel
+    document.querySelectorAll('.main > *').forEach(el => el.classList.add('hidden'));
+    const sec = document.getElementById('live-support-section');
+    if (sec) sec.classList.remove('hidden');
+    startTicketPolling();
+  } else {
+    // Show dashboard content, hide live panel
+    document.getElementById('live-support-section')?.classList.add('hidden');
+    // Restore all main children that aren't the live panel
+    document.querySelectorAll('.main > *').forEach(el => {
+      if (el.id !== 'live-support-section') el.classList.remove('hidden');
+    });
+    // Reload stats if they still show dashes
+    const totalEl = document.getElementById('stat-total');
+    if (!totalEl || totalEl.textContent === '—') refreshAll();
+  }
 }
+
+// Legacy alias so old calls still work
+function showLiveSupport() { showSection('live'); }
 
 function startTicketPolling() {
   clearInterval(_ticketPollTimer);

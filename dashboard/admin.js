@@ -93,21 +93,22 @@ function renderStats(data) {
   const rate = data.resolution_rate != null
     ? (data.resolution_rate * 100).toFixed(1) + '%'
     : '—';
-
-  document.getElementById('val-total').textContent     = data.total_tickets;
-  document.getElementById('val-resolved').textContent  = rate;
-  document.getElementById('sub-resolved').textContent  = `${data.resolved} resolved`;
-  document.getElementById('val-escalated').textContent = data.escalated;
-  document.getElementById('sub-escalated').textContent = `of ${data.total_tickets} tickets`;
-  document.getElementById('val-latency').textContent   = formatMs(data.avg_latency_ms || 0);
-  document.getElementById('val-tokens').textContent    = data.total_tokens
+  const tokens = data.total_tokens
     ? (data.total_tokens >= 1000 ? (data.total_tokens / 1000).toFixed(1) + 'K' : data.total_tokens)
     : '—';
+
+  // IDs match admin.html stat card elements
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('stat-total',     data.total_tickets ?? '—');
+  set('stat-rate',      rate);
+  set('stat-latency',   formatMs(data.avg_latency_ms || 0));
+  set('stat-tokens',    tokens);
+  set('stat-escalated', data.escalated ?? '—');
 }
 
 function showStatsError(detail) {
-  ['val-total','val-resolved','val-escalated','val-latency','val-tokens']
-    .forEach(id => document.getElementById(id).textContent = '—');
+  ['stat-total','stat-rate','stat-latency','stat-tokens','stat-escalated']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
 }
 
 // ── Charts ────────────────────────────────────────────────────────────────
