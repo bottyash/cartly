@@ -34,3 +34,6 @@ observability/logs/*.json
 .pytest_cache/
 .coverage
 htmlcov/
+
+# QA Reports (internal, not for public repository)
+Docs/QATest/
