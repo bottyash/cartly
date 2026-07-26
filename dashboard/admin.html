@@ -452,7 +452,9 @@ function startTicketPolling() {
 
 async function pollLiveTickets() {
   try {
-    const r = await fetch(`${LIVE_API}/live/tickets`);
+    const r = await fetch(`${LIVE_API}/live/tickets`, {
+      headers: { 'X-Admin-Token': ADMIN_TOKEN }
+    });
     if (!r.ok) return;
     const d = await r.json();
     _liveTickets = d.tickets || [];
@@ -502,7 +504,9 @@ async function openAdminChat(ticketId) {
 async function loadAdminChat() {
   if (!_selectedTicketId) return;
   try {
-    const r = await fetch(`${LIVE_API}/live/${_selectedTicketId}`);
+    const r = await fetch(`${LIVE_API}/live/${_selectedTicketId}`, {
+      headers: { 'X-Admin-Token': ADMIN_TOKEN }
+    });
     if (!r.ok) return;
     const ticket = await r.json();
 
@@ -572,7 +576,10 @@ async function adminResolve() {
   if (!_selectedTicketId) return;
   if (!confirm('Mark this ticket as resolved? The user\'s chat will be closed.')) return;
   try {
-    await fetch(`${LIVE_API}/live/${_selectedTicketId}/resolve`, { method: 'PATCH' });
+    await fetch(`${LIVE_API}/live/${_selectedTicketId}/resolve`, {
+      method: 'PATCH',
+      headers: { 'X-Admin-Token': ADMIN_TOKEN }
+    });
     _adminLastMsgCount = 0;
     await loadAdminChat();
     await pollLiveTickets();
