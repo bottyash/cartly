@@ -32,6 +32,13 @@ cd /home/ubuntu
 git clone https://github.com/bottyash/cartly.git
 cd cartly
 
+# ── 3a. Get this instance's public IP via IMDSv2 ─────────────────
+EC2_PUBLIC_IP=$(curl -sf \
+  -H "X-aws-ec2-metadata-token: $(curl -sf -X PUT \
+    'http://169.254.169.254/latest/api/token' \
+    -H 'X-aws-ec2-metadata-token-ttl-seconds: 21600')" \
+  http://169.254.169.254/latest/meta-data/public-ipv4 || echo '0.0.0.0')
+
 # ── 4. Create .env ────────────────────────────────────────────────
 # !! FILL IN YOUR VALUES BELOW !!
 cat > .env << 'ENVEOF'
@@ -39,7 +46,7 @@ cat > .env << 'ENVEOF'
 OPENROUTER_API_KEY=sk-or-v1-PASTE_YOUR_KEY_HERE
 OPENROUTER_MODEL=meta-llama/llama-3.2-3b-instruct
 OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
-OPENROUTER_SITE_URL=http://YOUR_EC2_PUBLIC_IP:3000
+OPENROUTER_SITE_URL=http://${EC2_PUBLIC_IP}
 OPENROUTER_SITE_NAME=Cartly
 
 # PostgreSQL
@@ -67,8 +74,8 @@ THRESHOLD_AMOUNT=500
 FAITHFULNESS_FLOOR=0.70
 
 # CORS
-APP_URL=http://YOUR_EC2_PUBLIC_IP:3000
-ALLOWED_ORIGINS=http://YOUR_EC2_PUBLIC_IP:3000,http://YOUR_EC2_PUBLIC_IP:8000
+APP_URL=http://${EC2_PUBLIC_IP}
+ALLOWED_ORIGINS=http://${EC2_PUBLIC_IP},http://${EC2_PUBLIC_IP}:8000,http://${EC2_PUBLIC_IP}:3000
 ENVEOF
 
 # ── 5. Fix ownership ──────────────────────────────────────────────
@@ -82,5 +89,6 @@ sudo -u ubuntu bash -c "
 "
 
 echo "=== Bootstrap Complete: $(date) ==="
-echo "Dashboard: http://\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):3000"
-echo "API:       http://\$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4):8000/docs"
+echo "Dashboard: http://${EC2_PUBLIC_IP}  (port 80)"
+echo "Dashboard: http://${EC2_PUBLIC_IP}:3000  (alt port)"
+echo "API:       http://${EC2_PUBLIC_IP}:8000/docs"

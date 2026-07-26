@@ -38,5 +38,6 @@ REMOTE
 
 echo ""
 echo "✅ Deployment complete!"
-echo "   Dashboard: http://$EC2_HOST:3000"
+echo "   Dashboard: http://$EC2_HOST  (port 80)"
+echo "   Dashboard: http://$EC2_HOST:3000  (alt)"
 echo "   API:       http://$EC2_HOST:8000/docs"

@@ -50,8 +50,8 @@ SG_ID=$(aws ec2 create-security-group \
 
 echo "  Security Group: $SG_ID"
 
-# Open ports: 22 (SSH), 3000 (Dashboard), 8000 (API)
-for PORT in 22 3000 8000; do
+# Open ports: 22 (SSH), 80 (HTTP), 3000 (Dashboard alt), 8000 (API)
+for PORT in 22 80 3000 8000; do
   aws ec2 authorize-security-group-ingress \
     --group-id "$SG_ID" \
     --protocol tcp \

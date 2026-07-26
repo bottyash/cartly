@@ -3,7 +3,9 @@
 ────────────────────────────────────────────────────────────── */
 'use strict';
 
-const API_BASE = 'http://localhost:8000';
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:8000'
+  : `${window.location.protocol}//${window.location.hostname}:8000`;
 
 function goCustomer() {
   window.location.href = 'user.html';
