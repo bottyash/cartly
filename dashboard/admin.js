@@ -82,7 +82,9 @@ async function loadTickets() {
   try {
     const r = await fetch(`${API_BASE}/admin/tickets`, { headers: adminHeaders() });
     if (!r.ok) { renderTableError(r.status); return; }
-    allTickets = await r.json();
+    const data = await r.json();
+    // API returns either an array directly or { tickets: [...] }
+    allTickets = Array.isArray(data) ? data : (data.tickets || []);
     renderTable(allTickets);
   } catch (err) {
     renderTableError(err.message);
@@ -434,9 +436,12 @@ document.addEventListener('keydown', e => {
 });
 
 // ── Init ──────────────────────────────────────────────────────────────────
-
+// NOTE: loadDashboard() is intentionally NOT called here.
+// It is called by initDashboard(token) only after a valid admin token is set.
+// Calling it here would fire with an empty token → silent 401 → blank dashboard.
 document.addEventListener('DOMContentLoaded', () => {
   checkHealth();
-  loadDashboard();
-  setInterval(() => { checkHealth(); loadDashboard(); }, 30_000);
+  setInterval(() => { checkHealth(); }, 30_000);
+  // Periodic refresh only runs if a token is set
+  setInterval(() => { if (ADMIN_TOKEN) loadDashboard(); }, 30_000);
 });
