@@ -120,8 +120,8 @@ function showStatsError(detail) {
 function renderCharts(data) {
   renderDonut(data);
   renderVolumeBar(data.tickets_by_day || {});
-  renderLatencyLine(data.avg_latency_by_day || {});
-  renderTriggersBar(data.escalation_triggers || {});
+  renderEscTriggers(data.escalation_triggers || {});
+  renderFRCoverageChart(data);
 }
 
 function mkChart(id, config) {
@@ -166,22 +166,19 @@ function renderDonut(data) {
     },
   });
 
-  // Legend
-  document.getElementById('donut-legend').innerHTML = `
-    <div class="legend-item"><div class="legend-dot" style="background:${CHART_COLORS.green}"></div>Resolved — ${pctR}%</div>
-    <div class="legend-item"><div class="legend-dot" style="background:${CHART_COLORS.amber}"></div>Escalated — ${pctE}%</div>
-  `;
+  // No separate legend element needed — tooltip handles it
 }
 
-// Daily volume bar
+// Daily volume bar — canvas ID: chart-daily (matches admin.html)
 function renderVolumeBar(byDay) {
-  const labels = Object.keys(byDay).slice(-7).map(d => {
+  const entries = Object.entries(byDay).slice(-14);
+  const labels = entries.map(([d]) => {
     const dt = new Date(d);
     return dt.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
   });
-  const values = Object.values(byDay).slice(-7);
+  const values = entries.map(([, v]) => v);
 
-  mkChart('chart-volume', {
+  mkChart('chart-daily', {
     type: 'bar',
     data: {
       labels,
@@ -240,35 +237,53 @@ function renderLatencyLine(byDay) {
   });
 }
 
-// Escalation triggers horizontal bar
-function renderTriggersBar(triggers) {
-  const TRIGGER_LABELS = {
-    threshold:        'Threshold (>₹500)',
-    critic_rejection: 'Critic Rejected',
-    hard_trigger:     'Hard Trigger',
-  };
-  const TRIGGER_COLORS = {
-    threshold:        CHART_COLORS.amber,
-    critic_rejection: CHART_COLORS.red,
-    hard_trigger:     CHART_COLORS.purple,
-  };
+// Escalation triggers — populate text cards (esc-threshold / esc-critic / esc-hard)
+function renderEscTriggers(triggers) {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val ?? '0'; };
+  set('esc-threshold', triggers.threshold        ?? 0);
+  set('esc-critic',    triggers.critic_rejection ?? 0);
+  set('esc-hard',      triggers.hard_trigger     ?? 0);
+}
 
-  const labels = Object.keys(triggers).map(k => TRIGGER_LABELS[k] || k);
-  const values = Object.values(triggers);
-  const colors = Object.keys(triggers).map(k => (TRIGGER_COLORS[k] || CHART_COLORS.blue) + 'bb');
+// FR Coverage — use chart-fr canvas that exists in the HTML
+function renderFRCoverageChart(data) {
+  // Try container-based bars first, fallback to chart-fr canvas
+  const container = document.getElementById('fr-coverage-row');
+  if (container && data.fr_coverage) {
+    const FR_DESC = {
+      FR1:'Intent classification', FR2:'Order lookup',
+      FR3:'Policy citation',       FR4:'Auto-resolve ≤₹500',
+      FR5:'Threshold gate',        FR6:'Safety critic',
+      FR7:'Policy trap → reject',  FR8:'Full observability',
+    };
+    const maxVal = Math.max(...Object.values(data.fr_coverage), 1);
+    container.innerHTML = Object.entries(data.fr_coverage).map(([fr, count]) => {
+      const pct = Math.round((count / maxVal) * 100);
+      return `<div class="fr-bar" title="${FR_DESC[fr]||fr}">
+        <div class="fr-bar-label">${fr}</div>
+        <div class="fr-bar-track"><div class="fr-bar-fill" style="height:${pct}%"></div></div>
+        <div class="fr-bar-count">${count}</div></div>`;
+    }).join('');
+    return;
+  }
 
-  mkChart('chart-triggers', {
+  // Fallback: draw a horizontal bar chart on chart-fr canvas
+  const triggers = data.escalation_triggers || {};
+  const labels = ['Threshold', 'Critic Reject', 'Hard Trigger'];
+  const values = [
+    triggers.threshold        || 0,
+    triggers.critic_rejection || 0,
+    triggers.hard_trigger     || 0,
+  ];
+  const colors = [CHART_COLORS.amber, CHART_COLORS.red, CHART_COLORS.purple];
+
+  mkChart('chart-fr', {
     type: 'bar',
     data: {
       labels,
-      datasets: [{
-        label: 'Count',
-        data: values,
-        backgroundColor: colors,
-        borderColor: colors.map(c => c.slice(0, -2)),
-        borderWidth: 1.5,
-        borderRadius: 4,
-      }],
+      datasets: [{ label: 'Count', data: values,
+        backgroundColor: colors.map(c => c + 'bb'),
+        borderColor: colors, borderWidth: 1.5, borderRadius: 4 }],
     },
     options: {
       indexAxis: 'y',
@@ -281,37 +296,12 @@ function renderTriggersBar(triggers) {
     },
   });
 }
-
-// FR Coverage bars
-function renderFRCoverage(frCoverage) {
-  const container = document.getElementById('fr-coverage-row');
-  if (!container) return;
-
-  const FR_DESC = {
-    FR1: 'Intent classification',
-    FR2: 'Order lookup',
-    FR3: 'Policy citation',
-    FR4: 'Auto-resolve ≤₹500',
-    FR5: 'Threshold gate',
-    FR6: 'Safety critic',
-    FR7: 'Policy trap → reject',
-    FR8: 'Full observability',
-  };
-
-  const maxVal = Math.max(...Object.values(frCoverage), 1);
-
-  container.innerHTML = Object.entries(frCoverage).map(([fr, count]) => {
-    const pct = Math.round((count / maxVal) * 100);
-    return `
-      <div class="fr-bar" title="${FR_DESC[fr] || fr}">
-        <div class="fr-bar-label">${fr}</div>
-        <div class="fr-bar-track">
-          <div class="fr-bar-fill" style="height:${pct}%"></div>
-        </div>
-        <div class="fr-bar-count">${count}</div>
-      </div>`;
-  }).join('');
+    },
+  });
 }
+
+// Legacy function kept for compatibility
+function renderFRCoverage(frCoverage) { /* handled by renderFRCoverageChart */ }
 
 // ── Ticket table ──────────────────────────────────────────────────────────
 
