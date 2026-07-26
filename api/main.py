@@ -32,8 +32,9 @@ import os
 import uuid
 from pathlib import Path
 
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from api.schemas import (
     AdminStatsResponse,
@@ -84,7 +85,37 @@ def _require_admin(x_admin_token: str | None = Header(default=None)) -> None:
 
 @app.get("/health", tags=["meta"])
 def health():
-    return {"status": "ok", "service": "cartly-api", "version": "1.0.0"}
+    """Liveness + DB readiness probe."""
+    try:
+        from data.mock_db import order_lookup as _probe
+        _probe("__health_check__")   # always returns None; errors if DB is down
+        db_status = "ok"
+    except Exception as exc:
+        db_status = f"error: {str(exc)[:80]}"
+    status = "ok" if db_status == "ok" else "degraded"
+    if status != "ok":
+        from fastapi.responses import JSONResponse
+        return JSONResponse(
+            status_code=503,
+            content={"status": status, "db": db_status, "service": "cartly-api", "version": "1.0.0"},
+        )
+    return {"status": "ok", "db": "ok", "service": "cartly-api", "version": "1.0.0"}
+
+
+# ── Global DB exception handler ────────────────────────────────────────────
+
+@app.exception_handler(RuntimeError)
+async def runtime_error_handler(request: Request, exc: RuntimeError):
+    """F-10: DB failures surface as 503 with a human-readable message."""
+    if "DB" in str(exc) or "psycopg" in str(exc).lower():
+        return JSONResponse(
+            status_code=503,
+            content={
+                "detail": "The database is temporarily unavailable. Your request has been escalated for human review.",
+                "escalated": True,
+            },
+        )
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
 
 
 # ──────────────────────────────────────────────
@@ -114,7 +145,9 @@ def get_log(ticket_id: str):
 
 
 @app.get("/tickets", tags=["tickets"])
-def list_tickets():
+def list_tickets(x_admin_token: str | None = Header(default=None)):
+    # F-22: require admin token — ticket list reveals resolution status
+    _require_admin(x_admin_token)
     logs = sorted(LOG_DIR.glob("TKT-*.json"), key=lambda p: p.stat().st_mtime, reverse=True)[:50]
     summaries = []
     for log_path in logs:
@@ -146,15 +179,19 @@ def get_order(
     order = order_lookup(order_id)
     if not order:
         raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
-    # Ownership check: supports first-name ("Rahul") or full-name ("Rahul Mehta")
-    if x_buyer_name:
-        db_name = order.get("buyer_name", "").strip().lower()
-        query   = x_buyer_name.strip().lower()
-        if db_name != query and not db_name.startswith(query + " "):
-            raise HTTPException(
-                status_code=403,
-                detail="Access denied: this order does not belong to your account."
-            )
+    # F-04: X-Buyer-Name is now mandatory — omitting it returns 401
+    if not x_buyer_name or not x_buyer_name.strip():
+        raise HTTPException(
+            status_code=401,
+            detail="X-Buyer-Name header is required to access order details.",
+        )
+    db_name = order.get("buyer_name", "").strip().lower()
+    query   = x_buyer_name.strip().lower()
+    if db_name != query and not db_name.startswith(query + " "):
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied: this order does not belong to your account."
+        )
     return order
 
 
@@ -367,12 +404,21 @@ def admin_stats(x_admin_token: str | None = Header(default=None)):
         except Exception:
             pass
 
+    sorted_lats = sorted(latencies)
+    def _percentile(data: list[float], p: float) -> float:
+        if not data:
+            return 0.0
+        idx = int(len(data) * p / 100)
+        return round(data[min(idx, len(data) - 1)], 1)
+
     return AdminStatsResponse(
         total_tickets=total,
         resolved=resolved,
         escalated=escalated,
         resolution_rate=round(resolved / total, 3) if total else 0.0,
         avg_latency_ms=round(sum(latencies) / len(latencies), 1) if latencies else 0.0,
+        p95_latency_ms=_percentile(sorted_lats, 95),
+        p99_latency_ms=_percentile(sorted_lats, 99),
         total_tokens=total_tokens,
         escalation_triggers=triggers,
         tickets_by_day=tickets_by_day,
@@ -385,23 +431,29 @@ def admin_stats(x_admin_token: str | None = Header(default=None)):
 # LIVE CHAT  —  human-agent endpoints
 # ──────────────────────────────────────────────
 
-from pydantic import BaseModel as _BM
+from pydantic import BaseModel as _BM, Field as _Field
+from typing import Literal
 
 class LiveConnectRequest(_BM):
-    order_id:      str
+    order_id:      str = _Field(..., max_length=20,  # F-16: VARCHAR(20) DB constraint
+                                description="Order ID (max 20 chars)")
     buyer_name:    str
     product_name:  str = ""
     issue_summary: str = "Customer requested human support"
 
 class LiveMessageRequest(_BM):
-    sender:      str        # 'user' | 'admin'
+    sender:      Literal["user", "admin"]   # F-17: restricted to valid values
     sender_name: str
-    message:     str
+    message:     str = _Field(..., min_length=1)   # F-19: no empty messages
 
 
 @app.post("/live/connect", tags=["live"])
 def live_connect(req: LiveConnectRequest):
     """User opens a live-chat ticket requesting a human agent."""
+    # F-18: reject phantom order IDs
+    if req.order_id != "WALK_IN" and not order_lookup(req.order_id):
+        raise HTTPException(status_code=404,
+                            detail=f"Order '{req.order_id}' not found. Please check your order ID.")
     ticket = create_live_ticket(
         order_id=req.order_id,
         buyer_name=req.buyer_name,
@@ -412,8 +464,12 @@ def live_connect(req: LiveConnectRequest):
 
 
 @app.get("/live/tickets", tags=["live"])
-def live_tickets(status: str | None = None):
+def live_tickets(
+    status: str | None = None,
+    x_admin_token: str | None = Header(default=None),
+):
     """Admin: list all active/waiting live tickets."""
+    _require_admin(x_admin_token)   # F-05
     return {"tickets": get_live_tickets(status)}
 
 
@@ -442,8 +498,12 @@ def live_send_message(ticket_id: int, req: LiveMessageRequest):
 
 
 @app.patch("/live/{ticket_id}/resolve", tags=["live"])
-def live_resolve(ticket_id: int):
+def live_resolve(
+    ticket_id: int,
+    x_admin_token: str | None = Header(default=None),
+):
     """Admin resolves a live ticket."""
+    _require_admin(x_admin_token)   # F-05
     ok = resolve_live_ticket(ticket_id)
     if not ok:
         raise HTTPException(status_code=404, detail="Live ticket not found")

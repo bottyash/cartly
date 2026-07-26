@@ -131,7 +131,7 @@ Respond ONLY with valid JSON:
                 source_refs=source_refs,
             )
 
-        except (LLMGatewayError, Exception) as exc:
+        except Exception as exc:   # F-29: LLMGatewayError is-a Exception
             log_event(
                 ticket_id,
                 step="product_agent_llm",

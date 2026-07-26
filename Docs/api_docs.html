@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cartly API Documentation v1.0.0</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    :root {
+      --bg: #0d0f1a;
+      --surface: #151829;
+      --surface2: #1c2035;
+      --border: #2a3050;
+      --accent: #6c63ff;
+      --accent2: #00d4aa;
+      --accent3: #ff6b6b;
+      --accent4: #ffd166;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --code-bg: #0a0c17;
+      --get: #00d4aa;
+      --post: #6c63ff;
+      --patch: #ffd166;
+      --delete: #ff6b6b;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .cover {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0d0f1a 0%, #1a1040 50%, #0d1a2a 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 60px 40px;
+      position: relative;
+      page-break-after: always;
+    }
+
+    .cover::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 600px 400px at 20% 30%, rgba(108,99,255,0.15) 0%, transparent 70%),
+        radial-gradient(ellipse 500px 300px at 80% 70%, rgba(0,212,170,0.1) 0%, transparent 70%);
+    }
+
+    .cover-inner { position: relative; z-index: 1; }
+
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(108,99,255,0.15);
+      border: 1px solid rgba(108,99,255,0.4);
+      border-radius: 50px;
+      padding: 8px 20px;
+      margin-bottom: 32px;
+    }
+
+    .logo-badge span { font-size: 20px; }
+    .logo-badge strong { font-size: 14px; color: #a89cff; letter-spacing: 1px; text-transform: uppercase; }
+
+    .cover h1 {
+      font-size: 56px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #a89cff 50%, #00d4aa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+    }
+
+    .cover .tagline {
+      font-size: 20px;
+      color: var(--muted);
+      margin-bottom: 48px;
+      font-weight: 300;
+    }
+
+    .cover-meta {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .cover-meta-item { text-align: center; }
+    .cover-meta-item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 4px; }
+    .cover-meta-item .value { font-size: 16px; font-weight: 600; color: var(--text); }
+
+    .cover-divider {
+      width: 80px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      margin: 0 auto 48px;
+    }
+
+    .cover-team {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px 40px;
+      display: inline-block;
+    }
+
+    .cover-team .team-label { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; }
+    .cover-team .team-names { font-size: 15px; color: var(--text); font-weight: 500; }
+
+    .stack-pills { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+    .pill { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; border: 1px solid; }
+    .pill-purple { background: rgba(108,99,255,0.15); border-color: rgba(108,99,255,0.4); color: #a89cff; }
+    .pill-teal   { background: rgba(0,212,170,0.1);  border-color: rgba(0,212,170,0.35); color: #00d4aa; }
+    .pill-yellow { background: rgba(255,209,102,0.1); border-color: rgba(255,209,102,0.35); color: #ffd166; }
+
+    .container { max-width: 900px; margin: 0 auto; padding: 0 40px; }
+
+    .toc-page { padding: 60px 0; page-break-after: always; }
+
+    .section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .section-num { font-size: 12px; font-weight: 600; color: var(--accent); font-family: 'JetBrains Mono', monospace; background: rgba(108,99,255,0.15); padding: 4px 10px; border-radius: 6px; }
+    h2 { font-size: 28px; font-weight: 700; color: var(--text); }
+
+    .toc-list { list-style: none; }
+    .toc-list li { display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(42,48,80,0.5); gap: 12px; }
+    .toc-list li .toc-num { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); min-width: 24px; }
+    .toc-list li .toc-title { flex: 1; font-size: 14px; color: var(--text); }
+    .toc-list li .toc-tag { font-size: 11px; color: var(--muted); font-style: italic; }
+
+    .section { padding: 60px 0; page-break-inside: avoid; }
+    .section + .section { border-top: 1px solid var(--border); }
+
+    h3 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 12px; margin-top: 28px; }
+    h4 { font-size: 14px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; margin-top: 20px; }
+    p { color: var(--muted); margin-bottom: 12px; }
+
+    .arch-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin: 24px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .arch-box .arch-title { color: var(--accent); font-weight: 500; margin-bottom: 16px; font-size: 13px; }
+
+    .endpoint-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 24px; overflow: hidden; page-break-inside: avoid; }
+    .endpoint-header { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+
+    .method-badge { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 6px; min-width: 56px; text-align: center; }
+    .method-get    { background: rgba(0,212,170,0.15);  color: var(--get);  border: 1px solid rgba(0,212,170,0.3); }
+    .method-post   { background: rgba(108,99,255,0.15); color: var(--post); border: 1px solid rgba(108,99,255,0.3); }
+    .method-patch  { background: rgba(255,209,102,0.1); color: var(--patch); border: 1px solid rgba(255,209,102,0.3); }
+
+    .endpoint-path { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text); }
+    .endpoint-tag { margin-left: auto; font-size: 11px; color: var(--muted); background: rgba(255,255,255,0.05); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); }
+    .endpoint-body { padding: 20px; }
+    .endpoint-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 16px; font-size: 13px; }
+    th { background: var(--surface2); color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid rgba(42,48,80,0.5); vertical-align: top; color: var(--text); }
+    td:first-child { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--accent2); }
+    tr:last-child td { border-bottom: none; }
+
+    .required-badge { font-size: 10px; background: rgba(255,107,107,0.15); color: var(--accent3); border: 1px solid rgba(255,107,107,0.3); padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+    .optional-badge { font-size: 10px; background: rgba(136,146,164,0.1); color: var(--muted); border: 1px solid rgba(136,146,164,0.2); padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+
+    pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 16px; overflow-x: auto; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.7; color: #c9d1d9; margin: 10px 0 16px; }
+    pre .key    { color: #79b8ff; }
+    pre .str    { color: #9ecbff; }
+    pre .num    { color: #f8c555; }
+    pre .bool   { color: #f97583; }
+    pre .null   { color: #6a737d; }
+    pre .comment{ color: #6a737d; font-style: italic; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: rgba(255,255,255,0.07); padding: 2px 6px; border-radius: 4px; color: var(--accent2); }
+
+    .status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 12px 0; }
+    .status-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+    .status-code { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+    .s-200 { color: var(--get); }
+    .s-401, .s-403, .s-404, .s-409 { color: var(--accent3); }
+    .s-422 { color: #ff9f43; }
+    .s-503 { color: var(--accent3); }
+    .status-text { font-size: 11px; color: var(--muted); }
+
+    .alert { border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: 13px; display: flex; gap: 12px; align-items: flex-start; }
+    .alert-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+    .alert-info { background: rgba(108,99,255,0.1); border-left: 3px solid var(--accent); color: #c0baf7; }
+    .alert-security { background: rgba(255,107,107,0.08); border-left: 3px solid var(--accent3); color: #f7b8b8; }
+
+    .schema-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin: 14px 0; overflow: hidden; }
+    .schema-header { background: var(--surface2); padding: 12px 18px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--accent); border-bottom: 1px solid var(--border); }
+    .schema-body { padding: 4px 0; }
+    .schema-row { display: grid; grid-template-columns: 160px 100px 1fr; gap: 12px; padding: 8px 18px; border-bottom: 1px solid rgba(42,48,80,0.4); font-size: 12px; }
+    .schema-row:last-child { border-bottom: none; }
+    .schema-field { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+    .schema-type { color: #f97583; font-family: 'JetBrains Mono', monospace; }
+    .schema-desc { color: var(--muted); }
+
+    .enum-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .enum-item { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: rgba(0,212,170,0.1); color: var(--accent2); border: 1px solid rgba(0,212,170,0.25); padding: 4px 10px; border-radius: 6px; }
+
+    .fr-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+    .fr-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+    .fr-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 600; margin-bottom: 4px; }
+    .fr-text { font-size: 11px; color: var(--muted); line-height: 1.5; }
+    .fr-status { font-size: 13px; margin-top: 6px; }
+
+    .env-table td:nth-child(3) { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--patch); }
+
+    .demo-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; display: grid; grid-template-columns: 80px 1fr auto; gap: 16px; align-items: center; }
+    .demo-order-id { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--accent2); }
+    .demo-desc { font-size: 13px; color: var(--muted); }
+    .demo-result { font-size: 12px; padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
+    .result-resolved { background: rgba(0,212,170,0.15); color: var(--get); border: 1px solid rgba(0,212,170,0.3); }
+    .result-threshold { background: rgba(255,209,102,0.1); color: var(--patch); border: 1px solid rgba(255,209,102,0.3); }
+    .result-critic { background: rgba(255,209,102,0.1); color: var(--patch); border: 1px solid rgba(255,209,102,0.3); }
+    .result-hard { background: rgba(255,107,107,0.1); color: var(--delete); border: 1px solid rgba(255,107,107,0.3); }
+
+    .page-break { page-break-after: always; }
+
+    .footer { margin-top: 60px; padding: 32px 40px; border-top: 1px solid var(--border); text-align: center; color: var(--muted); font-size: 12px; }
+
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="logo-badge">
+      <span>&#128722;</span>
+      <strong>Cartly Platform</strong>
+    </div>
+    <h1>API Reference</h1>
+    <p class="tagline">AI-Powered Refund Resolution &mdash; Multi-Agent System</p>
+    <div class="cover-divider"></div>
+    <div class="cover-meta">
+      <div class="cover-meta-item"><div class="label">Version</div><div class="value">v1.0.0</div></div>
+      <div class="cover-meta-item"><div class="label">Base URL</div><div class="value">http://&lt;host&gt;:8000</div></div>
+      <div class="cover-meta-item"><div class="label">Protocol</div><div class="value">REST / JSON</div></div>
+      <div class="cover-meta-item"><div class="label">Sprint Period</div><div class="value">Jun 22 &ndash; Jul 21, 2026</div></div>
+    </div>
+    <div class="stack-pills" style="margin-bottom:40px;">
+      <span class="pill pill-purple">Python 3.10</span>
+      <span class="pill pill-purple">FastAPI</span>
+      <span class="pill pill-teal">OpenRouter (LLaMA-3.2-3B)</span>
+      <span class="pill pill-yellow">PostgreSQL</span>
+      <span class="pill pill-purple">Docker Compose</span>
+      <span class="pill pill-teal">AWS EC2</span>
+    </div>
+    <div class="cover-team">
+      <div class="team-label">Team &mdash; Capstone Project</div>
+      <div class="team-names">Yash Parmar &middot; Hiten Mistry &middot; Avishka Jindal</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-page">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <h2>Table of Contents</h2>
+  </div>
+  <ul class="toc-list">
+    <li><span class="toc-num">01</span><span class="toc-title">Introduction &amp; Architecture</span><span class="toc-tag">Overview</span></li>
+    <li><span class="toc-num">02</span><span class="toc-title">Authentication</span><span class="toc-tag">Security</span></li>
+    <li><span class="toc-num">03</span><span class="toc-title">Schemas &amp; Data Models</span><span class="toc-tag">Pydantic</span></li>
+    <li><span class="toc-num">04</span><span class="toc-title">Tickets &mdash; Submit &amp; Query</span><span class="toc-tag">tickets</span></li>
+    <li><span class="toc-num">05</span><span class="toc-title">Orders &mdash; Buyer Lookup</span><span class="toc-tag">user</span></li>
+    <li><span class="toc-num">06</span><span class="toc-title">Product Catalog</span><span class="toc-tag">catalog</span></li>
+    <li><span class="toc-num">07</span><span class="toc-title">Live Chat &mdash; Human Agent</span><span class="toc-tag">live</span></li>
+    <li><span class="toc-num">08</span><span class="toc-title">Admin Endpoints</span><span class="toc-tag">admin</span></li>
+    <li><span class="toc-num">09</span><span class="toc-title">Observability &amp; Logs</span><span class="toc-tag">observability</span></li>
+    <li><span class="toc-num">10</span><span class="toc-title">Error Reference</span><span class="toc-tag">errors</span></li>
+    <li><span class="toc-num">11</span><span class="toc-title">Environment Configuration</span><span class="toc-tag">config</span></li>
+    <li><span class="toc-num">12</span><span class="toc-title">Demo Data &amp; Quick Start</span><span class="toc-tag">demo</span></li>
+    <li><span class="toc-num">13</span><span class="toc-title">Functional Requirements Coverage</span><span class="toc-tag">FR1&ndash;FR8</span></li>
+  </ul>
+</div>
+
+<!-- 01 INTRODUCTION -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">01</span><h2>Introduction &amp; Architecture</h2></div>
+  <p>Cartly is an <strong style="color:var(--text)">agentic AI system</strong> that autonomously triages, evaluates, and resolves customer refund tickets without human intervention for straightforward cases. It exposes a RESTful HTTP API built with <strong style="color:var(--text)">FastAPI</strong>, backed by a <strong style="color:var(--text)">multi-agent orchestration pipeline</strong> powered by LLaMA-3.2-3B via OpenRouter.</p>
+
+  <h3>Pipeline Overview</h3>
+  <div class="arch-box">
+    <div class="arch-title">// Orchestration Pipeline</div>
+    Customer Request (POST /tickets)<br>
+    &nbsp;&nbsp;&nbsp;|<br>
+    &nbsp;&nbsp;&nbsp;v<br>
+    +-------------------------------------------------------------+<br>
+    |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Orchestrator Agent&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+    |&nbsp;&nbsp;1. Hard-trigger check (legal/fraud keywords)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+    |&nbsp;&nbsp;2. Triage LLM -- intent + risk_tier + category&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+    |&nbsp;&nbsp;3. Threshold gate: amount &gt; Rs500? --&gt; ESCALATE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  &lt;- deterministic<br>
+    |&nbsp;&nbsp;4. Refund Agent: DB lookup --&gt; Policy KB --&gt; LLM reasoning|<br>
+    |&nbsp;&nbsp;5. Safety Critic: re-fetch KB --&gt; faithfulness score&nbsp;&nbsp;&nbsp;|<br>
+    |&nbsp;&nbsp;6. Verdict --&gt; ResolutionResponse + full trace&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+    +-------------------------------------------------------------+<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+    &nbsp;&nbsp;&nbsp;LLM Calls&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Every step<br>
+    &nbsp;(OpenRouter)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--&gt; TKT-*.json log
+  </div>
+
+  <h3>Base URL &amp; Interactive Docs</h3>
+  <table>
+    <thead><tr><th>Service</th><th>URL</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>API Server</td><td><code>http://&lt;host&gt;:8000</code></td><td>FastAPI ingress</td></tr>
+      <tr><td>Swagger UI</td><td><code>http://&lt;host&gt;:8000/docs</code></td><td>Interactive API explorer</td></tr>
+      <tr><td>ReDoc</td><td><code>http://&lt;host&gt;:8000/redoc</code></td><td>Alternate API docs</td></tr>
+      <tr><td>Customer Portal</td><td><code>http://&lt;host&gt;:3000/user.html</code></td><td>Frontend UI</td></tr>
+      <tr><td>Admin Dashboard</td><td><code>http://&lt;host&gt;:3000/admin.html</code></td><td>Admin UI (token required)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Content Type</h3>
+  <p>All requests with a body must send <code>Content-Type: application/json</code>. All responses are JSON.</p>
+</div>
+
+<!-- 02 AUTHENTICATION -->
+<div class="section">
+  <div class="section-header"><span class="section-num">02</span><h2>Authentication</h2></div>
+  <div class="alert alert-security">
+    <span class="alert-icon">&#128274;</span>
+    <div>Admin-protected endpoints require the <code>X-Admin-Token</code> header. Without it, the server returns <strong>403 Forbidden</strong>.</div>
+  </div>
+  <h3>Admin Token</h3>
+  <pre>X-Admin-Token: cartly-admin-2026</pre>
+  <p>Override via the <code>ADMIN_TOKEN</code> environment variable.</p>
+
+  <h3>Order Ownership</h3>
+  <pre>X-Buyer-Name: Priya Sharma</pre>
+  <table>
+    <thead><tr><th>Header</th><th>Required For</th><th>Failure Code</th></tr></thead>
+    <tbody>
+      <tr><td>X-Admin-Token</td><td>Admin &amp; restricted live endpoints</td><td>403 Forbidden</td></tr>
+      <tr><td>X-Buyer-Name</td><td>GET /orders/{order_id}</td><td>401 / 403</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 03 SCHEMAS -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">03</span><h2>Schemas &amp; Data Models</h2></div>
+  <p>All request/response contracts are defined as <strong style="color:var(--text)">Pydantic</strong> models in <code>api/schemas.py</code>.</p>
+
+  <div class="schema-block">
+    <div class="schema-header">TicketRequest (Request Body)</div>
+    <div class="schema-body">
+      <div class="schema-row"><span class="schema-field">raw_ticket</span><span class="schema-type">string</span><span class="schema-desc">Free-text complaint (1&ndash;2000 chars) <span class="required-badge">required</span></span></div>
+      <div class="schema-row"><span class="schema-field">order_id</span><span class="schema-type">string</span><span class="schema-desc">Marketplace order ID <span class="required-badge">required</span></span></div>
+      <div class="schema-row"><span class="schema-field">claimed_amount</span><span class="schema-type">float</span><span class="schema-desc">Refund amount in INR (0 &ndash; 500,000) <span class="required-badge">required</span></span></div>
+      <div class="schema-row"><span class="schema-field">buyer_id</span><span class="schema-type">string | null</span><span class="schema-desc">Buyer ID for audit trail <span class="optional-badge">optional</span></span></div>
+      <div class="schema-row"><span class="schema-field">channel</span><span class="schema-type">Channel</span><span class="schema-desc">Submission channel. Default: "web" <span class="optional-badge">optional</span></span></div>
+    </div>
+  </div>
+
+  <h4>Channel Enum</h4>
+  <div class="enum-list">
+    <span class="enum-item">web</span><span class="enum-item">mobile</span><span class="enum-item">email</span><span class="enum-item">chat</span>
+  </div>
+
+  <div class="schema-block" style="margin-top:24px;">
+    <div class="schema-header">ResolutionResponse (Response)</div>
+    <div class="schema-body">
+      <div class="schema-row"><span class="schema-field">ticket_id</span><span class="schema-type">string</span><span class="schema-desc">Generated ticket ID (e.g. "TKT-3A7F8B12")</span></div>
+      <div class="schema-row"><span class="schema-field">status</span><span class="schema-type">ResolutionStatus</span><span class="schema-desc">"resolved" | "escalated"</span></div>
+      <div class="schema-row"><span class="schema-field">resolution</span><span class="schema-type">ResolutionDetail | null</span><span class="schema-desc">Present when status is "resolved"</span></div>
+      <div class="schema-row"><span class="schema-field">handoff_brief</span><span class="schema-type">HandoffBrief | null</span><span class="schema-desc">Present when status is "escalated"</span></div>
+      <div class="schema-row"><span class="schema-field">trace</span><span class="schema-type">list[ObsStep]</span><span class="schema-desc">Full pipeline trace with latency + token costs</span></div>
+      <div class="schema-row"><span class="schema-field">total_latency_ms</span><span class="schema-type">float</span><span class="schema-desc">Total pipeline latency in milliseconds</span></div>
+      <div class="schema-row"><span class="schema-field">total_cost_tokens</span><span class="schema-type">int</span><span class="schema-desc">Total LLM tokens consumed</span></div>
+    </div>
+  </div>
+
+  <div class="schema-block" style="margin-top:16px;">
+    <div class="schema-header">ResolutionDetail</div>
+    <div class="schema-body">
+      <div class="schema-row"><span class="schema-field">eligible</span><span class="schema-type">bool</span><span class="schema-desc">Whether customer is eligible for refund</span></div>
+      <div class="schema-row"><span class="schema-field">action_taken</span><span class="schema-type">ActionTaken</span><span class="schema-desc">Specific action taken by the system</span></div>
+      <div class="schema-row"><span class="schema-field">reason</span><span class="schema-type">string</span><span class="schema-desc">Human-readable decision explanation</span></div>
+      <div class="schema-row"><span class="schema-field">source_refs</span><span class="schema-type">list[string]</span><span class="schema-desc">Policy IDs cited (e.g. ["POL-001"])</span></div>
+      <div class="schema-row"><span class="schema-field">transaction_ref</span><span class="schema-type">string | null</span><span class="schema-desc">Refund transaction reference (if issued)</span></div>
+      <div class="schema-row"><span class="schema-field">faithfulness_score</span><span class="schema-type">float | null</span><span class="schema-desc">Safety Critic score (0.0&ndash;1.0)</span></div>
+    </div>
+  </div>
+
+  <h4>ActionTaken Enum</h4>
+  <div class="enum-list">
+    <span class="enum-item">refund_issued</span><span class="enum-item">replacement_offered</span><span class="enum-item">denied</span><span class="enum-item">escalated</span><span class="enum-item">abstained</span><span class="enum-item">info_provided</span><span class="enum-item">info_required</span><span class="enum-item">complaint_logged</span><span class="enum-item">exchange_initiated</span>
+  </div>
+
+  <div class="schema-block" style="margin-top:16px;">
+    <div class="schema-header">HandoffBrief (Escalation Details)</div>
+    <div class="schema-body">
+      <div class="schema-row"><span class="schema-field">reason</span><span class="schema-type">string</span><span class="schema-desc">Why the ticket was escalated</span></div>
+      <div class="schema-row"><span class="schema-field">escalation_trigger</span><span class="schema-type">string</span><span class="schema-desc">"threshold" | "critic_rejection" | "policy_trap" | "hard_trigger"</span></div>
+      <div class="schema-row"><span class="schema-field">triage</span><span class="schema-type">TriageResult | null</span><span class="schema-desc">Triage classification result</span></div>
+      <div class="schema-row"><span class="schema-field">draft_decision</span><span class="schema-type">string | null</span><span class="schema-desc">Draft decision before escalation</span></div>
+      <div class="schema-row"><span class="schema-field">flags</span><span class="schema-type">list[string]</span><span class="schema-desc">Escalation flags (e.g. ["legal_threat"])</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 TICKETS -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">04</span><h2>Tickets &mdash; Submit &amp; Query</h2></div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/tickets</span>
+      <span class="endpoint-tag">tickets</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Submit a customer support ticket. The orchestrator runs the full multi-agent pipeline and returns an autonomous resolution or escalation.</p>
+      <h4>Request Body</h4>
+      <pre>{
+  <span class="key">"raw_ticket"</span>: <span class="str">"My order #1042 arrived damaged, I'd like a Rs350 refund"</span>,
+  <span class="key">"order_id"</span>:   <span class="str">"1042"</span>,
+  <span class="key">"claimed_amount"</span>: <span class="num">350.0</span>,
+  <span class="key">"buyer_id"</span>:  <span class="str">"buyer_42"</span>,
+  <span class="key">"channel"</span>:   <span class="str">"web"</span>
+}</pre>
+      <h4>Response (200 OK)</h4>
+      <pre>{
+  <span class="key">"ticket_id"</span>: <span class="str">"TKT-3A7F8B12"</span>,
+  <span class="key">"status"</span>: <span class="str">"resolved"</span>,
+  <span class="key">"resolution"</span>: {
+    <span class="key">"eligible"</span>: <span class="bool">true</span>,
+    <span class="key">"action_taken"</span>: <span class="str">"refund_issued"</span>,
+    <span class="key">"reason"</span>: <span class="str">"Product arrived damaged; eligible under POL-001."</span>,
+    <span class="key">"source_refs"</span>: [<span class="str">"POL-001"</span>],
+    <span class="key">"transaction_ref"</span>: <span class="str">"TXN-ABCD1234"</span>,
+    <span class="key">"faithfulness_score"</span>: <span class="num">0.92</span>
+  },
+  <span class="key">"handoff_brief"</span>: <span class="null">null</span>,
+  <span class="key">"trace"</span>: [ <span class="comment">/* ObsStep array */</span> ],
+  <span class="key">"total_latency_ms"</span>: <span class="num">1243.7</span>,
+  <span class="key">"total_cost_tokens"</span>: <span class="num">1872</span>
+}</pre>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Resolved or escalated</div></div>
+        <div class="status-item"><div class="status-code s-422">422 Unprocessable</div><div class="status-text">Validation error</div></div>
+        <div class="status-item"><div class="status-code s-503">503 Unavailable</div><div class="status-text">DB down, auto-escalated</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/tickets/generic</span>
+      <span class="endpoint-tag">tickets</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Submit a product/policy question without an order ID.</p>
+      <h4>Request Body</h4>
+      <pre>{ <span class="key">"query"</span>: <span class="str">"Is the SoundMax Pro Bluetooth Speaker returnable?"</span> }</pre>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">ResolutionResponse returned</div></div>
+        <div class="status-item"><div class="status-code s-422">422 Unprocessable</div><div class="status-text">Missing "query" field</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/tickets</span>
+      <span class="endpoint-tag">tickets &middot; admin</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">List recent tickets (last 50) with status summary. <strong style="color:var(--accent3)">Requires admin token.</strong></p>
+      <h4>Response (200 OK)</h4>
+      <pre>{
+  <span class="key">"tickets"</span>: [
+    { <span class="key">"ticket_id"</span>: <span class="str">"TKT-3A7F8B12"</span>, <span class="key">"status"</span>: <span class="str">"resolved"</span>, <span class="key">"steps"</span>: <span class="num">6</span> }
+  ]
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- 05 ORDERS -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">05</span><h2>Orders &mdash; Buyer Lookup</h2></div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/orders/{order_id}</span>
+      <span class="endpoint-tag">user</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Look up a single order by ID. <code>X-Buyer-Name</code> header is mandatory for ownership validation.</p>
+      <h4>Path Parameters</h4>
+      <table>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody><tr><td>order_id</td><td>string</td><td>Order ID (e.g. "1042") <span class="required-badge">required</span></td></tr></tbody>
+      </table>
+      <h4>Request Headers</h4>
+      <table>
+        <thead><tr><th>Header</th><th>Description</th></tr></thead>
+        <tbody><tr><td>X-Buyer-Name</td><td>Full buyer name for ownership validation <span class="required-badge">required</span></td></tr></tbody>
+      </table>
+      <h4>Example</h4>
+      <pre>GET /orders/1042
+X-Buyer-Name: Priya Sharma</pre>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Order returned</div></div>
+        <div class="status-item"><div class="status-code s-401">401 Unauthorized</div><div class="status-text">X-Buyer-Name missing</div></div>
+        <div class="status-item"><div class="status-code s-403">403 Forbidden</div><div class="status-text">Wrong buyer</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Order not found</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/orders/buyer/{buyer_name}</span>
+      <span class="endpoint-tag">user</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Return all orders for a given buyer name (exact, case-insensitive match).</p>
+      <h4>Response (200 OK)</h4>
+      <pre>{
+  <span class="key">"buyer_name"</span>: <span class="str">"Priya Sharma"</span>,
+  <span class="key">"orders"</span>: [
+    { <span class="key">"order_id"</span>: <span class="str">"1042"</span>, <span class="key">"product_name"</span>: <span class="str">"Ceramic Mug Set"</span>, <span class="key">"amount"</span>: <span class="num">350</span>, <span class="key">"status"</span>: <span class="str">"delivered"</span> }
+  ]
+}</pre>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Orders returned</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Buyer not found</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 06 CATALOG -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">06</span><h2>Product Catalog</h2></div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/products</span>
+      <span class="endpoint-tag">catalog</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Return the full product catalog, optionally filtered by category.</p>
+      <h4>Query Parameters</h4>
+      <table>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody><tr><td>category</td><td>string</td><td>Filter by category <span class="optional-badge">optional</span></td></tr></tbody>
+      </table>
+      <h4>Available Categories</h4>
+      <div class="enum-list">
+        <span class="enum-item">electronics</span><span class="enum-item">clothing</span><span class="enum-item">home</span><span class="enum-item">books</span><span class="enum-item">sports</span><span class="enum-item">beauty</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/products/{product_id}</span>
+      <span class="endpoint-tag">catalog</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Return details for a single product (e.g. <code>PRD-001</code>).</p>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Product returned</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Product not found</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/policies</span>
+      <span class="endpoint-tag">catalog</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Return all public policy chunks. The internal legal escalation policy (POL-005) is excluded.</p>
+      <h4>Response (200 OK)</h4>
+      <pre>{ <span class="key">"policies"</span>: [ { <span class="key">"id"</span>: <span class="str">"POL-001"</span>, <span class="key">"title"</span>: <span class="str">"Standard Return Policy"</span>, <span class="key">"text"</span>: <span class="str">"..."</span> } ], <span class="key">"total"</span>: <span class="num">4</span> }</pre>
+    </div>
+  </div>
+
+  <h3>Product Catalog (12 Products)</h3>
+  <table>
+    <thead><tr><th>ID</th><th>Name</th><th>Category</th><th>Price (Rs)</th><th>Returnable</th></tr></thead>
+    <tbody>
+      <tr><td>PRD-001</td><td>Bluetooth Speaker &mdash; SoundMax Pro</td><td>electronics</td><td>1,200</td><td>DOA only</td></tr>
+      <tr><td>PRD-002</td><td>Wireless Earbuds &mdash; SoundBuds Lite</td><td>electronics</td><td>450</td><td>DOA only</td></tr>
+      <tr><td>PRD-003</td><td>Smart Watch &mdash; TimeFit X1</td><td>electronics</td><td>2,499</td><td>DOA only</td></tr>
+      <tr><td>PRD-004</td><td>USB-C Fast Charger &mdash; 65W GaN</td><td>electronics</td><td>799</td><td>DOA only</td></tr>
+      <tr><td>PRD-005</td><td>Men's Slim Fit T-Shirt &mdash; Pack of 3</td><td>clothing</td><td>599</td><td>30 days</td></tr>
+      <tr><td>PRD-006</td><td>Women's Kurta Set &mdash; Festive</td><td>clothing</td><td>1,299</td><td>30 days</td></tr>
+      <tr><td>PRD-007</td><td>Stainless Steel Water Bottle 1L</td><td>home</td><td>349</td><td>30 days</td></tr>
+      <tr><td>PRD-008</td><td>Non-Stick Cookware Set &mdash; 5 Piece</td><td>home</td><td>1,899</td><td>30 days</td></tr>
+      <tr><td>PRD-009</td><td>Atomic Habits &mdash; James Clear</td><td>books</td><td>299</td><td>30 days</td></tr>
+      <tr><td>PRD-010</td><td>Yoga Mat &mdash; Anti-Slip 6mm</td><td>sports</td><td>549</td><td>30 days</td></tr>
+      <tr><td>PRD-011</td><td>Vitamin C Face Serum &mdash; 30ml</td><td>beauty</td><td>399</td><td>Sealed only</td></tr>
+      <tr><td>PRD-012</td><td>Hair Dryer &mdash; 2000W Professional</td><td>electronics</td><td>899</td><td>DOA only</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 07 LIVE CHAT -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">07</span><h2>Live Chat &mdash; Human Agent</h2></div>
+  <div class="alert alert-info">
+    <span class="alert-icon">&#8505;&#65039;</span>
+    <div>Live chat endpoints support real-time handoff to a human agent. Users open a ticket, admins pick it up, and both sides exchange messages. The ticket auto-activates when an admin sends the first message.</div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/live/connect</span>
+      <span class="endpoint-tag">live</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Open a live-chat ticket requesting a human agent. Use <code>"WALK_IN"</code> as order_id to skip order validation.</p>
+      <h4>Request Body &mdash; LiveConnectRequest</h4>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>order_id</td><td>string (max 20)</td><td>Must exist in DB or be "WALK_IN" <span class="required-badge">required</span></td></tr>
+          <tr><td>buyer_name</td><td>string</td><td>Customer's name <span class="required-badge">required</span></td></tr>
+          <tr><td>product_name</td><td>string</td><td>Product involved <span class="optional-badge">optional</span></td></tr>
+          <tr><td>issue_summary</td><td>string</td><td>Brief description <span class="optional-badge">optional</span></td></tr>
+        </tbody>
+      </table>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Ticket created</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Order not found</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/live/tickets</span>
+      <span class="endpoint-tag">live &middot; admin</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Admin: list all live tickets, optionally filtered by status. <strong style="color:var(--accent3)">Requires admin token.</strong></p>
+      <h4>Query Parameters</h4>
+      <table>
+        <thead><tr><th>Parameter</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody><tr><td>status</td><td>string</td><td>"waiting" | "active" | "resolved" <span class="optional-badge">optional</span></td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/live/{ticket_id}</span>
+      <span class="endpoint-tag">live</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Get a single live ticket with full message history. Polled by both user and admin.</p>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Ticket + messages</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Ticket not found</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-post">POST</span>
+      <span class="endpoint-path">/live/{ticket_id}/message</span>
+      <span class="endpoint-tag">live</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Append a message to a live ticket. Admin's first message auto-activates the ticket.</p>
+      <h4>Request Body &mdash; LiveMessageRequest</h4>
+      <table>
+        <thead><tr><th>Field</th><th>Type</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>sender</td><td>"user" | "admin"</td><td>Restricted to valid values <span class="required-badge">required</span></td></tr>
+          <tr><td>sender_name</td><td>string</td><td>Display name <span class="required-badge">required</span></td></tr>
+          <tr><td>message</td><td>string (min 1)</td><td>Message content, no empty messages <span class="required-badge">required</span></td></tr>
+        </tbody>
+      </table>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Message appended</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Ticket not found</div></div>
+        <div class="status-item"><div class="status-code s-409">409 Conflict</div><div class="status-text">Ticket already resolved</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-patch">PATCH</span>
+      <span class="endpoint-path">/live/{ticket_id}/resolve</span>
+      <span class="endpoint-tag">live &middot; admin</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Admin closes a live ticket. <strong style="color:var(--accent3)">Requires admin token.</strong></p>
+      <h4>Response (200 OK)</h4>
+      <pre>{ <span class="key">"status"</span>: <span class="str">"resolved"</span>, <span class="key">"ticket_id"</span>: <span class="num">42</span> }</pre>
+      <h4>Status Codes</h4>
+      <div class="status-grid">
+        <div class="status-item"><div class="status-code s-200">200 OK</div><div class="status-text">Ticket resolved</div></div>
+        <div class="status-item"><div class="status-code s-403">403 Forbidden</div><div class="status-text">Invalid admin token</div></div>
+        <div class="status-item"><div class="status-code s-404">404 Not Found</div><div class="status-text">Ticket not found</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 08 ADMIN -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">08</span><h2>Admin Endpoints</h2></div>
+  <div class="alert alert-security">
+    <span class="alert-icon">&#128737;&#65039;</span>
+    <div>All admin endpoints require <code>X-Admin-Token: cartly-admin-2026</code>. Missing or incorrect tokens return <strong>403 Forbidden</strong>.</div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/admin/tickets</span>
+      <span class="endpoint-tag">admin</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">List all AI-resolved tickets with enriched summaries including latency, token cost, escalation trigger, and timestamps.</p>
+      <h4>Response &mdash; list[TicketSummary] (200 OK)</h4>
+      <pre>[{
+  <span class="key">"ticket_id"</span>: <span class="str">"TKT-3A7F8B12"</span>,
+  <span class="key">"status"</span>: <span class="str">"resolved"</span>,
+  <span class="key">"order_id"</span>: <span class="str">"1042"</span>,
+  <span class="key">"buyer_id"</span>: <span class="str">"buyer_42"</span>,
+  <span class="key">"claimed_amount"</span>: <span class="num">350.0</span>,
+  <span class="key">"escalation_trigger"</span>: <span class="null">null</span>,
+  <span class="key">"total_latency_ms"</span>: <span class="num">1243.7</span>,
+  <span class="key">"total_cost_tokens"</span>: <span class="num">1872</span>,
+  <span class="key">"step_count"</span>: <span class="num">6</span>,
+  <span class="key">"ts_created"</span>: <span class="str">"2026-07-21T13:00:00.000Z"</span>
+}]</pre>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/admin/stats</span>
+      <span class="endpoint-tag">admin</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Aggregated KPI statistics and chart data for the admin observability dashboard. Includes per-day breakdowns and FR1&ndash;FR8 coverage counts.</p>
+      <h4>Response &mdash; AdminStatsResponse (200 OK)</h4>
+      <pre>{
+  <span class="key">"total_tickets"</span>: <span class="num">48</span>, <span class="key">"resolved"</span>: <span class="num">31</span>, <span class="key">"escalated"</span>: <span class="num">17</span>,
+  <span class="key">"resolution_rate"</span>: <span class="num">0.646</span>,
+  <span class="key">"avg_latency_ms"</span>: <span class="num">1380.4</span>, <span class="key">"p95_latency_ms"</span>: <span class="num">2910.0</span>, <span class="key">"p99_latency_ms"</span>: <span class="num">4120.0</span>,
+  <span class="key">"total_tokens"</span>: <span class="num">89312</span>,
+  <span class="key">"escalation_triggers"</span>: { <span class="key">"threshold"</span>: <span class="num">9</span>, <span class="key">"critic_rejection"</span>: <span class="num">5</span>, <span class="key">"hard_trigger"</span>: <span class="num">3</span> },
+  <span class="key">"tickets_by_day"</span>: { <span class="key">"2026-07-21"</span>: <span class="num">48</span> },
+  <span class="key">"avg_latency_by_day"</span>: { <span class="key">"2026-07-21"</span>: <span class="num">1380.4</span> },
+  <span class="key">"fr_coverage"</span>: { <span class="key">"FR1"</span>: <span class="num">48</span>, <span class="key">"FR2"</span>: <span class="num">45</span>, <span class="key">"FR3"</span>: <span class="num">40</span>, <span class="key">"FR4"</span>: <span class="num">31</span>, <span class="key">"FR5"</span>: <span class="num">9</span>, <span class="key">"FR6"</span>: <span class="num">43</span>, <span class="key">"FR7"</span>: <span class="num">5</span>, <span class="key">"FR8"</span>: <span class="num">48</span> }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- 09 OBSERVABILITY -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">09</span><h2>Observability &amp; Logs</h2></div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/health</span>
+      <span class="endpoint-tag">meta</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Liveness and database readiness probe. Returns 200 if healthy, 503 if DB is unavailable.</p>
+      <h4>Response (200 OK)</h4>
+      <pre>{ <span class="key">"status"</span>: <span class="str">"ok"</span>, <span class="key">"db"</span>: <span class="str">"ok"</span>, <span class="key">"service"</span>: <span class="str">"cartly-api"</span>, <span class="key">"version"</span>: <span class="str">"1.0.0"</span> }</pre>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method-badge method-get">GET</span>
+      <span class="endpoint-path">/logs/{ticket_id}</span>
+      <span class="endpoint-tag">observability</span>
+    </div>
+    <div class="endpoint-body">
+      <p class="endpoint-desc">Retrieve the full JSONL event trace for a ticket. Each event = one pipeline step with latency, token cost, decision, and metadata.</p>
+      <h4>Response (200 OK)</h4>
+      <pre>{
+  <span class="key">"ticket_id"</span>: <span class="str">"TKT-3A7F8B12"</span>,
+  <span class="key">"events"</span>: [
+    {
+      <span class="key">"step"</span>: <span class="str">"triage"</span>,
+      <span class="key">"ts"</span>: <span class="str">"2026-07-21T13:00:01.234Z"</span>,
+      <span class="key">"latency_ms"</span>: <span class="num">312.4</span>,
+      <span class="key">"cost_tokens"</span>: <span class="num">480</span>,
+      <span class="key">"decision"</span>: <span class="str">"refund_request | low | damaged_goods"</span>,
+      <span class="key">"metadata"</span>: { <span class="key">"intent"</span>: <span class="str">"refund_request"</span>, <span class="key">"risk_tier"</span>: <span class="str">"low"</span> }
+    }
+  ]
+}</pre>
+      <h4>Pipeline Steps</h4>
+      <table>
+        <thead><tr><th>Step Name</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>hard_trigger_check</td><td>Legal threats and fraud keyword detection</td></tr>
+          <tr><td>triage</td><td>LLM intent classification + risk tier</td></tr>
+          <tr><td>threshold_gate</td><td>Deterministic Rs500 escalation check</td></tr>
+          <tr><td>refund_agent_order_lookup</td><td>Database order fetch</td></tr>
+          <tr><td>refund_agent_llm</td><td>LLM refund reasoning with policy KB</td></tr>
+          <tr><td>safety_critic</td><td>Faithfulness validation of refund decision</td></tr>
+          <tr><td>orchestrator_verdict</td><td>Final resolved/escalated decision</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- 10 ERRORS -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">10</span><h2>Error Reference</h2></div>
+  <p>All error responses follow FastAPI's default structure:</p>
+  <pre>{ <span class="key">"detail"</span>: <span class="str">"Human-readable error message"</span> }</pre>
+  <p>DB errors additionally include an <code>escalated: true</code> flag:</p>
+  <pre>{ <span class="key">"detail"</span>: <span class="str">"The database is temporarily unavailable..."</span>, <span class="key">"escalated"</span>: <span class="bool">true</span> }</pre>
+  <table>
+    <thead><tr><th>Code</th><th>Name</th><th>When It Occurs</th></tr></thead>
+    <tbody>
+      <tr><td>200</td><td>OK</td><td>Request succeeded</td></tr>
+      <tr><td>401</td><td>Unauthorized</td><td>X-Buyer-Name header missing on /orders/{id}</td></tr>
+      <tr><td>403</td><td>Forbidden</td><td>Invalid/missing admin token, or order ownership mismatch</td></tr>
+      <tr><td>404</td><td>Not Found</td><td>Order, product, ticket, or log file not found</td></tr>
+      <tr><td>409</td><td>Conflict</td><td>Sending message to an already-resolved live ticket</td></tr>
+      <tr><td>422</td><td>Unprocessable Entity</td><td>Pydantic validation failure (missing fields, out-of-range)</td></tr>
+      <tr><td>503</td><td>Service Unavailable</td><td>Database connection failure; ticket auto-escalated to human</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 11 ENV CONFIG -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">11</span><h2>Environment Configuration</h2></div>
+  <p>Copy <code>.env.example</code> to <code>.env</code> and fill in the required values.</p>
+  <table class="env-table">
+    <thead><tr><th>Variable</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>OPENROUTER_API_KEY</td><td>Yes</td><td>&mdash;</td><td>OpenRouter API key (get free key at openrouter.ai)</td></tr>
+      <tr><td>OPENROUTER_MODEL</td><td>No</td><td>meta-llama/llama-3.2-3b-instruct</td><td>LLM model identifier</td></tr>
+      <tr><td>ADMIN_TOKEN</td><td>No</td><td>cartly-admin-2026</td><td>Admin dashboard authentication token</td></tr>
+      <tr><td>THRESHOLD_AMOUNT</td><td>No</td><td>500</td><td>Auto-resolve ceiling in INR (FR5)</td></tr>
+      <tr><td>FAITHFULNESS_FLOOR</td><td>No</td><td>0.70</td><td>Safety Critic rejection threshold (FR7)</td></tr>
+      <tr><td>DB_HOST</td><td>No</td><td>db</td><td>PostgreSQL host</td></tr>
+      <tr><td>DB_PORT</td><td>No</td><td>5432</td><td>PostgreSQL port</td></tr>
+      <tr><td>DB_NAME</td><td>No</td><td>cartly</td><td>Database name</td></tr>
+      <tr><td>DB_USER</td><td>No</td><td>cartly</td><td>Database user</td></tr>
+      <tr><td>DB_PASSWORD</td><td>No</td><td>cartly123</td><td>Database password</td></tr>
+      <tr><td>LOG_DIR</td><td>No</td><td>/app/observability/logs</td><td>Directory for per-ticket JSONL logs</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 12 DEMO DATA -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">12</span><h2>Demo Data &amp; Quick Start</h2></div>
+
+  <h3>Quick Start</h3>
+  <pre><span class="comment"># 1. Clone &amp; configure</span>
+git clone https://github.com/bottyash/cartly.git &amp;&amp; cd cartly
+cp .env.example .env
+<span class="comment"># Set OPENROUTER_API_KEY in .env</span>
+
+<span class="comment"># 2. Start all services</span>
+docker compose up --build
+
+<span class="comment"># 3. Test the API</span>
+curl -X POST http://localhost:8000/tickets \
+  -H "Content-Type: application/json" \
+  -d '{
+    "raw_ticket": "My mug set arrived broken, I want a refund",
+    "order_id": "1042",
+    "claimed_amount": 350,
+    "channel": "web"
+  }'</pre>
+
+  <h3>Demo Scenarios</h3>
+  <div class="demo-card">
+    <span class="demo-order-id">#1042</span>
+    <div><div style="font-weight:600;color:var(--text);margin-bottom:4px;">Damaged Mug Set &mdash; Priya Sharma</div><div class="demo-desc">Rs350 claimed &middot; Damaged on arrival &middot; Within return window</div></div>
+    <span class="demo-result result-resolved">Auto-Resolved</span>
+  </div>
+  <div class="demo-card">
+    <span class="demo-order-id">#1077</span>
+    <div><div style="font-weight:600;color:var(--text);margin-bottom:4px;">Non-Delivery &mdash; Rahul Mehta</div><div class="demo-desc">Rs1,200 claimed &middot; Package not delivered &middot; Over Rs500 threshold</div></div>
+    <span class="demo-result result-threshold">Threshold Escalation</span>
+  </div>
+  <div class="demo-card">
+    <span class="demo-order-id">#1090</span>
+    <div><div style="font-weight:600;color:var(--text);margin-bottom:4px;">Electronics Return &mdash; Ananya Patel</div><div class="demo-desc">Rs450 claimed &middot; SoundMax Pro return &middot; Non-returnable electronics</div></div>
+    <span class="demo-result result-critic">Critic Rejects (Policy Trap)</span>
+  </div>
+  <div class="demo-card">
+    <span class="demo-order-id">#1099</span>
+    <div><div style="font-weight:600;color:var(--text);margin-bottom:4px;">Legal Threat &mdash; Vikram Singh</div><div class="demo-desc">Rs300 claimed &middot; Message contains legal threat keywords</div></div>
+    <span class="demo-result result-hard">Hard-Trigger Escalation</span>
+  </div>
+
+  <h3>Demo Buyers</h3>
+  <table>
+    <thead><tr><th>Buyer Name</th><th>Order IDs</th></tr></thead>
+    <tbody>
+      <tr><td>Priya Sharma</td><td>1042, 1043</td></tr>
+      <tr><td>Rahul Mehta</td><td>1077, 1078</td></tr>
+      <tr><td>Ananya Patel</td><td>1090, 1091</td></tr>
+      <tr><td>Vikram Singh</td><td>1099, 1100</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- 13 FR COVERAGE -->
+<div class="section page-break">
+  <div class="section-header"><span class="section-num">13</span><h2>Functional Requirements Coverage</h2></div>
+  <p>All 8 functional requirements are implemented and measurable via the API observability trace.</p>
+
+  <div class="fr-grid">
+    <div class="fr-card"><div class="fr-num">FR1</div><div class="fr-text">Intent classification via LLM triage (step: triage)</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR2</div><div class="fr-text">Order DB lookup before any LLM reasoning</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR3</div><div class="fr-text">Policy citation mandatory in every decision</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR4</div><div class="fr-text">Rs500 or less claimed = auto-resolve without human</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR5</div><div class="fr-text">More than Rs500 = deterministic escalation (no LLM)</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR6</div><div class="fr-text">Safety Critic reviews every Refund Agent response</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR7</div><div class="fr-text">Policy trap = Critic rejects, system abstains</div><div class="fr-status">&#10004; Implemented</div></div>
+    <div class="fr-card"><div class="fr-num">FR8</div><div class="fr-text">Every step logged with latency + tokens</div><div class="fr-status">&#10004; Implemented</div></div>
+  </div>
+
+  <h3>Endpoint-to-FR Mapping</h3>
+  <table>
+    <thead><tr><th>Endpoint</th><th>FR Coverage</th></tr></thead>
+    <tbody>
+      <tr><td>POST /tickets</td><td>FR1, FR2, FR3, FR4, FR5, FR6, FR7, FR8</td></tr>
+      <tr><td>GET /logs/{ticket_id}</td><td>FR8 (trace visibility)</td></tr>
+      <tr><td>GET /admin/stats</td><td>FR1&ndash;FR8 (coverage dashboard)</td></tr>
+      <tr><td>GET /admin/tickets</td><td>FR8 (per-ticket audit)</td></tr>
+      <tr><td>POST /live/connect</td><td>FR5 (escalation handoff)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Cartly API Reference v1.0.0 &middot; Generated 2026-07-21</p>
+  <p style="margin-top:6px;">Yash Parmar &middot; Hiten Mistry &middot; Avishka Jindal &middot; Capstone Project</p>
+  <p style="margin-top:6px;">Live Swagger: <code>http://&lt;host&gt;:8000/docs</code> &middot; ReDoc: <code>http://&lt;host&gt;:8000/redoc</code></p>
+</div>
+
+</div>
+</body>
+</html>

@@ -33,9 +33,9 @@ OPENROUTER_BASE_URL  = os.getenv("OPENROUTER_BASE_URL",  "https://openrouter.ai/
 OPENROUTER_SITE_URL  = os.getenv("OPENROUTER_SITE_URL",  "http://localhost:3000")
 OPENROUTER_SITE_NAME = os.getenv("OPENROUTER_SITE_NAME", "Cartly")
 
-MAX_RETRIES  = 2
-RETRY_DELAYS = [1.0, 2.5, 5.0]   # seconds between retries (exponential-ish)
-TIMEOUT_S    = 90.0               # per-request timeout
+MAX_RETRIES  = 3                        # F-28: aligned with len(RETRY_DELAYS)
+RETRY_DELAYS = [1.0, 2.5, 5.0]         # seconds between retries (exponential-ish)
+TIMEOUT_S    = 90.0                     # per-request timeout
 
 # ── Client factory (lazy, one per process) ────────────────────────────────
 _client: openai.OpenAI | None = None

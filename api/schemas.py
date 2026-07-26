@@ -33,7 +33,7 @@ class ActionTaken(str, Enum):
     escalated            = "escalated"
     abstained            = "abstained"
     info_provided        = "info_provided"     # delivery / status queries
-    info_required        = "info_required"     # agent asked for more info (mapped → complaint_logged)
+    info_required        = "info_required"     # agent asked for more info (falls back to complaint_logged via _safe_action)
     complaint_logged     = "complaint_logged"  # complaint acknowledgement
     exchange_initiated   = "exchange_initiated" # exchange requests
 
@@ -45,7 +45,9 @@ class ActionTaken(str, Enum):
 class TicketRequest(BaseModel):
     raw_ticket: str = Field(
         ...,
-        description="Free-text customer complaint or refund request",
+        min_length=1,
+        max_length=2000,
+        description="Free-text customer complaint or refund request (1–2000 chars)",
         examples=["My order #1042 arrived damaged, I'd like a ₹350 refund"],
     )
     order_id: str = Field(
@@ -55,13 +57,14 @@ class TicketRequest(BaseModel):
     )
     buyer_id: str | None = Field(
         default=None,
-        description="Buyer identifier (defaults to order_id)",
-        examples=["1042"],
+        description="Buyer identifier (optional; used for audit trail)",
+        examples=["buyer_42"],
     )
     claimed_amount: float = Field(
         ...,
         ge=0,
-        description="Refund amount claimed by customer in INR",
+        le=500_000,
+        description="Refund amount claimed by customer in INR (0 – 5,00,000)",
         examples=[350.0],
     )
     channel: Channel = Field(default=Channel.web)
@@ -140,6 +143,8 @@ class AdminStatsResponse(BaseModel):
     escalated: int
     resolution_rate: float                 # 0–1
     avg_latency_ms: float
+    p95_latency_ms: float                  # p95 latency across all tickets
+    p99_latency_ms: float                  # p99 latency across all tickets
     total_tokens: int
     escalation_triggers: dict[str, int]    # trigger → count
     tickets_by_day: dict[str, int]         # date → count

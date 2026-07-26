@@ -78,14 +78,16 @@ def get_orders_by_buyer(buyer_name: str) -> list[dict]:
         conn = _get_connection()
         with conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # Escape LIKE metacharacters to prevent wildcard DB dump (F-01)
+                safe_name = buyer_name.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
                 cur.execute(
                     """
                     SELECT * FROM orders
                     WHERE LOWER(buyer_name) = LOWER(%s)
-                       OR LOWER(buyer_name) LIKE LOWER(%s)
+                       OR LOWER(buyer_name) LIKE LOWER(%s) ESCAPE '\\'
                     ORDER BY order_date DESC
                     """,
-                    (buyer_name, f"{buyer_name} %"),
+                    (buyer_name, f"{safe_name} %"),
                 )
                 rows = cur.fetchall()
                 results = []

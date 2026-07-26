@@ -32,7 +32,9 @@ from api.schemas import (
     TicketRequest,
     TriageResult,
 )
+from data.mock_db import owns_order
 from data.policy_kb import check_hard_triggers
+from agents.safety_critic import SAFETY_PATTERNS
 from observability.logger import log_event, read_events
 
 THRESHOLD_AMOUNT = float(os.getenv("THRESHOLD_AMOUNT", "500"))
@@ -74,6 +76,30 @@ Risk tier guide:
     def handle(self, request: TicketRequest) -> ResolutionResponse:
         t_start = time.monotonic()
 
+        # ── Step 0: Injection pattern scan (ALL intents, pre-triage) ────────
+        # F-07: previously this ran only on the refund path inside SafetyCritic.
+        # Moving it here ensures delivery/complaint routes are also protected.
+        raw_lower = request.raw_ticket.lower()
+        injection_flags = [
+            f"safety_violation:{pat}"
+            for pat in SAFETY_PATTERNS
+            if pat in raw_lower
+        ]
+        if injection_flags:
+            latency_ms = (time.monotonic() - t_start) * 1000
+            log_event(
+                self.ticket_id, step="injection_check",
+                latency_ms=latency_ms, cost_tokens=0,
+                decision=f"ESCALATE — injection detected: {injection_flags}",
+                metadata={"flags": injection_flags, "buyer_id": request.buyer_id},
+            )
+            return self._build_escalation_response(
+                reason="Prompt injection detected in ticket text.",
+                trigger="hard_trigger",
+                t_start=t_start,
+                flags=injection_flags,
+            )
+
         # ── Step 1: Hard-trigger check (pure Python, pre-triage) ─────────
         hard_triggers = check_hard_triggers(request.raw_ticket)
         if hard_triggers:
@@ -84,7 +110,7 @@ Risk tier guide:
                 latency_ms=latency_ms,
                 cost_tokens=0,
                 decision=f"ESCALATE — hard triggers: {hard_triggers}",
-                metadata={"triggers": hard_triggers},
+                metadata={"triggers": hard_triggers, "buyer_id": request.buyer_id},
             )
             return self._build_escalation_response(
                 reason="Ticket contains legal or fraud-related language requiring human review.",
@@ -115,9 +141,34 @@ Risk tier guide:
         if intent in ("complaint", "other"):
             return self._handle_complaint(request, triage, t_start, intent)
 
+        # ── F-02: Order ownership check ───────────────────────────────────────
+        # buyer_id must match the order's buyer_name (first-name or full-name).
+        # If buyer_id is absent the check is skipped (anonymous / legacy callers).
+        if request.buyer_id and request.buyer_id not in ("anonymous", "NONE"):
+            if not owns_order(request.buyer_id, request.order_id):
+                from fastapi import HTTPException
+                raise HTTPException(
+                    status_code=403,
+                    detail="Access denied: this order does not belong to your account.",
+                )
+
         # ─── 3e. Refund request — apply threshold gate (FR5) ─────────────
         t_gate = time.monotonic()
         over_threshold = request.claimed_amount > THRESHOLD_AMOUNT
+
+        # ── F-03: claimed_amount must not exceed the actual order value ────────
+        from data.mock_db import order_lookup as _order_lookup
+        _order = _order_lookup(request.order_id)
+        if _order and request.claimed_amount > float(_order.get("order_amount", float("inf"))):
+            from fastapi import HTTPException
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Claimed amount ₹{request.claimed_amount} exceeds the order value "
+                    f"₹{_order['order_amount']}. Please check the amount and resubmit."
+                ),
+            )
+
         gate_latency = (time.monotonic() - t_gate) * 1000
 
         log_event(
@@ -130,6 +181,7 @@ Risk tier guide:
                 "claimed_amount": request.claimed_amount,
                 "threshold": THRESHOLD_AMOUNT,
                 "over_threshold": over_threshold,
+                "buyer_id": request.buyer_id,
             },
         )
 
@@ -209,9 +261,11 @@ Risk tier guide:
             latency_ms=total_latency,
             cost_tokens=0,
             decision=f"RESOLVED — {agent_result.action_taken}",
+            # F-13: record buyer_id for audit trail
             metadata={
                 "transaction_ref": agent_result.transaction_ref,
                 "faithfulness_score": critic_result.faithfulness_score,
+                "buyer_id": request.buyer_id,
             },
         )
 
@@ -374,7 +428,7 @@ Risk tier guide:
                 metadata=triage.__dict__,
             )
             return triage
-        except (LLMGatewayError, Exception) as exc:
+        except Exception as exc:   # F-29: LLMGatewayError is-a Exception; no need for tuple
             log_event(
                 self.ticket_id,
                 step="triage",
@@ -395,6 +449,16 @@ Risk tier guide:
         flags: list[str] | None = None,
     ) -> ResolutionResponse:
         total_latency = (time.monotonic() - t_start) * 1000
+        # F-11: log orchestrator_verdict for ALL escalation paths so the
+        # north-star metric is not undercounted for hard_trigger / threshold.
+        log_event(
+            self.ticket_id,
+            step="orchestrator_verdict",
+            latency_ms=total_latency,
+            cost_tokens=0,
+            decision=f"ESCALATE — {trigger}",
+            metadata={"trigger": trigger, "flags": flags or []},
+        )
         events = read_events(self.ticket_id)
         trace = [
             ObsStep(
