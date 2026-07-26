@@ -100,6 +100,35 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ═══ AI CHAT — SEND MESSAGE ═══════════════════════════════ */
+/* ═══ CONVERSATIONAL PRE-FILTER ════════════════════════════
+   Intercepts greetings / chit-chat so they never hit the
+   orchestrator.  Only genuine support queries go to /tickets.
+═══════════════════════════════════════════════════════════ */
+const _GREET_RE = /^(hi+|hello+|hey+|howdy|sup|yo+|hiya|greetings|good\s*(morning|afternoon|evening|day)|namaste|helo|hii+|heya)[\s!?.]*$/i;
+const _THANKS_RE = /^(thank(s| you)+|thx|ty|cheers|great|awesome|perfect|ok(ay)?|sounds good|got it|sure|alright|understood|noted|cool|nice|wonderful)[\s!.]*$/i;
+const _BYE_RE    = /^(bye+|goodbye+|see ya|cya|take care|have a good|farewell|ttyl)[\s!.]*$/i;
+const _HOWRU_RE  = /^(how are you|how r u|how do you do|what'?s up|wassup|wazzup|how'?s it going|hows it)[\s!?]*$/i;
+
+function _conversationalReply(text, order) {
+  const t = text.trim();
+  const name = (window.currentUser || order?.buyer_name || '').split(' ')[0] || '';
+  const greet = name ? `Hi ${name}! 😊` : 'Hi there! 😊';
+
+  if (_GREET_RE.test(t)) {
+    return `${greet} How can I help you today? Feel free to ask about your order — refunds, delivery status, exchanges, or any other issue.`;
+  }
+  if (_HOWRU_RE.test(t)) {
+    return `I'm doing great, thanks for asking! 😄 I'm here and ready to help you. What can I assist you with regarding your order?`;
+  }
+  if (_THANKS_RE.test(t)) {
+    return `You're very welcome! 🙌 Is there anything else I can help you with?`;
+  }
+  if (_BYE_RE.test(t)) {
+    return `Take care! 👋 Don't hesitate to reach out if you need anything else. Have a great day!`;
+  }
+  return null; // not a conversational message — let the orchestrator handle it
+}
+
 async function sendMessage() {
   if (chatLocked) return;
   const inputEl = document.getElementById('chat-inp');
@@ -111,13 +140,23 @@ async function sendMessage() {
   inputEl.value = '';
   resizeTextarea(inputEl);
 
+  const order = window._currentOrder;
+
+  // ── Conversational pre-filter (no API call, no escalation) ────
+  const quickReply = _conversationalReply(text, order);
+  if (quickReply) {
+    addBubble('bot', quickReply);
+    setTimeout(() => inputEl.focus(), 100);
+    return;
+  }
+
+  // ── Real support query — send to orchestrator ──────────────────
   const typingId = addTypingIndicator();
   chatLocked = true;
   const sendBtn = document.getElementById('send-btn');
   if (sendBtn) sendBtn.disabled = true;
 
   try {
-    const order = window._currentOrder;
     if (!order) {
       removeTypingIndicator(typingId);
       addBubble('bot', '⚠️ No order selected. Please go back and choose an order first.');
@@ -150,6 +189,7 @@ async function sendMessage() {
     setTimeout(() => inputEl.focus(), 100);
   }
 }
+
 
 /* ═══ AI CHAT — RENDER RESULT (USER-FRIENDLY, NO TECH DETAILS) */
 function renderResult(data) {
