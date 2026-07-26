@@ -340,6 +340,31 @@ tbody tr:last-child td{border:none}
               </div>
               <button class="admin-chat-resolve" id="admin-resolve-btn" onclick="adminResolve()" disabled>✓ Resolve</button>
             </div>
+
+            <!-- ── Agent Context Card (hidden until ticket selected) ── -->
+            <div id="agent-context-card" class="hidden" style="
+              background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);
+              border-bottom:1px solid rgba(255,255,255,.08);
+              padding:14px 18px;
+              display:grid;
+              grid-template-columns:1fr 1fr;
+              gap:10px 24px;
+              font-size:12px;
+            ">
+              <!-- Left: Order details -->
+              <div>
+                <div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">📦 Order Details</div>
+                <div id="ctx-order-rows" style="display:flex;flex-direction:column;gap:4px"></div>
+              </div>
+              <!-- Right: Escalation reason -->
+              <div>
+                <div style="color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">⚠️ Escalation Reason</div>
+                <div id="ctx-esc-reason" style="color:#fbbf24;font-size:12px;line-height:1.5"></div>
+                <div style="margin-top:8px;color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:.08em">🤖 AI Summary</div>
+                <div id="ctx-ai-summary" style="color:rgba(255,255,255,.7);font-size:12px;line-height:1.5;margin-top:4px"></div>
+              </div>
+            </div>
+
             <div class="admin-msgs" id="admin-chat-msgs">
               <div class="no-live-msg" style="margin-top:60px">Select a ticket from the left to view the conversation and respond.</div>
             </div>
@@ -539,6 +564,74 @@ async function openAdminChat(ticketId) {
   clearInterval(_chatPollTimer);
   await loadAdminChat();
   _chatPollTimer = setInterval(loadAdminChat, 2000);
+
+  // ── Populate Agent Context Card ──────────────────────────────
+  const ticket = _liveTickets.find(t => t.id === ticketId) || {};
+  const card = document.getElementById('agent-context-card');
+  if (card) card.classList.remove('hidden');
+
+  // 1. Fetch full order details
+  if (ticket.order_id) {
+    try {
+      const or = await fetch(`${LIVE_API}/admin/orders/${ticket.order_id}`, {
+        headers: adminHeaders()
+      });
+      if (or.ok) {
+        const o = await or.json();
+        const fmt = (v) => v != null ? String(v) : '—';
+        const rows = [
+          ['Order ID',  '#' + fmt(o.order_id)],
+          ['Product',   fmt(o.product_name)],
+          ['Amount',    o.order_amount ? '₹' + Number(o.order_amount).toLocaleString('en-IN') : '—'],
+          ['Status',    fmt(o.order_status)],
+          ['Payment',   fmt(o.payment_status)],
+          ['Delivery',  fmt(o.delivery_status)],
+          ['Courier',   fmt(o.courier)],
+          ['Order Date',o.order_date ? new Date(o.order_date).toLocaleDateString('en-IN') : '—'],
+        ];
+        const rowsEl = document.getElementById('ctx-order-rows');
+        if (rowsEl) rowsEl.innerHTML = rows.map(([k,v]) =>
+          `<div style="display:flex;gap:6px;align-items:baseline">
+            <span style="color:rgba(255,255,255,.4);min-width:72px;flex-shrink:0">${escAdmin(k)}</span>
+            <span style="color:#e2e8f0;font-weight:500">${escAdmin(v)}</span>
+          </div>`
+        ).join('');
+      }
+    } catch(_) {}
+  }
+
+  // 2. Parse escalation trigger from issue_summary
+  // Format: "Escalated (trigger) — Order #... : ..."
+  const esc = ticket.issue_summary || '';
+  const triggerMatch = esc.match(/Escalated \(([^)]+)\)/i);
+  const trigger = triggerMatch ? triggerMatch[1] : 'unknown';
+  const reasonMap = {
+    threshold:        'AI confidence below approval threshold — needs manual review of the request.',
+    critic_rejection: 'AI critic rejected the proposed resolution — response quality check failed.',
+    user_request:     'Customer explicitly requested a human agent.',
+    safety:           'Safety filter triggered — sensitive content detected.',
+    error:            'System error during AI processing.',
+  };
+  const escEl = document.getElementById('ctx-esc-reason');
+  if (escEl) escEl.textContent = reasonMap[trigger] || `Trigger: ${trigger}`;
+
+  // 3. Build handoff brief from first customer messages
+  setTimeout(async () => {
+    try {
+      const dr = await fetch(`${LIVE_API}/live/${ticketId}`, { headers: adminHeaders() });
+      if (dr.ok) {
+        const d = await dr.json();
+        const userMsgs = (d.messages || [])
+          .filter(m => m.sender === 'user')
+          .slice(0, 3)
+          .map(m => '• ' + m.message.slice(0, 120))
+          .join('\n');
+        const aiEl = document.getElementById('ctx-ai-summary');
+        if (aiEl) aiEl.textContent = userMsgs ||
+          'No messages yet — customer will describe their issue in chat.';
+      }
+    } catch(_) {}
+  }, 300);
 }
 
 async function loadAdminChat() {

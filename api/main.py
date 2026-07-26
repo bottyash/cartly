@@ -204,6 +204,19 @@ def get_orders_for_buyer(buyer_name: str):
     return {"buyer_name": buyer_name, "orders": orders}
 
 
+@app.get("/admin/orders/{order_id}", tags=["admin"])
+def admin_get_order(
+    order_id: str,
+    x_admin_token: str | None = Header(default=None),
+):
+    """Admin-only: look up any order by ID without buyer auth check.
+    Used by live chat context card to show full order context to agents."""
+    _require_admin(x_admin_token)
+    order = order_lookup(order_id)
+    if not order:
+        raise HTTPException(status_code=404, detail=f"Order '{order_id}' not found.")
+    return order
+
 
 # ──────────────────────────────────────────────
 # Product Catalog endpoints
