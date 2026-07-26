@@ -453,7 +453,7 @@ function startTicketPolling() {
 async function pollLiveTickets() {
   try {
     const r = await fetch(`${LIVE_API}/live/tickets`, {
-      headers: { 'X-Admin-Token': ADMIN_TOKEN }
+      headers: { 'X-Admin-Token': window.ADMIN_TOKEN }
     });
     if (!r.ok) return;
     const d = await r.json();
@@ -505,7 +505,7 @@ async function loadAdminChat() {
   if (!_selectedTicketId) return;
   try {
     const r = await fetch(`${LIVE_API}/live/${_selectedTicketId}`, {
-      headers: { 'X-Admin-Token': ADMIN_TOKEN }
+      headers: { 'X-Admin-Token': window.ADMIN_TOKEN }
     });
     if (!r.ok) return;
     const ticket = await r.json();
@@ -578,7 +578,7 @@ async function adminResolve() {
   try {
     await fetch(`${LIVE_API}/live/${_selectedTicketId}/resolve`, {
       method: 'PATCH',
-      headers: { 'X-Admin-Token': ADMIN_TOKEN }
+      headers: { 'X-Admin-Token': window.ADMIN_TOKEN }
     });
     _adminLastMsgCount = 0;
     await loadAdminChat();
