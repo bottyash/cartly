@@ -168,7 +168,7 @@ async function sendMessage() {
       body: JSON.stringify({
         raw_ticket:     text,
         order_id:       String(order.order_id),
-        buyer_id:       String(order.order_id),
+        buyer_id:       currentUser || order.buyer_name || 'anonymous',
         claimed_amount: parseFloat(order.order_amount) || 0,
         channel:        'web',
       }),
