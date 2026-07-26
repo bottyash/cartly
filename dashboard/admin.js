@@ -298,9 +298,6 @@ function renderFRCoverageChart(data) {
     },
   });
 }
-    },
-  });
-}
 
 // Legacy function kept for compatibility
 function renderFRCoverage(frCoverage) { /* handled by renderFRCoverageChart */ }
