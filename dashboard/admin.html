@@ -445,6 +445,7 @@ function showSection(name) {
 function showLiveSupport() { showSection('live'); }
 
 function startTicketPolling() {
+  if (!window.ADMIN_TOKEN) return; // don't poll without a token
   clearInterval(_ticketPollTimer);
   pollLiveTickets(); // immediate
   _ticketPollTimer = setInterval(pollLiveTickets, 3000);
