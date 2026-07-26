@@ -186,7 +186,7 @@ tbody tr:last-child td{border:none}
       <p class="gate-s">Enter your admin token to access the operations dashboard</p>
       <input type="password" id="gate-token-input" class="gate-inp"
         placeholder="cartly-admin-2026" onkeydown="if(event.key==='Enter')gateLogin()"/>
-      <button class="gate-btn" onclick="gateLogin()">Access Dashboard</button>
+      <button id="gate-login-btn" class="gate-btn" onclick="gateLogin()">Access Dashboard</button>
       <p class="gate-err" id="gate-error"></p>
       <p class="gate-hint">Hint: cartly-admin-2026</p>
     </div>
@@ -376,15 +376,45 @@ tbody tr:last-child td{border:none}
 <script>
 let adminToken = '';
 
-function gateLogin() {
+async function gateLogin() {
   const v = document.getElementById('gate-token-input').value.trim();
   const errEl = document.getElementById('gate-error');
+  const btn   = document.getElementById('gate-login-btn');
+
   if (!v) { errEl.textContent = 'Please enter a token.'; return; }
-  adminToken = v;
-  document.getElementById('admin-token-gate-screen').classList.add('hidden');
-  document.getElementById('admin-dashboard').classList.remove('hidden');
-  initDashboard(adminToken);
-  checkSidebarHealth();
+
+  // Validate token against the server BEFORE granting access
+  errEl.textContent = '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Verifying…'; }
+
+  try {
+    const r = await fetch(window.location.origin + '/api/live/tickets', {
+      headers: { 'x-admin-token': v }
+    });
+
+    if (r.status === 403) {
+      errEl.textContent = '❌ Invalid token. Please try again.';
+      if (btn) { btn.disabled = false; btn.textContent = 'Access Dashboard'; }
+      return;
+    }
+
+    if (!r.ok) {
+      errEl.textContent = `⚠️ Server error (${r.status}). Please try again.`;
+      if (btn) { btn.disabled = false; btn.textContent = 'Access Dashboard'; }
+      return;
+    }
+
+    // Token is valid — grant access
+    adminToken = v;
+    document.getElementById('admin-token-gate-screen').classList.add('hidden');
+    document.getElementById('admin-dashboard').classList.remove('hidden');
+    initDashboard(adminToken);
+    checkSidebarHealth();
+
+  } catch (err) {
+    errEl.textContent = '⚠️ Could not reach server. Check your connection.';
+    if (btn) { btn.disabled = false; btn.textContent = 'Access Dashboard'; }
+  }
 }
 
 function adminLogout() {
