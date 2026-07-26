@@ -223,7 +223,7 @@ tbody tr:last-child td{border:none}
       </div>
       <div class="sb-sec">System</div>
       <div class="sb-item" id="sb-health"><span class="sb-ic" id="sb-health-ic">⚪</span> <span id="sb-health-lbl">API Status</span></div>
-      <div class="sb-item" onclick="window.open('http://localhost:8000/docs','_blank')"><span class="sb-ic">📖</span> API Docs</div>
+      <div class="sb-item" onclick="window.open(window.location.origin+'/docs','_blank')"><span class="sb-ic">📖</span> API Docs</div>
       <div class="sb-item" onclick="adminLogout()"><span class="sb-ic">🚪</span> Sign Out</div>
     </aside>
 
@@ -403,7 +403,7 @@ function closeModal(e) { if(e.target===document.getElementById('trace-modal')) c
 function closeTraceModal() { document.getElementById('trace-modal').classList.add('hidden'); }
 
 // ─── LIVE SUPPORT ───────────────────────────────────────────────────────────
-const LIVE_API = 'http://localhost:8000';
+const LIVE_API = window.location.origin + '/api';
 let _liveTickets = [];
 let _selectedTicketId = null;
 let _adminLastMsgCount = 0;
@@ -591,7 +591,7 @@ async function checkSidebarHealth() {
   const ic = document.getElementById('sb-health-ic');
   const lb = document.getElementById('sb-health-lbl');
   try {
-    const r = await fetch('http://localhost:8000/health', { signal: AbortSignal.timeout(4000) });
+    const r = await fetch(window.location.origin + '/api/health', { signal: AbortSignal.timeout(4000) });
     if (r.ok) { ic.textContent='🟢'; lb.textContent='API Online'; }
     else { ic.textContent='🔴'; lb.textContent='API Error'; }
   } catch { ic.textContent='🔴'; lb.textContent='API Offline'; }

@@ -544,7 +544,7 @@ a{text-decoration:none;color:inherit}button{cursor:pointer;font-family:inherit;b
 <script src="user.js"></script>
 <script>
 'use strict';
-const API = 'http://localhost:8000';
+const API = window.location.origin + '/api';
 const STATUS_CLASS = {delivered:'s-delivered',in_transit:'s-transit',shipped:'s-transit',processing:'s-pending',pending:'s-pending',not_delivered:'s-pending',cancelled:'s-cancelled'};
 const STATUS_ICO = {delivered:'✅',in_transit:'🚚',shipped:'📬',processing:'⚙️',pending:'🕐',not_delivered:'⚠️',cancelled:'❌'};
 const CAT_ICO = {electronics:'⚡',clothing:'👕',home:'🏠',books:'📚',sports:'🏃',beauty:'✨',default:'📦'};

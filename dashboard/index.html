@@ -461,7 +461,7 @@ footer{background:var(--gray-900);color:rgba(255,255,255,.6);padding:48px 20px 2
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'http://localhost:8000';
+const API = window.location.origin + '/api';
 const CAT_ICONS = {electronics:'⚡',clothing:'👕',home:'🏠',books:'📚',sports:'🏃',beauty:'✨',default:'📦'};
 
 let allProducts = [];
