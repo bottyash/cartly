@@ -7,7 +7,8 @@
 // API is proxied through nginx: /api/ → api:8000/
 const API_BASE = window.location.origin + '/api';
 // Use window.ADMIN_TOKEN so inline scripts in admin.html can access it
-window.ADMIN_TOKEN = sessionStorage.getItem('cartly_admin_token') || '';
+// localStorage (not sessionStorage) so token persists across tabs
+window.ADMIN_TOKEN = localStorage.getItem('cartly_admin_token') || '';
 
 let allTickets = [];
 let charts     = {};
@@ -27,7 +28,7 @@ const adminHeaders = () => ({ 'x-admin-token': window.ADMIN_TOKEN });
 
 function initDashboard(token) {
   window.ADMIN_TOKEN = token;
-  sessionStorage.setItem('cartly_admin_token', token);
+  localStorage.setItem('cartly_admin_token', token);
   loadDashboard();
 }
 

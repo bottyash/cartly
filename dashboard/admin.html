@@ -372,7 +372,7 @@ tbody tr:last-child td{border:none}
   </div>
 </div>
 
-<script src="admin.js?v=3"></script>
+<script src="admin.js?v=4"></script>
 <script>
 let adminToken = '';
 
@@ -389,7 +389,7 @@ function gateLogin() {
 
 function adminLogout() {
   adminToken = '';
-  sessionStorage.removeItem('cartly_admin_token');
+  localStorage.removeItem('cartly_admin_token');
   document.getElementById('admin-dashboard').classList.add('hidden');
   document.getElementById('admin-token-gate-screen').classList.remove('hidden');
   document.getElementById('gate-token-input').value = '';
@@ -615,7 +615,7 @@ async function checkSidebarHealth() {
 
 // Auto-login if token stored
 document.addEventListener('DOMContentLoaded', () => {
-  const stored = sessionStorage.getItem('cartly_admin_token');
+  const stored = localStorage.getItem('cartly_admin_token');
   if (stored) {
     document.getElementById('gate-token-input').value = stored;
     gateLogin();
