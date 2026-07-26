@@ -372,7 +372,7 @@ tbody tr:last-child td{border:none}
   </div>
 </div>
 
-<script src="admin.js"></script>
+<script src="admin.js?v=3"></script>
 <script>
 let adminToken = '';
 
@@ -452,10 +452,16 @@ function startTicketPolling() {
 
 async function pollLiveTickets() {
   try {
+    // Use adminHeaders() — same function used by stats/tickets, guaranteed to have token
     const r = await fetch(`${LIVE_API}/live/tickets`, {
-      headers: { 'X-Admin-Token': window.ADMIN_TOKEN }
+      headers: typeof adminHeaders === 'function' ? adminHeaders() : { 'x-admin-token': window.ADMIN_TOKEN }
     });
-    if (!r.ok) return;
+    if (!r.ok) {
+      // Show error state instead of silent fail
+      const list = document.getElementById('live-ticket-list');
+      if (list) list.innerHTML = `<div class="no-live-msg" style="color:#ef4444">⚠️ Could not load tickets (${r.status}). Please refresh.</div>`;
+      return;
+    }
     const d = await r.json();
     _liveTickets = d.tickets || [];
     renderTicketList();
@@ -466,7 +472,10 @@ async function pollLiveTickets() {
       badge.textContent = n;
       badge.classList.toggle('hidden', n === 0);
     }
-  } catch(_) {}
+  } catch(err) {
+    const list = document.getElementById('live-ticket-list');
+    if (list) list.innerHTML = `<div class="no-live-msg" style="color:#ef4444">⚠️ Network error: ${err.message}</div>`;
+  }
 }
 
 function renderTicketList() {
