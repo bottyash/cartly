@@ -6,7 +6,8 @@
 
 // API is proxied through nginx: /api/ → api:8000/
 const API_BASE = window.location.origin + '/api';
-let ADMIN_TOKEN = sessionStorage.getItem('cartly_admin_token') || '';
+// Use window.ADMIN_TOKEN so inline scripts in admin.html can access it
+window.ADMIN_TOKEN = sessionStorage.getItem('cartly_admin_token') || '';
 
 let allTickets = [];
 let charts     = {};
@@ -22,10 +23,10 @@ Chart.defaults.borderColor    = '#e2e8f0';
 Chart.defaults.font.family    = "'Inter', sans-serif";
 Chart.defaults.font.size      = 12;
 
-const adminHeaders = () => ({ 'x-admin-token': ADMIN_TOKEN });
+const adminHeaders = () => ({ 'x-admin-token': window.ADMIN_TOKEN });
 
 function initDashboard(token) {
-  ADMIN_TOKEN = token;
+  window.ADMIN_TOKEN = token;
   sessionStorage.setItem('cartly_admin_token', token);
   loadDashboard();
 }
@@ -433,5 +434,5 @@ document.addEventListener('DOMContentLoaded', () => {
   checkHealth();
   setInterval(() => { checkHealth(); }, 30_000);
   // Periodic refresh only runs if a token is set
-  setInterval(() => { if (ADMIN_TOKEN) loadDashboard(); }, 30_000);
+  setInterval(() => { if (window.ADMIN_TOKEN) loadDashboard(); }, 30_000);
 });
