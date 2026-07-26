@@ -197,15 +197,32 @@ function renderResult(data) {
 
   if (data.status === 'resolved') {
     const r      = data.resolution || {};
-    const action = (r.action_taken || 'processed').replace(/_/g, ' ');
-    // Simple, clean message — no policy refs, no faithfulness scores, no transaction IDs
-    const msg = `✅ **Great news!** ${r.reason || `Your request has been ${action}.`}`;
-    addBubble('bot', msg, 'bubble-resolved');
+    const action = r.action_taken || '';
+    const reason = r.reason || '';
+
+    // ── Context-aware prefix — never "Great news!" for bad outcomes ────────
+    let prefix = '';
+    if (action === 'refund_issued') {
+      prefix = '✅ **Refund approved!** ';
+    } else if (action === 'replacement_offered' || action === 'exchange_initiated') {
+      prefix = '🔄 **Exchange/replacement initiated.** ';
+    } else if (action === 'denied') {
+      prefix = '😔 ';  // empathetic but no cheerful opener
+    } else if (action === 'complaint_logged') {
+      prefix = '📝 ';
+    } else if (action === 'delivery_status_provided' || action === 'info_provided') {
+      prefix = '';   // just the clean info, no flair
+    }
+    // fallback: no prefix so the LLM's own wording leads naturally
+
+    const msg = `${prefix}${reason || `Your request has been ${action.replace(/_/g,' ')}.`}`;
+    addBubble('bot', msg, action === 'refund_issued' ? 'bubble-resolved' : '');
   } else {
     // Escalation: don't show technical details — show human connect CTA instead
     showConnectHumanCTA(data);
   }
 }
+
 
 /* ═══ CONNECT TO HUMAN — CTA BUBBLE ═══════════════════════ */
 function showConnectHumanCTA(data) {
