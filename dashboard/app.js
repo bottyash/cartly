@@ -3,9 +3,8 @@
 ────────────────────────────────────────────────────────────── */
 'use strict';
 
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'
-  : `${window.location.protocol}//${window.location.hostname}:8000`;
+// API is proxied through nginx on port 80: /api/ → api:8000/
+const API_BASE = window.location.origin + '/api';
 
 function goCustomer() {
   window.location.href = 'user.html';

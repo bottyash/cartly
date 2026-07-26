@@ -4,8 +4,9 @@
 ────────────────────────────────────────────────────────────── */
 'use strict';
 
-const API_BASE    = 'http://localhost:8000';
-let ADMIN_TOKEN = sessionStorage.getItem('cartly_admin_token') || 'cartly-admin-2026';
+// API is proxied through nginx: /api/ → api:8000/
+const API_BASE = window.location.origin + '/api';
+let ADMIN_TOKEN = sessionStorage.getItem('cartly_admin_token') || '';
 
 let allTickets = [];
 let charts     = {};
@@ -33,7 +34,8 @@ function initDashboard(token) {
 
 function esc(str) {
   return String(str ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');  // F-23: escape single quotes
 }
 
 function formatMs(ms) {

@@ -5,7 +5,8 @@
 ────────────────────────────────────────────────────────── */
 'use strict';
 
-const API_BASE = 'http://localhost:8000';
+// API is proxied through nginx: /api/ → api:8000/
+const API_BASE = window.location.origin + '/api';
 let chatLocked    = false;
 let bubbleCounter = 0;
 let typingCounter = 0;
@@ -31,7 +32,8 @@ function showToast(msg, type) {
 function esc(str) {
   return String(str ?? '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');  // F-23: escape single quotes
 }
 
 /* ═══ MARKDOWN RENDERER ════════════════════════════════════ */
