@@ -3,6 +3,33 @@
 -- Covers demo tickets + additional buyers for admin dashboard
 -- ============================================================
 
+-- ── Live Chat Tables (Human Support) ─────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS live_chat_tickets (
+    id              SERIAL          PRIMARY KEY,
+    order_id        VARCHAR(20)     NOT NULL,
+    buyer_name      VARCHAR(100)    NOT NULL,
+    product_name    VARCHAR(200)    NOT NULL DEFAULT '',
+    issue_summary   TEXT            NOT NULL DEFAULT 'Customer requested human support',
+    status          VARCHAR(20)     NOT NULL DEFAULT 'waiting',
+    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS live_chat_messages (
+    id          SERIAL          PRIMARY KEY,
+    ticket_id   INTEGER         NOT NULL REFERENCES live_chat_tickets(id) ON DELETE CASCADE,
+    sender      VARCHAR(20)     NOT NULL,
+    sender_name VARCHAR(100)    NOT NULL,
+    message     TEXT            NOT NULL,
+    created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_lct_status ON live_chat_tickets(status);
+CREATE INDEX IF NOT EXISTS idx_lcm_ticket ON live_chat_messages(ticket_id);
+
+-- ── Orders Table ──────────────────────────────────────────────────────────
+
 CREATE TABLE IF NOT EXISTS orders (
     order_id        VARCHAR(20)     PRIMARY KEY,
     buyer_name      VARCHAR(100)    NOT NULL,
