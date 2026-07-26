@@ -47,6 +47,7 @@ from data.mock_db import (
     order_lookup, get_orders_by_buyer, owns_order,
     create_live_ticket, get_live_tickets, get_live_ticket,
     add_live_message, resolve_live_ticket, set_ticket_active,
+    set_ticket_verdict,
 )
 from data.products import get_all_products, get_product
 from data.policy_kb import _CHUNKS as _policy_chunks
@@ -521,3 +522,49 @@ def live_resolve(
     if not ok:
         raise HTTPException(status_code=404, detail="Live ticket not found")
     return {"status": "resolved", "ticket_id": ticket_id}
+
+
+class VerdictRequest(BaseModel):
+    verdict_type:     str   # refund | replacement | exchange | complaint | other
+    verdict_decision: str   # approved | denied
+    comment:          str   # mandatory — required for both approve and deny
+
+
+@app.post("/live/{ticket_id}/verdict", tags=["live"])
+def live_verdict(
+    ticket_id: int,
+    req: VerdictRequest,
+    x_admin_token: str | None = Header(default=None),
+):
+    """
+    Admin submits a final verdict on a live support ticket.
+    - Sets verdict_type, verdict_decision, verdict_comment on the ticket.
+    - Updates the customer's order notes (visible in My Orders).
+    - Posts a system message to the chat (customer sees it live).
+    - Marks the ticket as resolved.
+    """
+    _require_admin(x_admin_token)
+
+    # Validate inputs
+    allowed_types     = {"refund", "replacement", "exchange", "complaint", "other"}
+    allowed_decisions = {"approved", "denied"}
+    if req.verdict_type not in allowed_types:
+        raise HTTPException(status_code=422, detail=f"verdict_type must be one of {allowed_types}")
+    if req.verdict_decision not in allowed_decisions:
+        raise HTTPException(status_code=422, detail="verdict_decision must be 'approved' or 'denied'")
+    if not req.comment or not req.comment.strip():
+        raise HTTPException(status_code=422, detail="comment is mandatory for all verdicts")
+
+    ticket = get_live_ticket(ticket_id)
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Live ticket not found")
+    if ticket["status"] == "resolved":
+        raise HTTPException(status_code=409, detail="Ticket already resolved")
+
+    result = set_ticket_verdict(
+        ticket_id,
+        req.verdict_type,
+        req.verdict_decision,
+        req.comment.strip(),
+    )
+    return result

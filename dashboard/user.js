@@ -380,7 +380,11 @@ async function pollLiveChat() {
     // Stop polling when resolved
     if (ticket.status === 'resolved') {
       clearInterval(_livePolling);
-      addLiveBubble('system', '✅ This conversation has been resolved by the support agent. Thank you for contacting Cartly!');
+      // Only show generic banner if the verdict didn't already post a system message
+      const hasSystemMsg = (ticket.messages || []).some(m => m.sender === 'system');
+      if (!hasSystemMsg) {
+        addLiveBubble('system', '✅ This conversation has been resolved by our support team. Thank you for contacting Cartly!');
+      }
     }
   } catch (_) { /* silently ignore poll errors */ }
 }
@@ -394,10 +398,28 @@ function addLiveBubble(role, text, senderName) {
   const container = document.getElementById('live-messages');
   if (!container) return;
   const div = document.createElement('div');
+
+  // System messages (verdict notifications) get a special banner style
+  if (role === 'system') {
+    const isApproved = text.startsWith('✅');
+    const isDenied   = text.startsWith('❌');
+    const bg     = isApproved ? '#f0fdf4' : isDenied ? '#fef2f2' : '#fffbeb';
+    const border = isApproved ? '#a7f3d0' : isDenied ? '#fecaca' : '#fde68a';
+    const lines  = text.split('\n').map(l => l.trim()).filter(Boolean);
+    div.style.cssText = `background:${bg};border:1.5px solid ${border};border-radius:12px;padding:14px 16px;margin:6px 0;font-size:14px;line-height:1.7`;
+    div.innerHTML = lines.map((l, i) =>
+      i === 0
+        ? `<div style="font-weight:700;font-size:15px;margin-bottom:4px">${esc(l)}</div>`
+        : `<div style="color:#374151">${esc(l)}</div>`
+    ).join('');
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+    return;
+  }
+
   div.className = `chat-bubble bubble-${role === 'admin' ? 'bot' : (role === 'user' ? 'user' : 'bot')}`;
   const now  = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
   const name = (role === 'admin') ? `<div class="bubble-sender">Support Agent</div>` :
-               (role === 'system') ? '' :
                (senderName ? `<div class="bubble-sender">${esc(senderName)}</div>` : '');
   div.innerHTML = `<div class="bubble-body">${name}${renderMarkdown(text)}</div><div class="bubble-time">${now}</div>`;
   container.appendChild(div);

@@ -42,9 +42,17 @@ button{cursor:pointer;font-family:inherit;border:none;outline:none}
 .admin-chat-hd{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px;background:#fff}
 .admin-chat-name{font-size:14px;font-weight:700;color:#0f172a}
 .admin-chat-sub{font-size:12px;color:#64748b}
-.admin-chat-resolve{margin-left:auto;padding:6px 14px;background:#f0fdf4;border:1px solid #bbf7d0;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
-.admin-chat-resolve:hover:not(:disabled){background:#dcfce7}
-.admin-chat-resolve:disabled{opacity:.5;cursor:not-allowed}
+.admin-chat-resolve{margin-left:auto;padding:6px 14px;background:linear-gradient(135deg,#4f46e5,#7c3aed);border:none;color:#fff;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s}
+.admin-chat-resolve:hover:not(:disabled){opacity:.85}
+.admin-chat-resolve:disabled{opacity:.35;cursor:not-allowed}
+.vtype-btn{padding:5px 12px;border:1px solid rgba(255,255,255,.15);border-radius:20px;color:rgba(255,255,255,.6);background:transparent;font-size:12px;cursor:pointer;transition:all .15s}
+.vtype-btn.active{background:rgba(99,102,241,.25);border-color:#818cf8;color:#a5b4fc;font-weight:600}
+.vtype-btn:hover{border-color:rgba(255,255,255,.3);color:#e2e8f0}
+.vdec-btn{flex:1;padding:9px 0;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.vdec-btn.approve{background:rgba(22,163,74,.15);color:#4ade80;border-color:rgba(22,163,74,.3)}
+.vdec-btn.approve.active{background:rgba(22,163,74,.3);border-color:#4ade80}
+.vdec-btn.deny{background:rgba(239,68,68,.1);color:#f87171;border-color:rgba(239,68,68,.2)}
+.vdec-btn.deny.active{background:rgba(239,68,68,.25);border-color:#f87171}
 .admin-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;background:#f8fafc}
 .admin-msgs::-webkit-scrollbar{width:4px}
 .admin-msgs::-webkit-scrollbar-thumb{background:#cbd5e1}
@@ -338,7 +346,7 @@ tbody tr:last-child td{border:none}
                 <div class="admin-chat-name" id="admin-chat-hd-name">Select a ticket to start chatting</div>
                 <div class="admin-chat-sub" id="admin-chat-hd-sub">Click a ticket on the left</div>
               </div>
-              <button class="admin-chat-resolve" id="admin-resolve-btn" onclick="adminResolve()" disabled>✓ Resolve</button>
+              <button class="admin-chat-resolve" id="admin-resolve-btn" onclick="toggleVerdictPanel()" disabled>⚖️ Verdict</button>
             </div>
 
             <!-- ── Agent Context Card (hidden until ticket selected) ── -->
@@ -368,7 +376,9 @@ tbody tr:last-child td{border:none}
             <div class="admin-msgs" id="admin-chat-msgs">
               <div class="no-live-msg" style="margin-top:60px">Select a ticket from the left to view the conversation and respond.</div>
             </div>
-            <div class="admin-inp-row">
+
+            <!-- Regular chat input -->
+            <div class="admin-inp-row" id="admin-chat-inp-row">
               <textarea id="admin-chat-ta" class="admin-ta" rows="1"
                 placeholder="Type your reply… (Enter to send)"
                 onkeydown="adminChatKeydown(event)"></textarea>
@@ -378,6 +388,65 @@ tbody tr:last-child td{border:none}
                 </svg>
               </div>
             </div>
+
+            <!-- ── Verdict Panel (hidden, slides in on button click) ── -->
+            <div id="verdict-panel" class="hidden" style="
+              background:linear-gradient(135deg,#0f172a,#1e293b);
+              border-top:2px solid rgba(255,255,255,.1);
+              padding:16px 18px;
+              display:flex;
+              flex-direction:column;
+              gap:12px;
+            ">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div style="font-size:13px;font-weight:600;color:#f8fafc">⚖️ Submit Final Verdict</div>
+                <button onclick="toggleVerdictPanel()" style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:18px;line-height:1">×</button>
+              </div>
+
+              <!-- Action Type -->
+              <div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:8px">Request Type</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap" id="verdict-type-btns">
+                  <button class="vtype-btn active" data-type="refund"      onclick="setVerdictType('refund')">💰 Refund</button>
+                  <button class="vtype-btn"         data-type="replacement" onclick="setVerdictType('replacement')">📦 Replacement</button>
+                  <button class="vtype-btn"         data-type="exchange"    onclick="setVerdictType('exchange')">🔃 Exchange</button>
+                  <button class="vtype-btn"         data-type="complaint"   onclick="setVerdictType('complaint')">📢 Complaint</button>
+                  <button class="vtype-btn"         data-type="other"       onclick="setVerdictType('other')">💬 Other</button>
+                </div>
+              </div>
+
+              <!-- Decision -->
+              <div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:8px">Decision</div>
+                <div style="display:flex;gap:8px">
+                  <button id="vdec-approve" class="vdec-btn approve active" onclick="setVerdictDecision('approved')">✅ Approve</button>
+                  <button id="vdec-deny"    class="vdec-btn deny"           onclick="setVerdictDecision('denied')">❌ Deny</button>
+                </div>
+              </div>
+
+              <!-- Mandatory comment -->
+              <div>
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:8px">
+                  Agent Comment <span style="color:#ef4444">*</span> (mandatory)
+                </div>
+                <textarea id="verdict-comment" rows="3" placeholder="Explain your decision to the customer…" style="
+                  width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);
+                  border:1px solid rgba(255,255,255,.12);border-radius:8px;
+                  color:#f8fafc;font-size:13px;padding:10px 12px;resize:vertical;
+                  font-family:inherit;outline:none;
+                " oninput="this.style.borderColor=this.value.trim()?'rgba(99,102,241,.6)':'rgba(239,68,68,.5)'"></textarea>
+                <div id="verdict-comment-err" style="color:#ef4444;font-size:11px;margin-top:4px;display:none">⚠️ Comment is required.</div>
+              </div>
+
+              <!-- Submit -->
+              <button id="verdict-submit-btn" onclick="submitVerdict()" style="
+                background:linear-gradient(135deg,#4f46e5,#7c3aed);
+                border:none;border-radius:8px;color:#fff;
+                font-size:13px;font-weight:600;padding:11px 0;cursor:pointer;
+                transition:opacity .2s;
+              ">Submit Verdict & Close Chat</button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -705,9 +774,92 @@ async function adminSendMessage() {
   } catch(_) { alert('Failed to send. Please try again.'); }
 }
 
+// ── Verdict state ────────────────────────────────────────────
+let _verdictType     = 'refund';
+let _verdictDecision = 'approved';
+
+function toggleVerdictPanel() {
+  const panel  = document.getElementById('verdict-panel');
+  const inpRow = document.getElementById('admin-chat-inp-row');
+  if (!panel) return;
+  const hidden = panel.classList.contains('hidden');
+  panel.classList.toggle('hidden', !hidden);
+  if (inpRow) inpRow.classList.toggle('hidden', hidden);
+  if (hidden) {
+    // Reset form on open
+    document.getElementById('verdict-comment').value = '';
+    document.getElementById('verdict-comment').style.borderColor = '';
+    document.getElementById('verdict-comment-err').style.display = 'none';
+    setVerdictType('refund');
+    setVerdictDecision('approved');
+    setTimeout(() => document.getElementById('verdict-comment')?.focus(), 80);
+  }
+}
+
+function setVerdictType(type) {
+  _verdictType = type;
+  document.querySelectorAll('.vtype-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === type);
+  });
+}
+
+function setVerdictDecision(decision) {
+  _verdictDecision = decision;
+  document.getElementById('vdec-approve')?.classList.toggle('active', decision === 'approved');
+  document.getElementById('vdec-deny')?.classList.toggle('active',    decision === 'denied');
+}
+
+async function submitVerdict() {
+  if (!_selectedTicketId) return;
+
+  const comment   = (document.getElementById('verdict-comment')?.value || '').trim();
+  const errEl     = document.getElementById('verdict-comment-err');
+  const submitBtn = document.getElementById('verdict-submit-btn');
+
+  // Validate mandatory comment
+  if (!comment) {
+    if (errEl) errEl.style.display = 'block';
+    document.getElementById('verdict-comment').style.borderColor = 'rgba(239,68,68,.7)';
+    document.getElementById('verdict-comment').focus();
+    return;
+  }
+  if (errEl) errEl.style.display = 'none';
+
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Submitting…'; }
+
+  try {
+    const r = await fetch(`${LIVE_API}/live/${_selectedTicketId}/verdict`, {
+      method: 'POST',
+      headers: { ...adminHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        verdict_type:     _verdictType,
+        verdict_decision: _verdictDecision,
+        comment:          comment,
+      }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      alert('Failed to submit verdict: ' + (err.detail || r.status));
+      return;
+    }
+
+    // Hide verdict panel, refresh chat
+    document.getElementById('verdict-panel')?.classList.add('hidden');
+    document.getElementById('admin-chat-inp-row')?.classList.remove('hidden');
+    _adminLastMsgCount = 0;
+    await loadAdminChat();
+    await pollLiveTickets();
+
+  } catch(err) {
+    alert('Network error: ' + err.message);
+  } finally {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Submit Verdict & Close Chat'; }
+  }
+}
+
+// Legacy resolve kept for backward-compat (now unused from UI)
 async function adminResolve() {
   if (!_selectedTicketId) return;
-  if (!confirm('Mark this ticket as resolved? The user\'s chat will be closed.')) return;
   try {
     await fetch(`${LIVE_API}/live/${_selectedTicketId}/resolve`, {
       method: 'PATCH',

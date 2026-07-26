@@ -700,12 +700,32 @@ function renderOrders() {
     const sc = STATUS_CLASS[o.delivery_status] || 's-other';
     const ico = STATUS_ICO[o.delivery_status] || '📦';
     const catIco = CAT_ICO[o.product_category] || '📦';
+
+    // Resolution badge from admin verdict
+    let resolutionBadge = '';
+    if (o.notes && o.notes.startsWith('[RESOLVED]')) {
+      const isApproved = o.notes.includes(' approved ');
+      const color  = isApproved ? '#16a34a' : '#dc2626';
+      const bg     = isApproved ? '#f0fdf4'  : '#fef2f2';
+      const border = isApproved ? '#bbf7d0'  : '#fecaca';
+      const label  = isApproved ? '✅ Approved' : '❌ Declined';
+      // Extract the note text after "Note: "
+      const noteIdx  = o.notes.indexOf('Note: ');
+      const noteText = noteIdx >= 0 ? o.notes.slice(noteIdx + 6) : '';
+      resolutionBadge = `
+        <div style="margin-top:8px;padding:8px 12px;background:${bg};border:1px solid ${border};border-radius:8px;font-size:12px">
+          <div style="font-weight:700;color:${color}">${label}</div>
+          ${noteText ? `<div style="color:#374151;margin-top:3px">${esc(noteText)}</div>` : ''}
+        </div>`;
+    }
+
     return `
     <div class="order-row" onclick="openOrderChat('${o.order_id}')">
       <div class="order-row-ico">${catIco}</div>
-      <div class="order-row-info">
+      <div class="order-row-info" style="flex:1">
         <div class="order-row-name">${esc(o.product_name)}</div>
         <div class="order-row-meta">Order #${esc(o.order_id)} · ${esc(o.order_date||'')} · ${esc(o.courier||'')}</div>
+        ${resolutionBadge}
       </div>
       <div class="order-row-right">
         <div class="order-row-amt">₹${Number(o.order_amount).toLocaleString('en-IN')}</div>

@@ -11,6 +11,7 @@ Provides public functions:
   add_live_message(ticket_id, sender, sender_name, message) -> dict
   resolve_live_ticket(ticket_id) -> bool
   set_ticket_active(ticket_id) -> bool
+  set_ticket_verdict(ticket_id, verdict_type, verdict_decision, comment) -> dict
 """
 
 from __future__ import annotations
@@ -276,6 +277,97 @@ def resolve_live_ticket(ticket_id: int) -> bool:
                 return cur.rowcount == 1
     except psycopg2.Error as exc:
         raise RuntimeError(f"resolve_live_ticket failed: {exc}") from exc
+    finally:
+        try: conn.close()
+        except Exception: pass
+
+
+def set_ticket_verdict(
+    ticket_id: int,
+    verdict_type: str,      # refund | replacement | exchange | complaint | other
+    verdict_decision: str,  # approved | denied
+    comment: str,
+) -> dict:
+    """
+    Record a human agent verdict on a live chat ticket:
+    1. Saves verdict fields (type, decision, comment) on the ticket.
+    2. Updates the linked order's notes with a resolution summary.
+    3. Appends a formatted system message visible to the customer.
+    4. Marks the ticket as resolved.
+    Returns the updated ticket dict.
+    """
+    # Build human-readable verdict message for the customer
+    type_label = {
+        "refund":      "Refund",
+        "replacement": "Replacement",
+        "exchange":    "Exchange",
+        "complaint":   "Complaint",
+        "other":       "Request",
+    }.get(verdict_type, verdict_type.title())
+
+    if verdict_decision == "approved":
+        msg = (
+            f"✅ {type_label} Approved\n\n"
+            f"Your {type_label.lower()} request has been approved by our support team.\n"
+            f"Agent note: {comment}"
+        )
+        order_note = f"[RESOLVED] {type_label} approved by support agent. Note: {comment}"
+    else:
+        msg = (
+            f"❌ {type_label} Request Declined\n\n"
+            f"After review, we are unable to approve this {type_label.lower()} request.\n"
+            f"Agent note: {comment}"
+        )
+        order_note = f"[RESOLVED] {type_label} denied by support agent. Note: {comment}"
+
+    try:
+        conn = _get_connection()
+        with conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+                # 1. Fetch ticket to get order_id
+                cur.execute("SELECT * FROM live_chat_tickets WHERE id = %s", (ticket_id,))
+                ticket = cur.fetchone()
+                if not ticket:
+                    raise RuntimeError(f"Ticket {ticket_id} not found")
+
+                # 2. Save verdict on ticket + resolve
+                cur.execute(
+                    """
+                    UPDATE live_chat_tickets
+                    SET verdict_type=%s, verdict_decision=%s, verdict_comment=%s,
+                        status='resolved', updated_at=NOW()
+                    WHERE id=%s
+                    """,
+                    (verdict_type, verdict_decision, comment, ticket_id),
+                )
+
+                # 3. Update order notes (visible in customer's My Orders)
+                cur.execute(
+                    "UPDATE orders SET notes=%s WHERE order_id=%s",
+                    (order_note, str(ticket["order_id"])),
+                )
+
+                # 4. Add system message to chat (customer sees this live)
+                cur.execute(
+                    """
+                    INSERT INTO live_chat_messages (ticket_id, sender, sender_name, message)
+                    VALUES (%s, 'system', 'Cartly Support', %s)
+                    RETURNING id, ticket_id, sender, sender_name, message, created_at
+                    """,
+                    (ticket_id, msg),
+                )
+                new_msg = dict(cur.fetchone())
+                new_msg["created_at"] = new_msg["created_at"].isoformat()
+
+        return {
+            "ticket_id":       ticket_id,
+            "verdict_type":    verdict_type,
+            "verdict_decision": verdict_decision,
+            "verdict_comment": comment,
+            "system_message":  new_msg,
+        }
+    except psycopg2.Error as exc:
+        raise RuntimeError(f"set_ticket_verdict failed: {exc}") from exc
     finally:
         try: conn.close()
         except Exception: pass

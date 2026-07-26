@@ -6,15 +6,22 @@
 -- ── Live Chat Tables (Human Support) ─────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS live_chat_tickets (
-    id              SERIAL          PRIMARY KEY,
-    order_id        VARCHAR(20)     NOT NULL,
-    buyer_name      VARCHAR(100)    NOT NULL,
-    product_name    VARCHAR(200)    NOT NULL DEFAULT '',
-    issue_summary   TEXT            NOT NULL DEFAULT 'Customer requested human support',
-    status          VARCHAR(20)     NOT NULL DEFAULT 'waiting',
-    created_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ     NOT NULL DEFAULT NOW()
+    id               SERIAL          PRIMARY KEY,
+    order_id         VARCHAR(20)     NOT NULL,
+    buyer_name       VARCHAR(100)    NOT NULL,
+    product_name     VARCHAR(200)    NOT NULL DEFAULT '',
+    issue_summary    TEXT            NOT NULL DEFAULT 'Customer requested human support',
+    status           VARCHAR(20)     NOT NULL DEFAULT 'waiting',
+    verdict_type     VARCHAR(30)     DEFAULT NULL,
+    verdict_decision VARCHAR(10)     DEFAULT NULL,
+    verdict_comment  TEXT            DEFAULT NULL,
+    created_at       TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+    updated_at       TIMESTAMPTZ     NOT NULL DEFAULT NOW()
 );
+-- Idempotent migration for existing databases
+ALTER TABLE live_chat_tickets ADD COLUMN IF NOT EXISTS verdict_type     VARCHAR(30)  DEFAULT NULL;
+ALTER TABLE live_chat_tickets ADD COLUMN IF NOT EXISTS verdict_decision  VARCHAR(10)  DEFAULT NULL;
+ALTER TABLE live_chat_tickets ADD COLUMN IF NOT EXISTS verdict_comment   TEXT         DEFAULT NULL;
 
 CREATE TABLE IF NOT EXISTS live_chat_messages (
     id          SERIAL          PRIMARY KEY,
